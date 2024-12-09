@@ -13,6 +13,7 @@ namespace RandomDungeonWithBluePrint
         public List<Vector2Int> Branches;
 
         public Grid Grid { get; } = new Grid();
+        public TileInfo tileInfo = new TileInfo(); //自作
         public List<Room> Rooms => Sections.Where(s => s.ExistRoom).Select(s => s.Room).ToList();
         public bool RoomIsFull => MaxRoomNum <= Rooms.Count;
         public bool ExistRoomToBeMake => !Sections.Where(s => !s.ExistRoom && s.MakeRoomWeight > 0).All(s => s.ExistRoom);
@@ -20,6 +21,10 @@ namespace RandomDungeonWithBluePrint
         public void BuildGrid()
         {
             Grid.Build(Size, Rooms, Branches);
+        }
+
+        public void BuildTileInfo(){
+            tileInfo.Build(Size, Rooms, Branches);
         }
 
         public Section GetSection(int index)

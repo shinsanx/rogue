@@ -79,7 +79,28 @@ namespace RandomDungeonWithBluePrint {
 
         public enum MapChipType {
             Floor,
-            Wall
+            Wall,
+            Padding,
+            Up,
+            Down,
+            Left,
+            Right,
+            DownUp,
+            LeftRight,
+            RightUp,
+            DownRight,
+            DownLeft,
+            LeftUp,
+            DownRightUp,
+            DownLeftRight,
+            DownLeftUp,
+            LeftRightUp,
+            Debug,
+        }
+
+        public enum TileType{
+            Nothing,
+            Aisle,
         }
     }
 }

@@ -5,27 +5,26 @@ using UnityEngine;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace RandomDungeonWithBluePrint
-{
-    public class Joint
-    {
+namespace RandomDungeonWithBluePrint {
+    public class Joint {
         public int Direction;
         public Vector2Int Position;
         public bool Connected;
     }
 
-    public class Room
-    {
+    public class Room {
         public RectInt Rect;
         public readonly List<Vector2Int> Positions = new List<Vector2Int>();
         public readonly Dictionary<int, List<Vector2Int>> Edge = new Dictionary<int, List<Vector2Int>>();
         public readonly List<Joint> Joints = new List<Joint>();
 
-        public Room(RectInt rect)
-        {
+        public List<Vector2Int> jointPositions = new List<Vector2Int>(); //自作。接続情報の位置
+        public int roomNum; //自作
+        public List<GameObject> gameObjects = new List<GameObject>();//自作
+
+        public Room(RectInt rect) {
             Rect = rect;
-            foreach (var pos in Rect.allPositionsWithin)
-            {
+            foreach (var pos in Rect.allPositionsWithin) {
                 Positions.Add(pos);
             }
 
@@ -35,23 +34,30 @@ namespace RandomDungeonWithBluePrint
             Edge[Constants.Direction.Down] = Positions.Where(p => p.y == Rect.yMax - 1).ToList();
         }
 
-        public void SetJoint(int direction, Vector2Int position)
-        {
-            Joints.Add(new Joint
-            {
+        public void SetJoint(int direction, Vector2Int position) {
+            Joints.Add(new Joint {
                 Direction = direction,
                 Position = position
             });
         }
 
-        public IEnumerable<Joint> GetUnconnectedJoints(int direction)
-        {
+        public IEnumerable<Joint> GetUnconnectedJoints(int direction) {
             return Joints.Where(j => j.Direction == direction && !j.Connected);
         }
 
-        public IEnumerable<Joint> GetConnectedJoints(int direction)
-        {
+        public IEnumerable<Joint> GetConnectedJoints(int direction) {
             return Joints.Where(j => j.Direction == direction && j.Connected);
+        }
+
+
+        //自作
+        public List<Vector2Int> ExtractConnectedJointPositions() {
+            List<Joint> joints = Joints.Where(j => j.Connected).ToList();
+            List<Vector2Int> jointPoss = new List<Vector2Int>();
+            foreach(var joint in joints) {
+                jointPoss.Add(joint.Position);
+            }
+            return jointPoss;
         }
     }
 }
