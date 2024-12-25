@@ -11,6 +11,7 @@ namespace RandomDungeonWithBluePrint {
         public int mapChipType; //移動可否判定用のmapChipType
         public int tileType; //タイルのタイプ　Enemyの移動計算用
         public int objType; //タイル上にいる物体のGameObject
+        public GameObject objectOnTile; //自作。タイル上にいる物体のGameObject
         private List<List<TileInfo>> tiles = new List<List<TileInfo>>(); //xとy
         public TileInfo this[int x, int y] => tiles[y][x]; //インデクサ。インスタンスを生成した時にListみたいに取得できる。
         public Vector2Int mapSize;
