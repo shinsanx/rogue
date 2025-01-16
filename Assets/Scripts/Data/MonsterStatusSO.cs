@@ -10,7 +10,7 @@ public class MonsterStatusSO : ScriptableObject {
     public int AttackPower;
     public int Deffence;
     public int Exp;
-    public int MoveSpeed;
+    public string MoveSpeed;
     public string Attribute;
     public float ItemDropRate;
     public Sprite Sprite;
