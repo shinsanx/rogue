@@ -12,10 +12,11 @@ public class UserInput : MonoBehaviour
     Vector2 inputVector;
     public bool isMoveButtonLongPrresed = false;
 
+    
     //移動
     public void OnMove(InputAction.CallbackContext context){
 
-        if(context.started){
+        if(context.started){        
             isMoveButtonLongPrresed = true;
             return;
         }

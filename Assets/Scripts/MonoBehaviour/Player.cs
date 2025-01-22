@@ -46,7 +46,7 @@ public class Player : MonoBehaviour, IPositionAdapter, IAnimationAdapter, IDamag
 
     // === IAnimationAdapter ===
     public bool AttackAnimation {
-        set{animator.SetTrigger("AttackTrigger");}
+        set{animator.SetTrigger("AtkTrigger");}
     }
 
     public Vector2 MoveAnimationDirection {

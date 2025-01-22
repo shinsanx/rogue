@@ -14,7 +14,7 @@ public class PlayerAnimLogic
         animationAdapter.MoveAnimationDirection = vector;
     }
 
-    public void SetAttackAnimation(){
+    public void SetAttackAnimation(){        
         animationAdapter.AttackAnimation = true;
     }
 }

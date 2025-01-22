@@ -17,6 +17,7 @@ public class TileLogic {
     //床が移動可能かどうか判別する
     public bool CheckMovableTile(Vector2Int currentPos, Vector2Int targetPos) {
         //floor =>0 wall =>1
+        if(field == null)Debug.Log(field + " fieldが空です");
         bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0 ? true : false;
         bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0 ? true : false;
         bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0 ? true : false;

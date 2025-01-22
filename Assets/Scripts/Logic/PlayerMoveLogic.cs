@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine.Tilemaps;
 using UnityEngine.Rendering;
 
-public class PlayerMoveLogic : MonoBehaviour
+public class PlayerMoveLogic
 {
     private TileLogic tileLogic;
     private IPositionAdapter positionAdapter;

@@ -7,7 +7,7 @@ using UnityEngine;
 public class StateMachine : ScriptableObject
 {
     public State CurrentState => _currentState;
-    private State _currentState;
+    public State _currentState;
 
     [SerializeField] private State defaultState;
 
