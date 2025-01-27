@@ -5,13 +5,15 @@ using UnityEngine;
 public class PlayerStatusDataLogic
 {
     private IPlayerStatusAdapter playerStatusAdapter;
+    private IObjectData objectData;
     private IAnimationAdapter animationAdapter;
     private List<string> messages = new List<string>();
     CreateMessageLogic createMessageLogic;
 
-    public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter){
+    public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData){
         this.playerStatusAdapter = playerStatusAdapter;
         this.animationAdapter = animationAdapter;
+        this.objectData = objectData;
         createMessageLogic = new CreateMessageLogic();
     }    
 
@@ -26,8 +28,7 @@ public class PlayerStatusDataLogic
         playerStatusAdapter.health += randUpHP;
     }
 
-    public void SetStatusDefault(IPlayerStatusAdapter playerStatusAdapter){
-        playerStatusAdapter.Name = "トルネコ";
+    public void SetStatusDefault(IPlayerStatusAdapter playerStatusAdapter){        
         playerStatusAdapter.Level = 1;
         playerStatusAdapter.MaxHealth = 15;
         playerStatusAdapter.health = 15;
@@ -40,6 +41,12 @@ public class PlayerStatusDataLogic
         playerStatusAdapter.Experience = 0;
         playerStatusAdapter.EquipWeapon = null;
         playerStatusAdapter.EquipShield = null;
+    }
+
+    public void SetObjectDataDefault(IObjectData objectData){
+        objectData.Name = "トルネコ";   
+        objectData.Type = "Player";
+
     }
 
     public void TakeDamage(int damage, string dealerName){

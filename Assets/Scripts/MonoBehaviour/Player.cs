@@ -1,57 +1,65 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
-using UnityEditor;
 
 [RequireComponent(typeof(Animator))]
+public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStatusAdapter, IObjectData {
+    // === Serialized Fields ===
+    [SerializeField] private RandomDungeonWithBluePrint.RandomMapTest randomMapTest;
+    [SerializeField] private DungeonEventManager dungeonEventManager;
+    [SerializeField] private Animator animator;
+    [SerializeField] private UserInput userInput;
 
-public class Player : MonoBehaviour, IPositionAdapter, IAnimationAdapter, IDamageable, IPlayerStatusAdapter
-{
-
-    [SerializeField] RandomDungeonWithBluePrint.RandomMapTest randomMapTest; //アタッチ
-    [SerializeField] DungeonEventManager dungeonEventManager; //アタッチ
-    [SerializeField] Animator animator; //アタッチ
-    [SerializeField] UserInput userInput; //on~系のイベント登録のためにアタッチ
-
+    // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
     private PlayerAttackLogic playerAttackLogic;
     private TileLogic tileLogic;
     private PlayerAnimLogic playerAnimLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
+
     private Vector2Int playerPosition;
     private Vector2 playerFaceDirection;
+    private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
 
-    private Vector2 moveOffset = new Vector2(.5f, .5f);
     private int _currentHp;
     private int _maxHp;
     private int _currentLv;
     private int _totalExp;
 
-    // === IPositionAdapter ===
+    private static int _idCounter = 0;
+
+    // === Events ===
+    public event Action<IObjectData> OnObjectUpdated;
+
+    // === Properties ===
+
+    // IObjectData
+    public int Id { get; set; }
+    public string Name { get; set; }
+    string IObjectData.Type { get; set; }
+    int IObjectData.RoomNum { get; set; }
+
     public Vector2Int Position {
-        get {return playerPosition;}
-        set{
+        get => playerPosition;
+        set {
             playerPosition = value;
             transform.DOMove(value.ToVector2() + moveOffset, 0.3f).SetEase(Ease.Linear);
         }
     }
 
-    public int CharacterType {
-        get { return (int)DungeonConstants.ObjTypelnTile.Player;}
-        set{}
-    }
 
-    // === IAnimationAdapter ===
+    // IAnimationAdapter
     public bool AttackAnimation {
-        set{animator.SetTrigger("AtkTrigger");}
+        set => animator.SetTrigger("AtkTrigger");
     }
 
     public Vector2 MoveAnimationDirection {
-        get{ return playerFaceDirection;}
-        set{
+        get => playerFaceDirection;
+        set {
             playerFaceDirection = new Vector2(value.x, value.y);
             animator.SetFloat("x", value.x);
             animator.SetFloat("y", value.y);
@@ -59,23 +67,24 @@ public class Player : MonoBehaviour, IPositionAdapter, IAnimationAdapter, IDamag
     }
 
     public bool TakeDamageAnimation {
-        set{ animator.SetTrigger("TakeDamageTrigger");}
+        set => animator.SetTrigger("TakeDamageTrigger");
     }
 
-    // === IStatusAdapter ===
-    public string Name {get; set;}
+    // IStatusAdapter
     public int level {
-        get{return _currentLv;}
+        get => _currentLv;
         set {
             _currentLv = value;
             playerStatusDataLogic.LevelUp();
-            if (_currentLv >= 2) MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.LvUppedMessage(Name, _currentLv));
-            MessageBus.Instance.Publish(DungeonConstants.UpdateLvText,this);
+            if (_currentLv >= 2) {
+                MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.LvUppedMessage(Name, _currentLv));
+            }
+            MessageBus.Instance.Publish(DungeonConstants.UpdateLvText, this);
         }
     }
 
     public int MaxHealth {
-        get {return _maxHp;}
+        get => _maxHp;
         set {
             _maxHp = value;
             MessageBus.Instance.Publish(DungeonConstants.UpdateHPText, this);
@@ -83,51 +92,65 @@ public class Player : MonoBehaviour, IPositionAdapter, IAnimationAdapter, IDamag
     }
 
     public int health {
-        get {return _currentHp;}
+        get => _currentHp;
         set {
-            _currentHp = value;
-            if(_currentHp > MaxHealth) _currentHp = MaxHealth;
+            _currentHp = value > MaxHealth ? MaxHealth : value;
             MessageBus.Instance.Publish(DungeonConstants.UpdateHPText, this);
         }
     }
 
-    public int Level {get;set;}
-    public int MaxSatiety {get;set;}
-    public int Satiety {get;set;}
-    public int MaxMuscle {get;set;}
-    public int Muscle {get;set;}
-    public int BasicAttackPower {get;set;}
-    public int DefencePower {get;set;}
     public int Experience {
-        get {return _totalExp;}
-        set{
+        get => _totalExp;
+        set {
             _totalExp += value;
-            if(_totalExp >= DungeonConstants.necessarryExp[level + 1]){
-            level++;
+            if (_totalExp >= DungeonConstants.necessarryExp[level + 1]) {
+                level++;
             }
         }
-    }        
+    }
 
-    public WeaponSO EquipWeapon{get;set;}//装備中の武器
-    public ShieldSO EquipShield{get;set;}//装備中の盾
+    public WeaponSO EquipWeapon { get; set; }
+    public ShieldSO EquipShield { get; set; }
 
-    private void Start(){
+    // Additional properties
+    public int Level { get; set; }
+    public int MaxSatiety { get; set; }
+    public int Satiety { get; set; }
+    public int MaxMuscle { get; set; }
+    public int Muscle { get; set; }
+    public int BasicAttackPower { get; set; }
+    public int DefencePower { get; set; }
+
+    // === Unity Methods ===
+    private void OnEnable() {
+        Id = CharacterManager.GetUniqueID();
+    }
+
+    private void Start() {
+        InitializePlayer();
+    }
+
+    // === Methods ===
+    private void InitializePlayer() {
         playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         tileLogic = new TileLogic();
-        //マップ生成より先に取得してしまうとFieldが空になる。いったんStartにしてるけど修正しないといけない。
         playerAnimLogic = new PlayerAnimLogic(this);
-        playerMoveLogic = new PlayerMoveLogic(this,playerAnimLogic);
-        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic,this,this,this);
-        playerStatusDataLogic = new PlayerStatusDataLogic(this,this);
+        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic);
+        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
+        playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this);
         createMessageLogic = new CreateMessageLogic();
+
+        // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
         randomMapTest.onFieldUpdate.AddListener(tileLogic.UpdateFieldInformation);
         playerStatusDataLogic.SetStatusDefault(this);
+        playerStatusDataLogic.SetObjectDataDefault(this);
+        CharacterManager.i.AddCharacter(this);
         MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
     }
 
-    public void TakeDamage(int damage, string dealerName){
+    public void TakeDamage(int damage, string dealerName) {
         playerStatusDataLogic.TakeDamage(damage, dealerName);
     }
 }

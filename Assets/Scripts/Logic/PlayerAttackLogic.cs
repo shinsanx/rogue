@@ -7,7 +7,7 @@ public class PlayerAttackLogic
 {
     private PlayerAnimLogic playerAnimLogic;
     private IAnimationAdapter animationAdapter;
-    private IPositionAdapter positionAdapter;
+    private IObjectData objectData;
     private IPlayerStatusAdapter playerStatusAdapter;
     private TileLogic tileLogic;
     private DamageCalculate damageCalculate;
@@ -19,13 +19,13 @@ public class PlayerAttackLogic
     public PlayerAttackLogic(
         PlayerAnimLogic playerAnimLogic,
         IAnimationAdapter animationAdapter,
-        IPositionAdapter positionAdapter,
+        IObjectData objectData,
         IPlayerStatusAdapter playerStatusAdapter
     ){
         this.playerAnimLogic = playerAnimLogic;
         tileLogic = new TileLogic();
         this.animationAdapter = animationAdapter;
-        this.positionAdapter = positionAdapter;
+        this.objectData = objectData;
         this.playerStatusAdapter = playerStatusAdapter;
         stateMachine = GameAssets.i.stateMachine;
         enemyState = GameAssets.i.enemyState;
@@ -38,8 +38,8 @@ public class PlayerAttackLogic
     }
 
     private GameObject GetTarget(){
-        int selfXpos = Mathf.FloorToInt(positionAdapter.Position.x);
-        int selfYpos = Mathf.FloorToInt(positionAdapter.Position.y);
+        int selfXpos = Mathf.FloorToInt(objectData.Position.x);
+        int selfYpos = Mathf.FloorToInt(objectData.Position.y);
         int targetXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
         int targetYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
         Vector2Int targetVector = new Vector2Int(selfXpos + targetXpos, selfYpos + targetYpos);
@@ -65,7 +65,7 @@ public class PlayerAttackLogic
         IMonsterStatusAdapter monsterStatusAdapter = targetObject.GetComponent<IMonsterStatusAdapter>();
         int damage = damageCalculate.CalculateAttackDamage(playerStatusAdapter.Level, playerStatusAdapter.Muscle, weaponPw, monsterStatusAdapter.Defence);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
-        damageable.TakeDamage(damage, playerStatusAdapter.Name);
+        damageable.TakeDamage(damage, objectData.Name);
     }
 
     private void EndState(){

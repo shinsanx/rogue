@@ -185,7 +185,7 @@ public class TileLogic {
     //部屋の中の視野検索用
     public List<Vector2Int> ExtractAllRoomPositions(int roomNum) {
         // 無効なルーム番号はnullを返す
-        if (roomNum <= 0) return null;
+        if (roomNum == 0) return null;
 
         // 指定されたroomNumのRoomオブジェクトを取得
         Room room = field.Rooms.FirstOrDefault(r => r.roomNum == roomNum);
@@ -228,5 +228,7 @@ public class TileLogic {
         }
         return neighborBranches;
     }
+
+
 
 }

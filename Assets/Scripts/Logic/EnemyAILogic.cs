@@ -9,7 +9,7 @@ using System;
 using JetBrains.Annotations;
 
 public class EnemyAILogic {
-    private IPositionAdapter positionAdapter;
+    private IObjectData objectData;
     private EnemyAnimLogic enemyAnimLogic;
     private EnemyAttackLogic enemyAttackLogic;
     private EnemyMoveLogic enemyMoveLogic;
@@ -28,21 +28,21 @@ public class EnemyAILogic {
     List<Vector2Int> routeCache = new List<Vector2Int>(); //ルート探索時のキャッシュ
 
     //コンストラクタ
-    public EnemyAILogic(IPositionAdapter positionAdapter, IAnimationAdapter animationAdapter, IMonsterStatusAdapter monsterStatusAdapter, SpriteRenderer sr) {
-        this.positionAdapter = positionAdapter;
+    public EnemyAILogic(IObjectData objectData, IAnimationAdapter animationAdapter, IMonsterStatusAdapter monsterStatusAdapter, SpriteRenderer sr) {
+        this.objectData = objectData;
         this.animationAdapter = animationAdapter;
 
         enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
-        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, animationAdapter, positionAdapter, monsterStatusAdapter);
-        enemyMoveLogic = new EnemyMoveLogic(positionAdapter, enemyAnimLogic);
+        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, animationAdapter, objectData, monsterStatusAdapter);
+        enemyMoveLogic = new EnemyMoveLogic(objectData, enemyAnimLogic);
         tileLogic = new TileLogic();
         pathfinding = new AStarPathfinding(tileLogic);
     }
 
     public void AIStart() {
-        TurnStartProcess(positionAdapter.Position);
+        TurnStartProcess(objectData.Position);
         DecideAction();
-        TurnEndProcess(positionAdapter.Position);
+        TurnEndProcess(objectData.Position);
 
         //全モンスターの行動が終わったかどうかを確認するメソッドに通知する
         MessageBus.Instance.Publish(DungeonConstants.NotifyEnemyAct, this);
@@ -51,7 +51,7 @@ public class EnemyAILogic {
     private void DecideAction() {
         //if(player == null) Debug.Log("player is null");
         //Debug.Log(postPlayerPos + "postPlayerPos ターンスタート時の目的地");
-        Vector2Int selfPosInt = positionAdapter.Position;
+        Vector2Int selfPosInt = objectData.Position;
         if (selfPosInt == postPlayerPos) {
             postPlayerPos = Vector2Int.zero; //postPlayerPosにたどり着いたら目標地点をリセット
         }
@@ -60,7 +60,7 @@ public class EnemyAILogic {
 
         //攻撃可能位置にプレイヤーがいた場合は攻撃
         if (adjacentPlayer_first) {
-            direction = (Vector2)player.transform.position - (Vector2)positionAdapter.Position;
+            direction = (Vector2)player.transform.position - (Vector2)objectData.Position;
             directionInt = direction.ToVector2Int();
 
 
@@ -163,18 +163,18 @@ public class EnemyAILogic {
         return surroundingObjects;
     }
 
-    //ターンスタートプロセス。自身の除隊を判定する
+    //ターンスタートプロセス。自身の状態を判定する
     private void TurnStartProcess(Vector2Int selfPos){
         player = null;
         existPlayerWithView = false;
         monsterView = null;
 
         //プレイヤーと隣接しているか確認する
-        player = GetSurroundingObject(positionAdapter.Position).FirstOrDefault();
+        player = GetSurroundingObject(objectData.Position).FirstOrDefault();
     }
 
     private void TurnEndProcess(Vector2Int selfPos){
-        
+
     }
 
 
@@ -223,5 +223,14 @@ public class EnemyAILogic {
     private bool DiscernReachable(List<Vector2Int> route) {
         return route.All(position => tileLogic.CheckTileStandable(position));
     }
+
+    //自身がRoom内かどうか判定する
+    private bool ExistsInRoom(Vector2Int selfPos){
+        int roomNum = tileLogic.LookupRoomNum(selfPos);
+        if(roomNum == 0) return false;
+        
+        return true;
+    }
+
 
 }

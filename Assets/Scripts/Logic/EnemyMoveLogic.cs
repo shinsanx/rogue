@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 public class EnemyMoveLogic
 {
-    private IPositionAdapter positionAdapter;
+    private IObjectData objectData;
     private EnemyAnimLogic enemyAnimLogic;
     private Vector2 moveOffset = new Vector2(.5f, .5f);
 
     //コンストラクタ
     public EnemyMoveLogic(
-        IPositionAdapter positionAdapter,
+        IObjectData objectData,
         EnemyAnimLogic enemyAnimLogic
     ) {
-        this.positionAdapter = positionAdapter;
+        this.objectData = objectData;
         this.enemyAnimLogic = enemyAnimLogic;
     }
 
@@ -23,6 +23,6 @@ public class EnemyMoveLogic
         enemyAnimLogic.SetMoveAnimation(new Vector2(direction.x, direction.y));
 
         Vector2 newPosition = targetPos + moveOffset;
-        positionAdapter.Position = newPosition.ToVector2Int(); 
+        objectData.Position = newPosition.ToVector2Int(); 
     }
 }

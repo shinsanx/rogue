@@ -9,15 +9,15 @@ using UnityEngine.Rendering;
 public class PlayerMoveLogic
 {
     private TileLogic tileLogic;
-    private IPositionAdapter positionAdapter;
+    private IObjectData objectData;
     private PlayerAnimLogic playerAnimLogic;
     private StateMachine stateMachine;
     private State enemyState;
 
     //コンストラクタ
-    public PlayerMoveLogic(IPositionAdapter positionAdapter, PlayerAnimLogic playerAnimLogic){
+    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){
         tileLogic = new TileLogic();
-        this.positionAdapter = positionAdapter;
+        this.objectData = objectData;
         this.playerAnimLogic = playerAnimLogic;
         stateMachine = GameAssets.i.stateMachine;
         enemyState = GameAssets.i.enemyState;
@@ -38,7 +38,7 @@ public class PlayerMoveLogic
         roundY = Mathf.Round(inputVector.y);
 
         Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
-        Vector2Int currentPos = positionAdapter.Position;
+        Vector2Int currentPos = objectData.Position;
         Vector2Int targetPos = inputVectorInt + currentPos;
 
         if(isMoving) return;
@@ -70,7 +70,7 @@ public class PlayerMoveLogic
         if(isMoving == true) return;
         LockInputWhileMoving();
         Vector2 newPosition = tileLogic.GetTilePosition(targetPos) + moveOffset;
-        positionAdapter.Position = newPosition.ToVector2Int();
+        objectData.Position = newPosition.ToVector2Int();
         EndState();
     }
 

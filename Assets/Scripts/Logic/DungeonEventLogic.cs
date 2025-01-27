@@ -53,7 +53,7 @@ public class DungeonEventLogic
 
     public void PlayerStateExit(){
         ResetObjectTypeAndPosition();
-        dungeonData.playerPosition = GameObject.FindGameObjectWithTag("Player").GetComponent<IPositionAdapter>().Position;
+        dungeonData.playerPosition = GameObject.FindGameObjectWithTag("Player").GetComponent<IObjectData>().Position;
     }
 
     public async void EnemyStateStart(){

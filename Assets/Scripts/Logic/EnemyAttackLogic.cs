@@ -7,7 +7,7 @@ public class EnemyAttackLogic
 {
     private EnemyAnimLogic enemyAnimLogic;
     private IAnimationAdapter animationAdapter;
-    private IPositionAdapter positionAdapter;
+    private IObjectData objectData;
     private IPlayerStatusAdapter playerStatusAdapter;
 
     private DamageCalculate damageCalculate;
@@ -21,12 +21,12 @@ public class EnemyAttackLogic
     public EnemyAttackLogic(
         EnemyAnimLogic enemyAnimLogic,
         IAnimationAdapter animationAdapter,
-        IPositionAdapter positionAdapter,
+        IObjectData objectData,
         IMonsterStatusAdapter monsterStatusAdapter
         ) {
             this.enemyAnimLogic = enemyAnimLogic;
             this.animationAdapter = animationAdapter;
-            this.positionAdapter = positionAdapter;
+            this.objectData = objectData;
             this.monsterStatusAdapter = monsterStatusAdapter;
             stateMachine = GameAssets.i.stateMachine;
             enemyState = GameAssets.i.enemyState;
@@ -38,8 +38,8 @@ public class EnemyAttackLogic
     }
 
     private GameObject GetTarget(){
-        int selfXpos = Mathf.FloorToInt(positionAdapter.Position.x);
-        int selfYpos = Mathf.FloorToInt(positionAdapter.Position.y);
+        int selfXpos = Mathf.FloorToInt(objectData.Position.x);
+        int selfYpos = Mathf.FloorToInt(objectData.Position.y);
         int targetXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
         int targetYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
 

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IPlayerStatusAdapter
-{
-    public string Name{get;set;}
+{    
     public int Level {get;set;}
     public int MaxHealth{get;set;}
     public int health {get;set;}
