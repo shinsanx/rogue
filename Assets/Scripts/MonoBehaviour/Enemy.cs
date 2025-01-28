@@ -12,8 +12,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     [SerializeField] SpriteRenderer sr;
     [SerializeField] MonsterStatusSO monsterSO;
     [SerializeField] MessageBox messageBox;
-
-    private RandomDungeonWithBluePrint.RandomMapTest randomMapTest; //アタッチ
+    
     private EnemyStatusLogic enemyStatusLogic;
     private EnemyAnimLogic enemyAnimLogic;
     private EnemyAttackLogic enemyAttackLogic;
@@ -32,6 +31,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         set {
             transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
             _enemyPosition = value;
+            OnObjectUpdated.Invoke(this);
             //Debug.Log(_enemyPosition + "enemyPos");
         }
     }
@@ -124,8 +124,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAILogic = new EnemyAILogic(this, this, this, sr);
+        enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
         CharacterManager.i.AddCharacter(this);
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
+
     }
 
     private void OnEnemyDestroyed(){

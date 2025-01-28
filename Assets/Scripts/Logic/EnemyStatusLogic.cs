@@ -19,12 +19,10 @@ public class EnemyStatusLogic
         ) {
             this.monsterStatusAdapter = monsterStatusAdapter;
             this.monsterSO = monsterSO;
-            createMessageLogic = new CreateMessageLogic();
-            UpdateEnemyStatus(monsterStatusAdapter, monsterSO);
+            createMessageLogic = new CreateMessageLogic();            
         }
 
-    private void UpdateEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO){
-        monsterStatusAdapter.Name = monsterStatusSO.Name;
+    public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, IObjectData objectData){        
         monsterStatusAdapter.HP = monsterStatusSO.HP;
         monsterStatusAdapter.AttackPower = monsterStatusSO.AttackPower;
         monsterStatusAdapter.Defence = monsterStatusSO.Deffence;
@@ -34,17 +32,24 @@ public class EnemyStatusLogic
         monsterStatusAdapter.ItemDropRate = monsterStatusSO.ItemDropRate;
         monsterStatusAdapter.AnimatorController = monsterStatusSO.AnimatorController;
         monsterStatusAdapter.Sprite = monsterStatusSO.Sprite;
+
+        objectData.Name = monsterStatusSO.Name;
+        objectData.Type = "Enemy";        
     }
+
+    
+    
+    
 
     public void TakeDamage(int damage, string dealerName){
         monsterStatusAdapter.HP -= damage;
 
         //TODO: dealerのタグによってメッセージを変える。プレイヤーかその他か
         messages.Clear();
-        messages = createMessageLogic.CreateAttackMessage(messages, damage, dealerName, monsterStatusAdapter.Name);
+        messages = createMessageLogic.CreateAttackMessage(messages, damage, dealerName, monsterSO.Name);
 
         if(monsterStatusAdapter.HP <= 0){
-            messages = createMessageLogic.CreateDefeatedMessage(messages, monsterStatusAdapter.Name, monsterStatusAdapter.Exp);
+            messages = createMessageLogic.CreateDefeatedMessage(messages, monsterSO.Name, monsterStatusAdapter.Exp);
             MessageBus.Instance.Publish(DungeonConstants.GetExp, monsterStatusAdapter.Exp);
         }
         MessageBus.Instance.Publish("sendMessage", messages);

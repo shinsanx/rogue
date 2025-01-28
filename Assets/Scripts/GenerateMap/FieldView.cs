@@ -79,7 +79,7 @@ namespace RandomDungeonWithBluePrint {
                             tilemap.SetTile(new Vector3Int(x, y, 0), downLeftRight);
                             break;
                             case (int)Constants.MapChipType.DownLeftUp:
-                            tilemap.SetTile(new Vector3Int(x, y, 0), downLeftRight);
+                            tilemap.SetTile(new Vector3Int(x, y, 0), downLeftUp);
                             break;
                             case (int)Constants.MapChipType.LeftRightUp:
                             tilemap.SetTile(new Vector3Int(x, y, 0), leftRightUp);

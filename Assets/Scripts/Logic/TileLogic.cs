@@ -89,7 +89,7 @@ public class TileLogic {
     public void SetObjectToTile(List<Transform> objectsTransform) {
         ResetObjectOnTile(); //オブジェクト情報をリセット
         field.tileInfo.ResetObjType(); //オブジェクトタイプ情報をリセット
-        Debug.Log("タイル情報がリセットされました。");
+        //Debug.Log("タイル情報がリセットされました。");
 
         foreach (Transform go in objectsTransform) {
             if (!go.TryGetComponent(out IPositionAdapter positionAdapter)) continue;

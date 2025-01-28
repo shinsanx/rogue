@@ -110,7 +110,7 @@ public class EnemyAILogic {
 
             //自分が通路にいる場合
             if (!isInRoom) {
-                Debug.Log("im in aisle!");
+                // Debug.Log("im in aisle!");
                 List<Vector2Int> aisles = tileLogic.GetNeighborBranchPositions(selfPosInt);
                 Vector2Int faceDirection = animationAdapter.MoveAnimationDirection.ToVector2Int();
 
@@ -223,6 +223,7 @@ public class EnemyAILogic {
     private bool DiscernReachable(List<Vector2Int> route) {
         return route.All(position => tileLogic.CheckTileStandable(position));
     }
+    
 
     //自身がRoom内かどうか判定する
     private bool ExistsInRoom(Vector2Int selfPos){

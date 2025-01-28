@@ -2552,7 +2552,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 1225546471}
   sr: {fileID: 1225546472}
-  slimeSO: {fileID: 11400000, guid: d75ae348a8a9f42158683e37af58ced8, type: 2}
+  monsterSO: {fileID: 11400000, guid: d75ae348a8a9f42158683e37af58ced8, type: 2}
   messageBox: {fileID: 193195853}
 --- !u!95 &1225546471
 Animator:

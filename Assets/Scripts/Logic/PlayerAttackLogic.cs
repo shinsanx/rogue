@@ -33,23 +33,22 @@ public class PlayerAttackLogic
 
     public void Attack(){
         playerAnimLogic.SetAttackAnimation();
-        DealDamage(GetTarget());
+        DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition()));
         EndState();
     }
 
-    private GameObject GetTarget(){
+    private Vector2Int GetTargetPosition(){
         int selfXpos = Mathf.FloorToInt(objectData.Position.x);
         int selfYpos = Mathf.FloorToInt(objectData.Position.y);
-        int targetXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
-        int targetYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
-        Vector2Int targetVector = new Vector2Int(selfXpos + targetXpos, selfYpos + targetYpos);
-
-        GameObject targetObject = tileLogic.GetObjectOnTile(targetVector);
-        return targetObject;
+        int faceXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
+        int faceYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
+        Vector2Int targetVector = new Vector2Int(selfXpos + faceXpos, selfYpos + faceYpos);
+        return targetVector;
     }
 
     private void DealDamage(GameObject targetObject){
         if(targetObject == null) return;
+        Debug.Log(targetObject.name);
         if(!targetObject.CompareTag("Enemy"))return;
         if(damageCalculate == null){
             damageCalculate = new DamageCalculate();

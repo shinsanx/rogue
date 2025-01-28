@@ -28,11 +28,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private int _currentHp;
     private int _maxHp;
     private int _currentLv;
-    private int _totalExp;
-
-    private static int _idCounter = 0;
+    private int _totalExp;    
 
     // === Events ===
+    // CharacterManagerで実装。
     public event Action<IObjectData> OnObjectUpdated;
 
     // === Properties ===
@@ -48,8 +47,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         set {
             playerPosition = value;
             transform.DOMove(value.ToVector2() + moveOffset, 0.3f).SetEase(Ease.Linear);
+            OnObjectUpdated.Invoke(this);
         }
     }
+    
 
 
     // IAnimationAdapter

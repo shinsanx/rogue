@@ -72,6 +72,6 @@ public class EnemyAttackLogic
 
         int damage = damageCalculate.CalculateEnemyAttackDamage(monsterStatusAdapter.AttackPower, targetDefencePw);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
-        damageable.TakeDamage(damage, monsterStatusAdapter.Name);
+        damageable.TakeDamage(damage, objectData.Name);
     }
 }
