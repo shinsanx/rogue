@@ -20,7 +20,7 @@ namespace RandomDungeonWithBluePrint {
 
         public List<Vector2Int> jointPositions = new List<Vector2Int>(); //自作。接続情報の位置
         public int roomNum; //自作
-        public List<GameObject> gameObjects = new List<GameObject>();//自作
+        //public List<GameObject> gameObjects = new List<GameObject>();//自作 CharacterManagerに移管
 
         public Room(RectInt rect) {
             Rect = rect;

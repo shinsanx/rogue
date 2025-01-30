@@ -12,23 +12,18 @@ public class DungeonEventManager : MonoBehaviour
     StateMachine stateMachine;
     State playerState;
     State enemyState;
-    [SerializeField] GameObject objectParent;
     [SerializeField] GameObject enemyParent;
-    [SerializeField] RandomDungeonWithBluePrint.RandomMapTest randomMapTest;
     DungeonEventLogic dungeonEventLogic;
-
-    public DungeonData dungeonData;
+    
     
     void Start()
     {
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;
-        stateMachine.init();
+        stateMachine.init();        
 
-        dungeonData = new DungeonData();
-
-        dungeonEventLogic = new DungeonEventLogic(randomMapTest.currentField, objectParent, enemyParent, dungeonData);
+        dungeonEventLogic = new DungeonEventLogic(enemyParent);
 
         playerState.OnEnterEvent += dungeonEventLogic.PlayerStateStart;
         enemyState.OnEnterEvent += dungeonEventLogic.EnemyStateStart;
@@ -38,8 +33,7 @@ public class DungeonEventManager : MonoBehaviour
 
         //Enemyが行動終了後に通知できるようSubscribeしておく
         MessageBus.Instance.Subscribe(DungeonConstants.NotifyEnemyAct, dungeonEventLogic.NotifyEnemyAct);
-        //プレイヤーのポジションを取得する用
-        MessageBus.Instance.DelegateSubscribe<Vector2Int>(DungeonConstants.GetPlayerPosition, dungeonEventLogic.GetPlayerPosition);
+                
     }
 
     

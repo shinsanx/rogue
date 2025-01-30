@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Data.Common;
 
 public class CharacterManager : MonoBehaviour
 {
@@ -73,7 +74,7 @@ public class CharacterManager : MonoBehaviour
         if (matchingObject != null)
         {
             // IObjectData から GameObject を取得 (キャストが必要)
-            var matchingGameObject = matchingObject as MonoBehaviour;
+            MonoBehaviour matchingGameObject = matchingObject as MonoBehaviour;
             if (matchingGameObject != null)
             {
                 return matchingGameObject.gameObject;
@@ -81,7 +82,33 @@ public class CharacterManager : MonoBehaviour
         }
 
         // 一致するオブジェクトがない場合は null を返す
-        Debug.LogWarning($"No object found at position: {position}");
+        // Debug.LogWarning($"No object found at position: {position}");
         return null;
     }
+
+    //positionから存在するオブジェクトのタイプを返す
+    public string GetObjectTypeByPosition(Vector2Int position){
+        var obj = allObjectData.FirstOrDefault(obj => obj.Position == position);
+        if(obj == null) {
+            Debug.Log($"{position}にはタイプが見つかりません");
+            return null;            
+        }
+        return obj.Type;
+    }
+
+    public List<GameObject> GetObjectsInSameRoom(int roomNum){
+        // 指定された部屋番号のオブジェクトを抽出
+        IEnumerable<IObjectData> objectsInRoom = allObjectData.Where(obj => obj.RoomNum == roomNum);
+        
+        // MonoBehaviourにキャストしてGameObjectを取得
+        IEnumerable<GameObject> gameObjects = objectsInRoom.Select(data => {
+            MonoBehaviour monoBehaviour = data as MonoBehaviour;
+            return monoBehaviour?.gameObject;
+        });
+
+        // nullでないものだけをリストにして返す
+        return gameObjects.Where(obj => obj != null).ToList();
+    }
+    
+    
 }

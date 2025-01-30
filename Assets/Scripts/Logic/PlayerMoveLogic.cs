@@ -7,16 +7,14 @@ using UnityEngine.Tilemaps;
 using UnityEngine.Rendering;
 
 public class PlayerMoveLogic
-{
-    private TileLogic tileLogic;
+{    
     private IObjectData objectData;
     private PlayerAnimLogic playerAnimLogic;
     private StateMachine stateMachine;
     private State enemyState;
 
     //コンストラクタ
-    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){
-        tileLogic = new TileLogic();
+    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){        
         this.objectData = objectData;
         this.playerAnimLogic = playerAnimLogic;
         stateMachine = GameAssets.i.stateMachine;
@@ -66,10 +64,10 @@ public class PlayerMoveLogic
 
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
         playerAnimLogic.SetMoveAnimation(new Vector2(inputVector.x, inputVector.y));
-        if(!tileLogic.CheckMovableTile(currentPos, targetPos))return;
+        if(!TileManager.i.CheckMovableTile(currentPos, targetPos))return;
         if(isMoving == true) return;
         LockInputWhileMoving();
-        Vector2 newPosition = tileLogic.GetTilePosition(targetPos) + moveOffset;
+        Vector2 newPosition = targetPos + moveOffset;
         objectData.Position = newPosition.ToVector2Int();
         EndState();
     }

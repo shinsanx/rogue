@@ -13,8 +13,7 @@ public class EnemyAILogic {
     private EnemyAnimLogic enemyAnimLogic;
     private EnemyAttackLogic enemyAttackLogic;
     private EnemyMoveLogic enemyMoveLogic;
-    private IAnimationAdapter animationAdapter;
-    private TileLogic tileLogic;
+    private IAnimationAdapter animationAdapter;    
     private AStarPathfinding pathfinding;
 
     Vector2Int postPlayerPos = Vector2Int.zero;
@@ -34,9 +33,8 @@ public class EnemyAILogic {
 
         enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, animationAdapter, objectData, monsterStatusAdapter);
-        enemyMoveLogic = new EnemyMoveLogic(objectData, enemyAnimLogic);
-        tileLogic = new TileLogic();
-        pathfinding = new AStarPathfinding(tileLogic);
+        enemyMoveLogic = new EnemyMoveLogic(objectData, enemyAnimLogic);        
+        pathfinding = new AStarPathfinding();
     }
 
     public void AIStart() {
@@ -64,7 +62,7 @@ public class EnemyAILogic {
             directionInt = direction.ToVector2Int();
 
 
-            if (tileLogic.CheckMovableTile(selfPosInt, selfPosInt + directionInt)) {
+            if (TileManager.i.CheckMovableTile(selfPosInt, selfPosInt + directionInt)) {
                 enemyAttackLogic.Attack(player, directionInt);
                 return;
             }
@@ -76,12 +74,12 @@ public class EnemyAILogic {
 
             if (isInRoom) { //自分が部屋の中の場合
                 //JointPositionの取得
-                List<Vector2Int> jointPositions = tileLogic.ExtractJointPosInRoom(selfPosInt);
+                List<Vector2Int> jointPositions = TileManager.i.ExtractJointPosInRoom(selfPosInt);
 
                 //自身がJointの上だった場合は通路に入る（EnterJointを除く）
                 if (jointPositions.FirstOrDefault(j => j == selfPosInt) != Vector2Int.zero) {
                     Debug.Log(jointPositions.FirstOrDefault(j => j == selfPosInt) + "on joint");
-                    Vector2Int aisle = tileLogic.GetNeighborBranchPositions(selfPosInt).FirstOrDefault();
+                    Vector2Int aisle = TileManager.i.GetNeighborBranchPositions(selfPosInt).FirstOrDefault();
                     if (selfPosInt != enterJointPos) { //Roomの入り口には入らない
                         Debug.Log("target is" + aisle);
                         postPlayerPos = aisle;
@@ -111,7 +109,7 @@ public class EnemyAILogic {
             //自分が通路にいる場合
             if (!isInRoom) {
                 // Debug.Log("im in aisle!");
-                List<Vector2Int> aisles = tileLogic.GetNeighborBranchPositions(selfPosInt);
+                List<Vector2Int> aisles = TileManager.i.GetNeighborBranchPositions(selfPosInt);
                 Vector2Int faceDirection = animationAdapter.MoveAnimationDirection.ToVector2Int();
 
                 //通路に生まれた場合の回避策。直す必要あり。
@@ -155,7 +153,7 @@ public class EnemyAILogic {
 
         foreach (var direction in DungeonConstants.EightDirections) {
             Vector2Int targetPos = selfPosInt + DungeonConstants.ToVector2Int[direction];
-            GameObject go = tileLogic.GetObjectOnTile(targetPos);
+            GameObject go = CharacterManager.i.GetObjectByPosition(targetPos);
             if (go != null) {
                 surroundingObjects.Add(go);
             }
@@ -211,7 +209,7 @@ public class EnemyAILogic {
         Vector2Int newPos = new Vector2Int(selfPos.x + moveX, selfPos.y + moveY);
 
         // 移動可能か確認
-        if (tileLogic.CheckTileStandable(newPos)) {
+        if (TileManager.i.CheckTileStandable(newPos)) {
             return newPos;
         }
 
@@ -221,13 +219,13 @@ public class EnemyAILogic {
 
     // ルートのそれぞれのマスに他オブジェクトが存在していないかチェックする
     private bool DiscernReachable(List<Vector2Int> route) {
-        return route.All(position => tileLogic.CheckTileStandable(position));
+        return route.All(position => TileManager.i.CheckTileStandable(position));
     }
     
 
     //自身がRoom内かどうか判定する
     private bool ExistsInRoom(Vector2Int selfPos){
-        int roomNum = tileLogic.LookupRoomNum(selfPos);
+        int roomNum = TileManager.i.LookupRoomNum(selfPos);
         if(roomNum == 0) return false;
         
         return true;

@@ -5,17 +5,13 @@ using UnityEngine;
 using System.Linq;
 
 public class AStarPathfinding {
-    private TileLogic tileLogic;
-
-    public AStarPathfinding(TileLogic tileLogic) {
-        this.tileLogic = tileLogic;
-    }
+                
 
     public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos, List<Vector2Int> monsterView) {
         Node startNode = new Node(startPos);
         Node targetNode = new Node(targetPos);
 
-        if (!tileLogic.CheckTileStandable(targetPos)) {
+        if (!TileManager.i.CheckTileStandable(targetPos)) {
             Debug.Log("Target position is not walkable. Finding alternative target.");
             targetNode = GetAlternativeTarget(targetNode, startPos); // プレイヤー位置を追加
             if (targetNode == null) {
@@ -54,7 +50,7 @@ public class AStarPathfinding {
             }
 
             foreach (Node neighbour in GetNeighbours(currentNode)) { //currentNodeの周囲８マスのNodeに対して処理を行う
-                if (!tileLogic.CheckMovableTile(currentNode.position, neighbour.position) || closedList.Contains(neighbour)) { //移動不可位置とclosedListのNodeは無視する                    
+                if (!TileManager.i.CheckMovableTile(currentNode.position, neighbour.position) || closedList.Contains(neighbour)) { //移動不可位置とclosedListのNodeは無視する                    
                     continue;
                 }
 
@@ -125,7 +121,7 @@ public class AStarPathfinding {
         int closestDistance = int.MaxValue;
 
         foreach (Node neighbour in neighbours) {
-            if (tileLogic.CheckTileStandable(neighbour.position)) {
+            if (TileManager.i.CheckTileStandable(neighbour.position)) {
                 int distance = GetDistance(neighbour, new Node(startPos));
                 if (distance < closestDistance) {
                     closestNode = neighbour;

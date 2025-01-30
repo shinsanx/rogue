@@ -13,24 +13,36 @@ public class StatusUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI currentGoldTxt;
     [SerializeField] Image healthBarGage;
 
+    private Player player;
+
+
     private void Start(){
-        MessageBus.Instance.Subscribe(DungeonConstants.UpdateHPText, UpdateHPText);
-        MessageBus.Instance.Subscribe(DungeonConstants.UpdateLvText, UpdateLvText);
+
+        player = FindObjectOfType<Player>();
+        if(player != null){
+            player.OnHealthChanged += UpdateHPText;
+            player.OnLvChanged += UpdateLvText;
+        }                
+    }
+
+    private void OnDestroy() {
+        if(player != null){
+            player.OnHealthChanged -= UpdateHPText;
+            player.OnLvChanged -= UpdateLvText;
+        }
     }
 
     //本当はロジックに移行したい。StatusUILogicとか作って
-    public void UpdateHPText(object data){
-        IPlayerStatusAdapter playerStatusAdapter = (IPlayerStatusAdapter)data;
+    public void UpdateHPText(int currentHp, int maxHp){
         string updateTxt = null;
-        maxHPTxt.text = updateTxt.ConvertNumToUpperString(playerStatusAdapter.MaxHealth);
-        currentHPTxt.text = updateTxt.ConvertNumToUpperString(playerStatusAdapter.health);
+        maxHPTxt.text = updateTxt.ConvertNumToUpperString(maxHp);
+        currentHPTxt.text = updateTxt.ConvertNumToUpperString(currentHp);
 
-        healthBarGage.fillAmount = (float)playerStatusAdapter.health / (float)playerStatusAdapter.MaxHealth;
+        healthBarGage.fillAmount = (float)currentHp / (float)maxHp;
     }
 
-    public void UpdateLvText(object data){
-        IPlayerStatusAdapter playerStatusAdapter = (IPlayerStatusAdapter)data;
+    public void UpdateLvText(int level){
         string updateTxt = null;
-        currentLvTxt.text = updateTxt.ConvertNumToUpperString(playerStatusAdapter.Level);
+        currentLvTxt.text = updateTxt.ConvertNumToUpperString(level);
     }
 }

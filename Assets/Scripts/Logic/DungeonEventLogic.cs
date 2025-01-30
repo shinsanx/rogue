@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 public class DungeonEventLogic
 {
+    
     private StateMachine stateMachine;
     private State playerState;
     private State enemyState;
-    private RandomDungeonWithBluePrint.Field field;
-    private TileLogic tileLogic;
-    public GameObject objectParent;
-    public GameObject enemyParent;
-    private DungeonData dungeonData;
+        
+    private GameObject enemyParent;    
 
     public List<IPositionAdapter> objectsPositionAdapters = new List<IPositionAdapter>();
     public List<Transform> gameObjectsTransform = new List<Transform>();
@@ -35,13 +33,9 @@ public class DungeonEventLogic
         }
     }
 
-    public DungeonEventLogic(RandomDungeonWithBluePrint.Field field, GameObject objectParent, GameObject enemyParent, DungeonData dungeonData){
-        this.field = field;
-        this.objectParent = objectParent;
-        this.enemyParent = enemyParent;
-        this.dungeonData = dungeonData;
-
-        tileLogic = new TileLogic();
+    public DungeonEventLogic(GameObject enemyParent){
+        this.enemyParent = enemyParent;        
+        
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;
@@ -52,8 +46,7 @@ public class DungeonEventLogic
     }
 
     public void PlayerStateExit(){
-        ResetObjectTypeAndPosition();
-        dungeonData.playerPosition = GameObject.FindGameObjectWithTag("Player").GetComponent<IObjectData>().Position;
+        
     }
 
     public async void EnemyStateStart(){
@@ -62,15 +55,12 @@ public class DungeonEventLogic
     }
 
     public void EnemyStateExit(){
-        ResetObjectTypeAndPosition();
+        
     }
 
     //敵個々が行動したかどうかを検出する
     public void ConfirmActableEnemies(){
-        enemies = enemyParent.GetComponentsInChildren<Transform>().Skip(1).ToList();
-        foreach(var enemy in enemies){
-            IMonsterStatusAdapter monsterStatusAdapter = enemy.GetComponent<IMonsterStatusAdapter>();            
-        }
+        enemies = enemyParent.GetComponentsInChildren<Transform>().Skip(1).ToList();        
 
         //未行動のEnemyの数。ゼロになると(プロパティで)PlayerTurnになる。
         ActableEnemies = enemies.Count; //parent分を引く
@@ -81,20 +71,5 @@ public class DungeonEventLogic
         ActableEnemies -= 1;
     }
 
-    //すべてのオブジェクトのタイプとポジションをtileLogicに渡す。重いかも？
-    public void ResetObjectTypeAndPosition(){
-        objectsPositionAdapters.Clear();
-        gameObjectsTransform.Clear();
-
-        objectParent.transform.GetComponentsInChildren(objectsPositionAdapters);
-        objectParent.GetComponentsInChildren(gameObjectsTransform);
-
-        tileLogic.SetObjectToTile(gameObjectsTransform);
-        tileLogic.DistributeGameObjectToRooms(gameObjectsTransform);
-    }
-
-    //PlayerPositionを返す。ほんとにこのクラスでいいの？
-    public Vector2Int GetPlayerPosition(object data){
-        return dungeonData.playerPosition;
-    }
+    
 }

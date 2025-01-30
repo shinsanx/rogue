@@ -11,8 +11,7 @@ public class EnemyAttackLogic
     private IPlayerStatusAdapter playerStatusAdapter;
 
     private DamageCalculate damageCalculate;
-    private IMonsterStatusAdapter monsterStatusAdapter;
-    private TileLogic tileLogic;
+    private IMonsterStatusAdapter monsterStatusAdapter;    
 
     private StateMachine stateMachine;
     private State enemyState;
@@ -29,8 +28,7 @@ public class EnemyAttackLogic
             this.objectData = objectData;
             this.monsterStatusAdapter = monsterStatusAdapter;
             stateMachine = GameAssets.i.stateMachine;
-            enemyState = GameAssets.i.enemyState;
-            tileLogic = new TileLogic();
+            enemyState = GameAssets.i.enemyState;            
     }
 
     public void Attack(GameObject go, Vector2Int direction){
@@ -44,7 +42,7 @@ public class EnemyAttackLogic
         int targetYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
 
         Vector2Int targetVector = new Vector2Int(selfXpos + targetXpos, selfYpos + targetYpos);
-        GameObject targetObject = tileLogic.GetObjectOnTile(targetVector);
+        GameObject targetObject = CharacterManager.i.GetObjectByPosition(targetVector);
 
         return targetObject;        
     }

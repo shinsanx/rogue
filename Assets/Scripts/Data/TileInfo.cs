@@ -9,9 +9,7 @@ namespace RandomDungeonWithBluePrint {
 
         public Vector2 position; //移動用のTileのポジション
         public int mapChipType; //移動可否判定用のmapChipType
-        public int tileType; //タイルのタイプ　Enemyの移動計算用
-        public int objType; //タイル上にいる物体のGameObject
-        public GameObject objectOnTile; //自作。タイル上にいる物体のGameObject
+        public int tileType; //タイルのタイプ　Enemyの移動計算用        
         private List<List<TileInfo>> tiles = new List<List<TileInfo>>(); //xとy
         public TileInfo this[int x, int y] => tiles[y][x]; //インデクサ。インスタンスを生成した時にListみたいに取得できる。
         public Vector2Int mapSize;
@@ -42,7 +40,7 @@ namespace RandomDungeonWithBluePrint {
 
             }
             MakePosition(size.x, size.y);
-            ResetObjType();
+            //ResetObjType();
         }
 
         //自作 Tileの盤面を作成。
@@ -64,15 +62,15 @@ namespace RandomDungeonWithBluePrint {
             }
         }
 
-        //ObjTypeを0に統一
-        public void ResetObjType() {
-            int x = mapSize.x;
-            int y = mapSize.y;
-            for (int i = 0; i < y; i++) {
-                for (int j = 0; j < x; j++) {
-                    tiles[i][j].objType = (int)DungeonConstants.ObjTypelnTile.Nothing;
-                }
-            }
-        }
+        // //ObjTypeを0に統一
+        // public void ResetObjType() {
+        //     int x = mapSize.x;
+        //     int y = mapSize.y;
+        //     for (int i = 0; i < y; i++) {
+        //         for (int j = 0; j < x; j++) {
+        //             tiles[i][j].objType = (int)DungeonConstants.ObjTypelnTile.Nothing;
+        //         }
+        //     }
+        // }
     }
 }

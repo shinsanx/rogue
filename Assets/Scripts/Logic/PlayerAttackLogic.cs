@@ -8,8 +8,7 @@ public class PlayerAttackLogic
     private PlayerAnimLogic playerAnimLogic;
     private IAnimationAdapter animationAdapter;
     private IObjectData objectData;
-    private IPlayerStatusAdapter playerStatusAdapter;
-    private TileLogic tileLogic;
+    private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
 
     private StateMachine stateMachine;
@@ -23,7 +22,6 @@ public class PlayerAttackLogic
         IPlayerStatusAdapter playerStatusAdapter
     ){
         this.playerAnimLogic = playerAnimLogic;
-        tileLogic = new TileLogic();
         this.animationAdapter = animationAdapter;
         this.objectData = objectData;
         this.playerStatusAdapter = playerStatusAdapter;

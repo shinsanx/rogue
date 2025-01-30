@@ -15,8 +15,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
-    private PlayerAttackLogic playerAttackLogic;
-    private TileLogic tileLogic;
+    private PlayerAttackLogic playerAttackLogic;    
     private PlayerAnimLogic playerAnimLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
@@ -32,7 +31,11 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     // === Events ===
     // CharacterManagerで実装。
-    public event Action<IObjectData> OnObjectUpdated;
+    public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
+
+    // StatusUIで実装。
+    public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPを渡すイベント
+    public event Action<int> OnLvChanged; // レベルを渡すイベント
 
     // === Properties ===
 
@@ -80,7 +83,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
             if (_currentLv >= 2) {
                 MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.LvUppedMessage(Name, _currentLv));
             }
-            MessageBus.Instance.Publish(DungeonConstants.UpdateLvText, this);
+            OnLvChanged?.Invoke(_currentLv);
         }
     }
 
@@ -88,7 +91,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => _maxHp;
         set {
             _maxHp = value;
-            MessageBus.Instance.Publish(DungeonConstants.UpdateHPText, this);
+            OnHealthChanged?.Invoke(_currentHp, _maxHp);
         }
     }
 
@@ -96,7 +99,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => _currentHp;
         set {
             _currentHp = value > MaxHealth ? MaxHealth : value;
-            MessageBus.Instance.Publish(DungeonConstants.UpdateHPText, this);
+            OnHealthChanged?.Invoke(_currentHp, _maxHp);
         }
     }
 
@@ -133,8 +136,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     // === Methods ===
     private void InitializePlayer() {
-        playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
-        tileLogic = new TileLogic();
+        playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);        
         playerAnimLogic = new PlayerAnimLogic(this);
         playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic);
         playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
@@ -144,7 +146,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
-        randomMapTest.onFieldUpdate.AddListener(tileLogic.UpdateFieldInformation);
+        randomMapTest.onFieldUpdate.AddListener(TileManager.i.UpdateFieldInformation);
         playerStatusDataLogic.SetStatusDefault(this);
         playerStatusDataLogic.SetObjectDataDefault(this);
         CharacterManager.i.AddCharacter(this);
