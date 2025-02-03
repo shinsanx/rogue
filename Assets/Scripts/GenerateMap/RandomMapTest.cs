@@ -30,7 +30,7 @@ namespace RandomDungeonWithBluePrint {
         private void Create(BluePrintWithWeight bluePrint) {
             var field = FieldBuilder.Build(bluePrint.BluePrint);
             currentField = field;
-            MessageBus.Instance.DelegateSubscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);
+            MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);
             MessageBus.Instance.Publish("UpdateFieldInformation", currentField);
             fieldView.ShowField(field);
             onFieldUpdate?.Invoke(field);

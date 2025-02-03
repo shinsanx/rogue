@@ -20,7 +20,7 @@ public class TileManager{
 
     //コンストラクタ
     public TileManager() {
-        this.field = MessageBus.Instance.PublishDelegate<Field>(DungeonConstants.GetCurrentField, this);
+        this.field = MessageBus.Instance.Publish<Field>(DungeonConstants.GetCurrentField, this);
         MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateFieldInformation);
     }
 

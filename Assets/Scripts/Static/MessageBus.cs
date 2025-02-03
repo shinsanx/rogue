@@ -20,7 +20,7 @@ public class MessageBus {
     //戻り値なしの場合
     private Dictionary<string, Action<object>> subscribers = new Dictionary<string, Action<object>>();
 
-    public void Subscribe(string message, Action<object> callback) {
+    public void Subscribe(string message, Action<object> callback) {        
         if (!subscribers.ContainsKey(message)) {
             subscribers.Add(message, null);
         }
