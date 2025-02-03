@@ -9,11 +9,11 @@ public class State : ScriptableObject
     public Action OnEnterEvent;
     public Action OnExitEvent;
 
-    public void OnEnter(){
+    public virtual void OnEnter(){
         OnEnterEvent?.Invoke();        
     }
 
-    public void OnExit(){
+    public virtual void OnExit(){
         OnExitEvent?.Invoke();
     }
 }

@@ -22,6 +22,7 @@ public class MessageBoxLogic
 
     public delegate void DisplayDelegate(bool visible);
     private DisplayDelegate display;
+    private readonly IMessageDisplay _messageDisplay;
 
     //コンストラクタ
     public MessageBoxLogic(
@@ -41,14 +42,39 @@ public class MessageBoxLogic
             fourthTextArea = messageBox.fourthText;
     }
 
-    public async void CreateMessage(object data){
+    private readonly Queue<List<string>> messageQueue = new Queue<List<string>>();
+    private bool isProcessing = false;
+
+    public async Task CreateMessage(object data){
         List<string> strings = (List<string>)data;
+        if(strings == null) return;
+
         if(!messageBoxObj.activeSelf) {
             display(true);
         }
+        messageQueue.Enqueue(strings);
+
+
+        if (!isProcessing) {
+            await ProcessMessages();
+        }
+
+
+        
         messages.Add(strings);
         await OutputMessage(strings);
         messages.Remove(strings);
+    }
+
+    private async Task ProcessMessages(){
+        isProcessing = true;
+
+        while(messageQueue.Count > 0){
+            var strings = messageQueue.Dequeue();
+            await _messageDisplay.DisplayMessagesAsync();
+        }
+        isProcessing = false;
+        await _
     }
 
     private async Task OutputMessage(List<string> strings){

@@ -21,20 +21,17 @@ public class DungeonEventManager : MonoBehaviour
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;
-        stateMachine.init();        
+        stateMachine.init();
 
-        dungeonEventLogic = new DungeonEventLogic(enemyParent);
+        dungeonEventLogic = new DungeonEventLogic(enemyParent, this);
 
         playerState.OnEnterEvent += dungeonEventLogic.PlayerStateStart;
         enemyState.OnEnterEvent += dungeonEventLogic.EnemyStateStart;
 
         playerState.OnExitEvent += dungeonEventLogic.PlayerStateExit;
         enemyState.OnExitEvent += dungeonEventLogic.EnemyStateExit;
-
-        //Enemyが行動終了後に通知できるようSubscribeしておく
-        MessageBus.Instance.Subscribe(DungeonConstants.NotifyEnemyAct, dungeonEventLogic.NotifyEnemyAct);
+                
                 
     }
-
     
 }

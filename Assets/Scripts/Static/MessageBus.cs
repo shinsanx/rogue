@@ -46,7 +46,7 @@ public class MessageBus {
 
     private Dictionary<string, Delegate> delegateSubscribers = new Dictionary<string, Delegate>();
 
-    public void DelegateSubscribe<T>(string message, MethodWithReturnValue<T> callback) {
+    public void Subscribe<T>(string message, MethodWithReturnValue<T> callback) {
         if (!delegateSubscribers.ContainsKey(message)) {
             delegateSubscribers.Add(message, callback);
         } else {
@@ -54,7 +54,7 @@ public class MessageBus {
         }
     }
 
-    public T PublishDelegate<T>(string message, object data) {
+    public T Publish<T>(string message, object data) {
         T returnValue = default(T);
 
         //登録されているハンドラを呼び出し、戻り値を集約する
