@@ -3,128 +3,107 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using RandomDungeonWithBluePrint;
-using UnityEngine.Analytics;
-using Unity.VisualScripting;
 using System;
-using JetBrains.Annotations;
+
 
 public class EnemyAILogic {
-    private IObjectData objectData;
-    private EnemyAnimLogic enemyAnimLogic;
-    private EnemyAttackLogic enemyAttackLogic;
-    private EnemyMoveLogic enemyMoveLogic;
-    private IAnimationAdapter animationAdapter;    
-    private AStarPathfinding pathfinding;
+    // 状態を表すクラスを追加
+    private class EnemyAIState {
+        public bool IsInRoom { get; set; }
+        public bool IsAdjacentToPlayerAtStart { get; set; }
+        public bool IsAdjacentToPlayerAtEnd { get; set; }
+        public bool CanSeePlayer { get; set; }
+        public GameObject Player { get; set; }
+        public Vector2Int EnterJointPosition { get; set; }
+        public Vector2Int LastKnownPlayerPosition { get; set; }
+        public List<Vector2Int> MonsterView { get; set; }
+        public List<Vector2Int> RouteCache { get; set; }
+
+        public EnemyAIState() {
+            MonsterView = new List<Vector2Int>();
+            RouteCache = new List<Vector2Int>();
+            LastKnownPlayerPosition = Vector2Int.zero;
+        }
+    }
+
+    private readonly IObjectData objectData;
+    private readonly EnemyAnimLogic enemyAnimLogic;
+    private readonly EnemyAttackLogic enemyAttackLogic;
+    private readonly EnemyMoveLogic enemyMoveLogic;
+    private readonly IAnimationAdapter animationAdapter;
+    private readonly AStarPathfinding pathfinding;
+    private readonly EnemyAIState state;
 
     Vector2Int postPlayerPos = Vector2Int.zero;
 
-    bool isInRoom;
-    bool adjacentPlayer_first = false;
-    bool existPlayerWithView = false;
-    GameObject player = null;
-    Vector2Int enterJointPos;
-    List<Vector2Int> monsterView = new List<Vector2Int>();
-    List<Vector2Int> routeCache = new List<Vector2Int>(); //ルート探索時のキャッシュ
-
     //コンストラクタ
-    public EnemyAILogic(IObjectData objectData, IAnimationAdapter animationAdapter, IMonsterStatusAdapter monsterStatusAdapter, SpriteRenderer sr) {
+    public EnemyAILogic(
+        IObjectData objectData,
+        EnemyAnimLogic enemyAnimLogic,
+        EnemyAttackLogic enemyAttackLogic,
+        EnemyMoveLogic enemyMoveLogic,
+        IAnimationAdapter animationAdapter,
+        AStarPathfinding pathfinding) {
         this.objectData = objectData;
+        this.enemyAnimLogic = enemyAnimLogic;
+        this.enemyAttackLogic = enemyAttackLogic;
+        this.enemyMoveLogic = enemyMoveLogic;
         this.animationAdapter = animationAdapter;
-
-        enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
-        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, animationAdapter, objectData, monsterStatusAdapter);
-        enemyMoveLogic = new EnemyMoveLogic(objectData, enemyAnimLogic);        
-        pathfinding = new AStarPathfinding();
+        this.pathfinding = pathfinding;
+        this.state = new EnemyAIState();
     }
 
     public void AIStart() {
-        TurnStartProcess(objectData.Position);
-        DecideAction();
-        TurnEndProcess(objectData.Position);
-
-        //全モンスターの行動が終わったかどうかを確認するメソッドに通知する
-        MessageBus.Instance.Publish(DungeonConstants.NotifyEnemyAct, this);
+        UpdateEnemyState();
+        ExecuteAction();
+        UpdateEndState();
+        NotifyTurnComplete();
     }
 
-    private void DecideAction() {
-        //if(player == null) Debug.Log("player is null");
-        //Debug.Log(postPlayerPos + "postPlayerPos ターンスタート時の目的地");
-        Vector2Int selfPosInt = objectData.Position;
-        if (selfPosInt == postPlayerPos) {
-            postPlayerPos = Vector2Int.zero; //postPlayerPosにたどり着いたら目標地点をリセット
+    private void ExecuteAction() {
+        if (TryAttackPlayer()) return;
+        if (TryMove()) return;
+    }
+
+    private bool TryAttackPlayer() {
+        if (!state.IsAdjacentToPlayerAtStart || state.Player == null) return false;
+
+        Vector2Int enemyPos = objectData.Position;
+        Vector2Int playerPos = new Vector2Int(
+            Mathf.RoundToInt(state.Player.transform.position.x),
+            Mathf.RoundToInt(state.Player.transform.position.y)
+        );
+        Vector2Int direction = new Vector2Int(
+            playerPos.x - enemyPos.x,
+            playerPos.y - enemyPos.y
+        );
+
+        if (TileManager.i.CheckMovableTile(enemyPos, enemyPos + direction)) {
+            enemyAttackLogic.Attack(state.Player, direction);
+            return true;
         }
-        Vector2 direction = Vector2.zero;
-        Vector2Int directionInt = Vector2Int.zero;
+        return false;
+    }
 
-        //攻撃可能位置にプレイヤーがいた場合は攻撃
-        if (adjacentPlayer_first) {
-            direction = (Vector2)player.transform.position - (Vector2)objectData.Position;
-            directionInt = direction.ToVector2Int();
+    private bool TryMove() {
+        Vector2Int targetPosition = DetermineTargetPosition();
+        if (targetPosition == objectData.Position) return false;
 
-
-            if (TileManager.i.CheckMovableTile(selfPosInt, selfPosInt + directionInt)) {
-                enemyAttackLogic.Attack(player, directionInt);
-                return;
-            }
+        List<Vector2Int> route = MakeRoute(objectData.Position, targetPosition);
+        if (route != null && route.Count > 0) {
+            Move(objectData.Position, route[0]);
+            return true;
         }
-        //Debug.Log(isInRoom + ":is in room");
+        return false;
+    }
 
-        //視界にPlayerがいない　かつ　目的地がない場合
-        if (!existPlayerWithView && postPlayerPos == Vector2Int.zero) {
-
-            if (isInRoom) { //自分が部屋の中の場合
-                //JointPositionの取得
-                List<Vector2Int> jointPositions = TileManager.i.ExtractJointPosInRoom(selfPosInt);
-
-                //自身がJointの上だった場合は通路に入る（EnterJointを除く）
-                if (jointPositions.FirstOrDefault(j => j == selfPosInt) != Vector2Int.zero) {
-                    Debug.Log(jointPositions.FirstOrDefault(j => j == selfPosInt) + "on joint");
-                    Vector2Int aisle = TileManager.i.GetNeighborBranchPositions(selfPosInt).FirstOrDefault();
-                    if (selfPosInt != enterJointPos) { //Roomの入り口には入らない
-                        Debug.Log("target is" + aisle);
-                        postPlayerPos = aisle;
-                        MoveToTarget(selfPosInt, postPlayerPos);
-                        return;
-                    }
-                }
-
-                //目指すJointを決定する。
-                //出口が一つしかない場合は選択肢なし。
-                if (jointPositions.Count == 1) {
-                    postPlayerPos = jointPositions[0];
-                }
-
-                //ランダムの値が毎回同じにならないようにする
-                UnityEngine.Random.InitState(DateTime.Now.Millisecond);
-
-                while (true) {
-                    int randNum = UnityEngine.Random.Range(0, jointPositions.Count);
-                    postPlayerPos = jointPositions[randNum];
-                    //Debug.Log(postPlayerPos + "this is postPlayerPos(jointPos)");
-                    if (postPlayerPos == enterJointPos) continue;
-                    break;
-                }
-            }
-
-            //自分が通路にいる場合
-            if (!isInRoom) {
-                // Debug.Log("im in aisle!");
-                List<Vector2Int> aisles = TileManager.i.GetNeighborBranchPositions(selfPosInt);
-                Vector2Int faceDirection = animationAdapter.MoveAnimationDirection.ToVector2Int();
-
-                //通路に生まれた場合の回避策。直す必要あり。
-                if (faceDirection == Vector2Int.zero) faceDirection = aisles[0] - selfPosInt;
-
-                List<Vector2Int> facingTiles = DirectionUtils.GetSurroundingFacingTiles(selfPosInt, DungeonConstants.ToDirection[faceDirection]);
-                List<Vector2Int> intersection = aisles.Intersect(facingTiles).ToList();
-
-                postPlayerPos = intersection[0];
-                //分岐に対応できてない。CheckMovableTileを使ってランダムに選べるようにする
-            }
+    private Vector2Int DetermineTargetPosition() {
+        if (!state.CanSeePlayer && state.LastKnownPlayerPosition == Vector2Int.zero) {
+            return state.IsInRoom ?
+                DetermineRoomTargetPosition() :
+                DetermineCorridorTargetPosition();
         }
-
-        Move(selfPosInt, MakeRoute(selfPosInt, postPlayerPos)[0]);
-
+        return state.LastKnownPlayerPosition;
     }
 
     private void Move(Vector2Int selfPos, Vector2Int targetPos) {
@@ -134,13 +113,10 @@ public class EnemyAILogic {
 
     //Moveの目的地決定
     private void MoveToTarget(Vector2Int selfPos, Vector2Int targetPos) {
-        //Debug.Log(targetPos + ":targetPos in MoveToTarget Method");
-        //Debug.Log(monsterView.FirstOrDefault(p => p == targetPos) + "targetPosと一致するmonsterview");
-        List<Vector2Int> path = pathfinding.FindPath(selfPos, targetPos, monsterView);
+        List<Vector2Int> path = pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
 
         if (path != null && path.Count > 0) {
             Vector2Int nextStep = path[0];
-            //Debug.Log(nextStep + "nextStep");
             Vector2Int moveDirection = nextStep - selfPos;
             enemyMoveLogic.Move(nextStep, moveDirection);
         }
@@ -162,31 +138,39 @@ public class EnemyAILogic {
     }
 
     //ターンスタートプロセス。自身の状態を判定する
-    private void TurnStartProcess(Vector2Int selfPos){
-        player = null;
-        existPlayerWithView = false;
-        monsterView = null;
+    private void TurnStartProcess(Vector2Int selfPos) {
+        state.Player = null;
+        state.IsAdjacentToPlayerAtStart = false;
+        state.CanSeePlayer = false;
+        state.MonsterView = null;
 
         //プレイヤーと隣接しているか確認する
-        player = GetSurroundingObject(objectData.Position).FirstOrDefault();
+        state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
+        if (state.Player != null) {
+            state.IsAdjacentToPlayerAtStart = true;
+        }
     }
 
-    private void TurnEndProcess(Vector2Int selfPos){
-
+    private void TurnEndProcess(Vector2Int selfPos) {
+        state.IsAdjacentToPlayerAtEnd = false;
+        //プレイヤーと隣接しているか確認する
+        state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
+        if (state.Player != null) {
+            state.IsAdjacentToPlayerAtEnd = true;
+            state.LastKnownPlayerPosition = state.Player.transform.position.ToVector2Int();
+        }
     }
-
-
 
     // 使用するルートを選定する
     private List<Vector2Int> MakeRoute(Vector2Int selfPos, Vector2Int targetPos) {
         // プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する
-        if (existPlayerWithView) {
-            return pathfinding.FindPath(selfPos, targetPos, monsterView);
+        if (state.CanSeePlayer) {
+            return pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
         }
 
         // ルートキャッシュが有効で、全ての位置が移動可能ならキャッシュを使用する
-        if (routeCache.Count > 0 && DiscernReachable(routeCache)) {
-            return routeCache;
+        if (state.RouteCache.Count > 0 && DiscernReachable(state.RouteCache)) {
+            return state.RouteCache;
         }
 
         // 一歩だけ簡易検索して移動する（視野外のプレイヤーを追跡する場合など）
@@ -221,15 +205,84 @@ public class EnemyAILogic {
     private bool DiscernReachable(List<Vector2Int> route) {
         return route.All(position => TileManager.i.CheckTileStandable(position));
     }
-    
 
     //自身がRoom内かどうか判定する
-    private bool ExistsInRoom(Vector2Int selfPos){
+    private bool ExistsInRoom(Vector2Int selfPos) {
         int roomNum = TileManager.i.LookupRoomNum(selfPos);
-        if(roomNum == 0) return false;
-        
+        if (roomNum == 0) return false;
+
         return true;
     }
 
+    private void UpdateEnemyState() {
+        state.Player = CharacterManager.i.GetPlayer();
+        state.IsInRoom = TileManager.i.LookupRoomNum(objectData.Position) != 0;
+        state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
+        state.MonsterView = GetMonsterView();
+        state.CanSeePlayer = CanSeePlayer();
 
+        if (state.CanSeePlayer && state.Player != null) {
+            state.LastKnownPlayerPosition = new Vector2Int(
+                Mathf.RoundToInt(state.Player.transform.position.x),
+                Mathf.RoundToInt(state.Player.transform.position.y)
+            );
+        }
+    }
+
+    private void UpdateEndState() {
+        state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
+    }
+
+    private void NotifyTurnComplete() {
+        //GameManager.i.EnemyTurnEnd();
+    }
+
+    private bool IsAdjacentToPlayer() {
+        if (state.Player == null) return false;
+
+        Vector2 playerPos = state.Player.transform.position;
+        Vector2 enemyPos = new Vector2(objectData.Position.x, objectData.Position.y);
+        return Vector2.Distance(enemyPos, playerPos) <= 1.5f;
+    }
+
+    private List<Vector2Int> GetMonsterView() {
+        // 既存のGetMonsterViewロジックを実装
+        return TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
+
+        //通路の場合は、周囲8マスを視野に入れる？
+    }
+
+    //プレイヤーが視野内にいるかどうかを判定する
+    private bool CanSeePlayer() {
+        Vector2Int playerPos = state.Player.transform.position.ToVector2Int();
+        return state.MonsterView.Contains(playerPos);
+    }
+
+    private Vector2Int DetermineRoomTargetPosition() {
+        int currentRoomNum = TileManager.i.LookupRoomNum(objectData.Position);
+        List<Vector2Int> roomPositions = TileManager.i.ExtractAllRoomPositions(currentRoomNum);
+
+        if (roomPositions == null || roomPositions.Count == 0) {
+            return objectData.Position;
+        }
+
+        // ランダムな位置を選択
+        int randomIndex = UnityEngine.Random.Range(0, roomPositions.Count);
+        return roomPositions[randomIndex];
+    }
+
+    private Vector2Int DetermineCorridorTargetPosition() {
+        if (state.EnterJointPosition == Vector2Int.zero) {
+            var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+            if (joints != null && joints.Count > 0) {
+                // 最も近いジョイントポイントを選択
+                state.EnterJointPosition = joints
+                    .OrderBy(j => Vector2Int.Distance(objectData.Position, j))
+                    .First();
+            } else {
+                return objectData.Position;
+            }
+        }
+        return state.EnterJointPosition;
+    }
 }

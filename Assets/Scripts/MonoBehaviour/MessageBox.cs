@@ -101,7 +101,6 @@ public class MessageBox : MonoBehaviour {
         texts.transform.DOLocalMove(initialTextsPos, 0.0f).SetUpdate(true);
 
         TextMeshProUGUI[] textFields = { firstText, secondText, thirdText, fourthText };
-        Debug.Log(textFields.Length + " " + messages.Count);
         for (int i = 0; i < messages.Count && i < textFields.Length; i++) {            
             token.ThrowIfCancellationRequested();
 

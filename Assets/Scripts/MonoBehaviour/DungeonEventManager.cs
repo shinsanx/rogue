@@ -31,7 +31,7 @@ public class DungeonEventManager : MonoBehaviour
         playerState.OnExitEvent += dungeonEventLogic.PlayerStateExit;
         enemyState.OnExitEvent += dungeonEventLogic.EnemyStateExit;
                 
-                
+
     }
     
 }

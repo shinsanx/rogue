@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     private EnemyAnimLogic enemyAnimLogic;
     private EnemyAttackLogic enemyAttackLogic;
     private EnemyAILogic enemyAILogic;
+    private EnemyMoveLogic enemyMoveLogic;
 
     Vector2 moveOffset = new Vector2(.5f, .5f);
     private Vector2Int _enemyPosition; //startでtransform.position入れてるけど危険
@@ -122,13 +123,23 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         _enemyPosition = transform.position.ToVector2Int();
         enemyAnimLogic = new EnemyAnimLogic(this, sr);
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
+        enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
-        enemyAILogic = new EnemyAILogic(this, this, this, sr);
+        enemyAILogic = new EnemyAILogic(this, enemyAnimLogic, enemyAttackLogic, enemyMoveLogic, this, new AStarPathfinding());
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
         CharacterManager.i.AddCharacter(this);
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
 
     }
+
+    // public EnemyAILogic(
+    //     IObjectData objectData,
+    //     EnemyAnimLogic enemyAnimLogic,
+    //     EnemyAttackLogic enemyAttackLogic,
+    //     EnemyMoveLogic enemyMoveLogic,
+    //     IAnimationAdapter animationAdapter,
+    //     AStarPathfinding pathfinding)
+    // {
 
     private void OnEnemyDestroyed(){
         Destroy(gameObject);

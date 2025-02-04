@@ -4,13 +4,12 @@ using UnityEngine;
 using System.Linq;
 using System.Data.Common;
 
-public class CharacterManager : MonoBehaviour
-{
+public class CharacterManager : MonoBehaviour {
     private static CharacterManager _i;
-    public static CharacterManager i{
+    public static CharacterManager i {
         get {
-            if(_i == null) {
-            var obj = new GameObject("CharacterManager");
+            if (_i == null) {
+                var obj = new GameObject("CharacterManager");
                 _i = obj.AddComponent<CharacterManager>();
             }
             return _i;
@@ -23,33 +22,32 @@ public class CharacterManager : MonoBehaviour
     //IDの管理
     private static int _idCounter = 0;
 
-    public static int GetUniqueID(){
+    public static int GetUniqueID() {
         return ++_idCounter;
     }
 
     //IDをリセットする（必要があれば）
-    public static void ResetID(){
+    public static void ResetID() {
         _idCounter = 0;
-        
+
     }
-    
-    
-    
+
+
+
     // オブジェクトの情報を更新する
     private void UpdateObjectInfo(IObjectData objectData) {
-    for (int i = 0; i < allObjectData.Count; i++) {
-        if (allObjectData[i].Id == objectData.Id) {
-            allObjectData[i] = objectData;            
-            // Debug.Log($"Updated object: {objectData.Name} with ID: {objectData.Id}");
-            return;
+        for (int i = 0; i < allObjectData.Count; i++) {
+            if (allObjectData[i].Id == objectData.Id) {
+                allObjectData[i] = objectData;
+                // Debug.Log($"Updated object: {objectData.Name} with ID: {objectData.Id}");
+                return;
+            }
         }
+        Debug.LogWarning($"Object with ID: {objectData.Id} not found.");
     }
-    Debug.LogWarning($"Object with ID: {objectData.Id} not found.");
-}
 
     // キャラクターを追加するメソッド
-    public void AddCharacter(IObjectData character)
-    {
+    public void AddCharacter(IObjectData character) {
         allObjectData.Add(character);
         character.OnObjectUpdated += UpdateObjectInfo;
         Debug.Log($"registered: {character.Name}");
@@ -57,8 +55,7 @@ public class CharacterManager : MonoBehaviour
     }
 
     // キャラクターを削除するメソッド
-    public void RemoveCharacter(IObjectData character)
-    {
+    public void RemoveCharacter(IObjectData character) {
         character.OnObjectUpdated -= UpdateObjectInfo;
         allObjectData.Remove(character);
         Debug.Log($"unregistered: {character.Name}");
@@ -66,17 +63,14 @@ public class CharacterManager : MonoBehaviour
 
 
     // 指定された位置にあるオブジェクトを取得する    
-    public GameObject GetObjectByPosition(Vector2Int position)
-    {
+    public GameObject GetObjectByPosition(Vector2Int position) {
         // allObjectData から一致する IObjectData を検索
         var matchingObject = allObjectData.FirstOrDefault(obj => obj.Position == position);
 
-        if (matchingObject != null)
-        {
+        if (matchingObject != null) {
             // IObjectData から GameObject を取得 (キャストが必要)
             MonoBehaviour matchingGameObject = matchingObject as MonoBehaviour;
-            if (matchingGameObject != null)
-            {
+            if (matchingGameObject != null) {
                 return matchingGameObject.gameObject;
             }
         }
@@ -87,19 +81,19 @@ public class CharacterManager : MonoBehaviour
     }
 
     //positionから存在するオブジェクトのタイプを返す
-    public string GetObjectTypeByPosition(Vector2Int position){
+    public string GetObjectTypeByPosition(Vector2Int position) {
         var obj = allObjectData.FirstOrDefault(obj => obj.Position == position);
-        if(obj == null) {
+        if (obj == null) {
             Debug.Log($"{position}にはタイプが見つかりません");
-            return null;            
+            return null;
         }
         return obj.Type;
     }
 
-    public List<GameObject> GetObjectsInSameRoom(int roomNum){
-        // 指定された部屋番号のオブジェクトを抽出
+    //指定された部屋番号のオブジェクトを取得する
+    public List<GameObject> GetObjectsInSameRoom(int roomNum) {        
         IEnumerable<IObjectData> objectsInRoom = allObjectData.Where(obj => obj.RoomNum == roomNum);
-        
+
         // MonoBehaviourにキャストしてGameObjectを取得
         IEnumerable<GameObject> gameObjects = objectsInRoom.Select(data => {
             MonoBehaviour monoBehaviour = data as MonoBehaviour;
@@ -109,6 +103,17 @@ public class CharacterManager : MonoBehaviour
         // nullでないものだけをリストにして返す
         return gameObjects.Where(obj => obj != null).ToList();
     }
-    
-    
+
+    //プレイヤーを取得する
+    public GameObject GetPlayer() {
+        var obj = allObjectData.FirstOrDefault(obj => obj.Type == "Player");
+        if(obj != null) {
+            MonoBehaviour monoBehaviour = obj as MonoBehaviour;            
+            return monoBehaviour?.gameObject;
+        }
+        Debug.LogWarning("Playerが見つかりません");
+        return null;
+    }
+
+
 }

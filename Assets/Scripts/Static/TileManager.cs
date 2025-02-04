@@ -30,7 +30,8 @@ public class TileManager{
         bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
         bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
         bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
-        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
+        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        // 注意：Enemyでしか判定してない。Playerがいる場所は移動可能になっている
 
         return canMoveX && canMoveY && canMove && !existEnemy;
     }
