@@ -32,6 +32,7 @@ public class EnemyAttackLogic
     }
 
     public void Attack(GameObject go, Vector2Int direction){
+        Debug.Log("Attack by EnemyAttackLogic");
         DealDamage(go, direction);        
     }
 

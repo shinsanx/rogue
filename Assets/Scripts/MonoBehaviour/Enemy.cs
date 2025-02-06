@@ -125,6 +125,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
         enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
+        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);
         enemyAILogic = new EnemyAILogic(this, enemyAnimLogic, enemyAttackLogic, enemyMoveLogic, this, new AStarPathfinding());
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
         CharacterManager.i.AddCharacter(this);
@@ -132,14 +133,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
 
     }
 
-    // public EnemyAILogic(
-    //     IObjectData objectData,
-    //     EnemyAnimLogic enemyAnimLogic,
-    //     EnemyAttackLogic enemyAttackLogic,
-    //     EnemyMoveLogic enemyMoveLogic,
-    //     IAnimationAdapter animationAdapter,
-    //     AStarPathfinding pathfinding)
-    // {
 
     private void OnEnemyDestroyed(){
         Destroy(gameObject);

@@ -30,10 +30,21 @@ public class TileManager{
         bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
         bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
         bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
-        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        bool existCharacter = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
         // 注意：Enemyでしか判定してない。Playerがいる場所は移動可能になっている
 
-        return canMoveX && canMoveY && canMove && !existEnemy;
+        return canMoveX && canMoveY && canMove && !existCharacter;
+    }
+
+    public bool CheckAttackableTile(Vector2Int currentPos, Vector2Int targetPos) {
+        //floor =>0 wall =>1
+        bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
+        bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
+        bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
+        //bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        // 注意：Enemyでしか判定してない。Playerがいる場所は移動可能になっている
+
+        return canMoveX && canMoveY && canMove;
     }
 
     //AstarPathfinding専用。
@@ -104,7 +115,6 @@ public class TileManager{
 
         // room内の全ポジションを取得
         List<Vector2Int> allRoomPositions = new List<Vector2Int>(room.Positions);
-        Debug.Log($"Room {roomNum} has {allRoomPositions.Count} positions initially.");
 
         // 接続点（joint）を取得し、接続点から1マス隣の通路を探索
         List<Vector2Int> joints = ExtractJointPosInRoom(room.Positions[0]);
@@ -125,6 +135,9 @@ public class TileManager{
         Debug.Log($"Room {roomNum} final positions count: {allRoomPositions.Count}");
         return allRoomPositions;
     }
+
+    
+
 
     // 周囲１マスにある通路タイルを検出する
     public List<Vector2Int> GetNeighborBranchPositions(Vector2Int selfPos) {

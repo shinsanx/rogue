@@ -13,7 +13,7 @@ public class StateMachine : ScriptableObject
     [SerializeField] private State defaultState;
 
     //Stateが変わった時に呼ばれるイベント 未使用。
-    public event Action<State> OnStateChanged;
+    // public event Action<State> OnStateChanged;
 
     public void init(){
         _currentState = null; //生成した時に前の情報を引き継がない

@@ -39,7 +39,7 @@ public class CharacterManager : MonoBehaviour {
         for (int i = 0; i < allObjectData.Count; i++) {
             if (allObjectData[i].Id == objectData.Id) {
                 allObjectData[i] = objectData;
-                // Debug.Log($"Updated object: {objectData.Name} with ID: {objectData.Id}");
+                Debug.Log($"Updated object: {objectData.Name} with Pos: {objectData.Position}");                
                 return;
             }
         }
@@ -50,8 +50,8 @@ public class CharacterManager : MonoBehaviour {
     public void AddCharacter(IObjectData character) {
         allObjectData.Add(character);
         character.OnObjectUpdated += UpdateObjectInfo;
-        Debug.Log($"registered: {character.Name}");
-        Debug.Log($"ID: {character.Id}");
+        // Debug.Log($"registered: {character.Name}");
+        // Debug.Log($"ID: {character.Id}");
     }
 
     // キャラクターを削除するメソッド
@@ -84,7 +84,7 @@ public class CharacterManager : MonoBehaviour {
     public string GetObjectTypeByPosition(Vector2Int position) {
         var obj = allObjectData.FirstOrDefault(obj => obj.Position == position);
         if (obj == null) {
-            Debug.Log($"{position}にはタイプが見つかりません");
+            // Debug.Log($"{position}にはタイプが見つかりません");
             return null;
         }
         return obj.Type;

@@ -26,15 +26,11 @@ public class EnemyAILogic {
         }
     }
 
-    private readonly IObjectData objectData;
-    private readonly EnemyAnimLogic enemyAnimLogic;
+    private readonly IObjectData objectData;    
     private readonly EnemyAttackLogic enemyAttackLogic;
-    private readonly EnemyMoveLogic enemyMoveLogic;
-    private readonly IAnimationAdapter animationAdapter;
+    private readonly EnemyMoveLogic enemyMoveLogic;    
     private readonly AStarPathfinding pathfinding;
-    private readonly EnemyAIState state;
-
-    Vector2Int postPlayerPos = Vector2Int.zero;
+    private readonly EnemyAIState state;    
 
     //コンストラクタ
     public EnemyAILogic(
@@ -44,11 +40,10 @@ public class EnemyAILogic {
         EnemyMoveLogic enemyMoveLogic,
         IAnimationAdapter animationAdapter,
         AStarPathfinding pathfinding) {
-        this.objectData = objectData;
-        this.enemyAnimLogic = enemyAnimLogic;
+            
+        this.objectData = objectData;        
         this.enemyAttackLogic = enemyAttackLogic;
-        this.enemyMoveLogic = enemyMoveLogic;
-        this.animationAdapter = animationAdapter;
+        this.enemyMoveLogic = enemyMoveLogic;        
         this.pathfinding = pathfinding;
         this.state = new EnemyAIState();
     }
@@ -60,25 +55,69 @@ public class EnemyAILogic {
         NotifyTurnComplete();
     }
 
+    private void UpdateEnemyState() {
+        state.Player = CharacterManager.i.GetPlayer();
+        state.IsInRoom = TileManager.i.LookupRoomNum(objectData.Position) != 0;
+        Debug.Log($"state.IsInRoom: {state.IsInRoom}");
+        state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
+        Debug.Log($"state.IsAdjacentToPlayerAtStart: {state.IsAdjacentToPlayerAtStart}");
+        state.MonsterView = GetMonsterView();
+        Debug.Log($"state.MonsterView: {state.MonsterView.Count}");
+        state.CanSeePlayer = CanSeePlayer();
+        Debug.Log($"state.CanSeePlayer: {state.CanSeePlayer}");
+
+        if (state.CanSeePlayer && state.Player != null) {
+            state.LastKnownPlayerPosition = new Vector2Int(
+                Mathf.RoundToInt(state.Player.transform.position.x),
+                Mathf.RoundToInt(state.Player.transform.position.y)
+            );
+        }
+    }
+
+    private bool IsAdjacentToPlayer() {
+        if (state.Player == null) return false;
+
+        Vector2 playerPos = state.Player.transform.position;
+        Vector2 enemyPos = new Vector2(objectData.Position.x, objectData.Position.y);
+        return Vector2.Distance(enemyPos, playerPos) <= 1.5f;
+    }
+
+    private List<Vector2Int> GetMonsterView() {
+        // 既存のGetMonsterViewロジックを実装
+        return TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
+
+        //通路の場合は、周囲8マスを視野に入れる？
+    }
+
+    //プレイヤーが視野内にいるかどうかを判定する
+    private bool CanSeePlayer() {
+        Vector2Int playerPos = state.Player.transform.position.ToVector2Int();
+        return state.MonsterView.Contains(playerPos);
+    }
+
+
+    // 攻撃と移動をする
     private void ExecuteAction() {
         if (TryAttackPlayer()) return;
         if (TryMove()) return;
     }
 
+    // ターンスタート時にプレイヤーと隣接していた場合はプレイヤーを攻撃。
     private bool TryAttackPlayer() {
-        if (!state.IsAdjacentToPlayerAtStart || state.Player == null) return false;
+        if (!state.IsAdjacentToPlayerAtStart) return false;
 
         Vector2Int enemyPos = objectData.Position;
         Vector2Int playerPos = new Vector2Int(
             Mathf.RoundToInt(state.Player.transform.position.x),
             Mathf.RoundToInt(state.Player.transform.position.y)
         );
+        Debug.Log($"playerPos {playerPos}");
         Vector2Int direction = new Vector2Int(
             playerPos.x - enemyPos.x,
             playerPos.y - enemyPos.y
         );
 
-        if (TileManager.i.CheckMovableTile(enemyPos, enemyPos + direction)) {
+        if (TileManager.i.CheckAttackableTile(enemyPos, enemyPos + direction)) {                        
             enemyAttackLogic.Attack(state.Player, direction);
             return true;
         }
@@ -111,55 +150,7 @@ public class EnemyAILogic {
         enemyMoveLogic.Move(targetPos, moveDirection);
     }
 
-    //Moveの目的地決定
-    private void MoveToTarget(Vector2Int selfPos, Vector2Int targetPos) {
-        List<Vector2Int> path = pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
 
-        if (path != null && path.Count > 0) {
-            Vector2Int nextStep = path[0];
-            Vector2Int moveDirection = nextStep - selfPos;
-            enemyMoveLogic.Move(nextStep, moveDirection);
-        }
-    }
-
-    //周囲１マスのGameObjectを取り出す
-    private List<GameObject> GetSurroundingObject(Vector2 selfPos) {
-        List<GameObject> surroundingObjects = new List<GameObject>();
-        Vector2Int selfPosInt = selfPos.ToVector2Int();
-
-        foreach (var direction in DungeonConstants.EightDirections) {
-            Vector2Int targetPos = selfPosInt + DungeonConstants.ToVector2Int[direction];
-            GameObject go = CharacterManager.i.GetObjectByPosition(targetPos);
-            if (go != null) {
-                surroundingObjects.Add(go);
-            }
-        }
-        return surroundingObjects;
-    }
-
-    //ターンスタートプロセス。自身の状態を判定する
-    private void TurnStartProcess(Vector2Int selfPos) {
-        state.Player = null;
-        state.IsAdjacentToPlayerAtStart = false;
-        state.CanSeePlayer = false;
-        state.MonsterView = null;
-
-        //プレイヤーと隣接しているか確認する
-        state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
-        if (state.Player != null) {
-            state.IsAdjacentToPlayerAtStart = true;
-        }
-    }
-
-    private void TurnEndProcess(Vector2Int selfPos) {
-        state.IsAdjacentToPlayerAtEnd = false;
-        //プレイヤーと隣接しているか確認する
-        state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
-        if (state.Player != null) {
-            state.IsAdjacentToPlayerAtEnd = true;
-            state.LastKnownPlayerPosition = state.Player.transform.position.ToVector2Int();
-        }
-    }
 
     // 使用するルートを選定する
     private List<Vector2Int> MakeRoute(Vector2Int selfPos, Vector2Int targetPos) {
@@ -201,63 +192,6 @@ public class EnemyAILogic {
         return selfPos;
     }
 
-    // ルートのそれぞれのマスに他オブジェクトが存在していないかチェックする
-    private bool DiscernReachable(List<Vector2Int> route) {
-        return route.All(position => TileManager.i.CheckTileStandable(position));
-    }
-
-    //自身がRoom内かどうか判定する
-    private bool ExistsInRoom(Vector2Int selfPos) {
-        int roomNum = TileManager.i.LookupRoomNum(selfPos);
-        if (roomNum == 0) return false;
-
-        return true;
-    }
-
-    private void UpdateEnemyState() {
-        state.Player = CharacterManager.i.GetPlayer();
-        state.IsInRoom = TileManager.i.LookupRoomNum(objectData.Position) != 0;
-        state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
-        state.MonsterView = GetMonsterView();
-        state.CanSeePlayer = CanSeePlayer();
-
-        if (state.CanSeePlayer && state.Player != null) {
-            state.LastKnownPlayerPosition = new Vector2Int(
-                Mathf.RoundToInt(state.Player.transform.position.x),
-                Mathf.RoundToInt(state.Player.transform.position.y)
-            );
-        }
-    }
-
-    private void UpdateEndState() {
-        state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
-    }
-
-    private void NotifyTurnComplete() {
-        //GameManager.i.EnemyTurnEnd();
-    }
-
-    private bool IsAdjacentToPlayer() {
-        if (state.Player == null) return false;
-
-        Vector2 playerPos = state.Player.transform.position;
-        Vector2 enemyPos = new Vector2(objectData.Position.x, objectData.Position.y);
-        return Vector2.Distance(enemyPos, playerPos) <= 1.5f;
-    }
-
-    private List<Vector2Int> GetMonsterView() {
-        // 既存のGetMonsterViewロジックを実装
-        return TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
-
-        //通路の場合は、周囲8マスを視野に入れる？
-    }
-
-    //プレイヤーが視野内にいるかどうかを判定する
-    private bool CanSeePlayer() {
-        Vector2Int playerPos = state.Player.transform.position.ToVector2Int();
-        return state.MonsterView.Contains(playerPos);
-    }
-
     private Vector2Int DetermineRoomTargetPosition() {
         int currentRoomNum = TileManager.i.LookupRoomNum(objectData.Position);
         List<Vector2Int> roomPositions = TileManager.i.ExtractAllRoomPositions(currentRoomNum);
@@ -285,4 +219,85 @@ public class EnemyAILogic {
         }
         return state.EnterJointPosition;
     }
+
+    // ルートのそれぞれのマスに他オブジェクトが存在していないかチェックする
+    private bool DiscernReachable(List<Vector2Int> route) {
+        return route.All(position => TileManager.i.CheckTileStandable(position));
+    }    
+
+    
+
+    private void UpdateEndState() {
+        state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
+    }
+
+    private void NotifyTurnComplete() {
+        //GameManager.i.EnemyTurnEnd();
+    }
+
+    
+
+    
+
+    
+
+    
+
+    // //自身がRoom内かどうか判定する
+    // private bool ExistsInRoom(Vector2Int selfPos) {
+    //     int roomNum = TileManager.i.LookupRoomNum(selfPos);
+    //     if (roomNum == 0) return false;
+
+    //     return true;
+    // }
+
+        // //Moveの目的地決定
+    // private void MoveToTarget(Vector2Int selfPos, Vector2Int targetPos) {
+    //     List<Vector2Int> path = pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
+
+    //     if (path != null && path.Count > 0) {
+    //         Vector2Int nextStep = path[0];
+    //         Vector2Int moveDirection = nextStep - selfPos;
+    //         enemyMoveLogic.Move(nextStep, moveDirection);
+    //     }
+    // }
+
+    // //周囲１マスのGameObjectを取り出す
+    // private List<GameObject> GetSurroundingObject(Vector2 selfPos) {
+    //     List<GameObject> surroundingObjects = new List<GameObject>();
+    //     Vector2Int selfPosInt = selfPos.ToVector2Int();
+
+    //     foreach (var direction in DungeonConstants.EightDirections) {
+    //         Vector2Int targetPos = selfPosInt + DungeonConstants.ToVector2Int[direction];
+    //         GameObject go = CharacterManager.i.GetObjectByPosition(targetPos);
+    //         if (go != null) {
+    //             surroundingObjects.Add(go);
+    //         }
+    //     }
+    //     return surroundingObjects;
+    // }
+
+    //ターンスタートプロセス。自身の状態を判定する
+    // private void TurnStartProcess(Vector2Int selfPos) {
+    //     state.Player = null;
+    //     state.IsAdjacentToPlayerAtStart = false;
+    //     state.CanSeePlayer = false;
+    //     state.MonsterView = null;
+
+    //     //プレイヤーと隣接しているか確認する
+    //     state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
+    //     if (state.Player != null) {
+    //         state.IsAdjacentToPlayerAtStart = true;
+    //     }
+    // }
+
+    // private void TurnEndProcess(Vector2Int selfPos) {
+    //     state.IsAdjacentToPlayerAtEnd = false;
+    //     //プレイヤーと隣接しているか確認する
+    //     state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
+    //     if (state.Player != null) {
+    //         state.IsAdjacentToPlayerAtEnd = true;
+    //         state.LastKnownPlayerPosition = state.Player.transform.position.ToVector2Int();
+    //     }
+    // }
 }
