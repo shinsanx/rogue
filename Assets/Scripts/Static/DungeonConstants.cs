@@ -39,7 +39,11 @@ public static class DungeonConstants {
         North,
         South,
         East,
-        West
+        West,
+        NorthEast,
+        NorthWest,
+        SouthEast,
+        SouthWest
     }
 
 
@@ -47,7 +51,11 @@ public static class DungeonConstants {
         {new Vector2Int(0,1), Direction.North},
         {new Vector2Int(0, -1), Direction.South},
         {new Vector2Int(1, 0), Direction.East},
-        {new Vector2Int(-1, 0), Direction.West}
+        {new Vector2Int(-1, 0), Direction.West},
+        {new Vector2Int(1, 1), Direction.NorthEast},
+        {new Vector2Int(-1, 1), Direction.NorthWest},
+        {new Vector2Int(1, -1), Direction.SouthEast},
+        {new Vector2Int(-1, -1), Direction.SouthWest}
     };
 
     public static readonly int[] EightDirections = {

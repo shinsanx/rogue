@@ -16,9 +16,7 @@ public class PlayerMoveLogic
     //コンストラクタ
     public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){        
         this.objectData = objectData;
-        this.playerAnimLogic = playerAnimLogic;
-        stateMachine = GameAssets.i.stateMachine;
-        enemyState = GameAssets.i.enemyState;
+        this.playerAnimLogic = playerAnimLogic;                
     }
 
     Vector2 inputVector;
@@ -69,7 +67,7 @@ public class PlayerMoveLogic
         LockInputWhileMoving();
         Vector2 newPosition = targetPos + moveOffset;
         objectData.Position = newPosition.ToVector2Int();
-        EndState();
+        ActionEventManager.NotifyActionComplete();
     }
 
     async void LockInputWhileMoving(){
@@ -78,7 +76,4 @@ public class PlayerMoveLogic
         isMoving = false;
     }
 
-    private void EndState(){
-        stateMachine.SetState(enemyState);
-    }
 }

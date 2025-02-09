@@ -19,7 +19,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private PlayerAnimLogic playerAnimLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
-
+    private StateMachine stateMachine;
     private Vector2Int playerPosition;
     private Vector2 playerFaceDirection;
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
@@ -151,6 +151,12 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         playerStatusDataLogic.SetObjectDataDefault(this);
         CharacterManager.i.AddCharacter(this);
         MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
+        stateMachine = GameAssets.i.stateMachine;
+
+        // ActionEventManagerで使用するためにセット
+        ActionEventManager.OnPlayerActionComplete += () => {
+            stateMachine.SetState(GameAssets.i.enemyState);
+        };
     }
 
     public void TakeDamage(int damage, string dealerName) {

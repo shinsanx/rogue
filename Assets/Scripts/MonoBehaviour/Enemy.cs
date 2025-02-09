@@ -135,6 +135,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
 
 
     private void OnEnemyDestroyed(){
+        CharacterManager.i.RemoveCharacter(this);
         Destroy(gameObject);
     }
 

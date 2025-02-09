@@ -62,7 +62,6 @@ public class EnemyAILogic {
         state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
         state.MonsterView = GetMonsterView();
         state.CanSeePlayer = CanSeePlayer();
-        Debug.Log($"state.CanSeePlayer: {state.CanSeePlayer}");
 
         if (state.LastKnownPlayerPosition == objectData.Position) {
             // LastKnownPlayerPositionに辿り着いた場合はリセットする
@@ -143,7 +142,6 @@ public class EnemyAILogic {
                 DetermineRoomTargetPosition() :
                 DetermineCorridorTargetPosition();
         }
-        Debug.Log("プレイヤーの最後の位置を追いかけます");
         return state.LastKnownPlayerPosition;
     }
 
@@ -186,7 +184,7 @@ public class EnemyAILogic {
         Vector2Int newPos = new Vector2Int(selfPos.x + moveX, selfPos.y + moveY);
 
         // 移動可能か確認
-        if (TileManager.i.CheckTileStandable(newPos)) {
+        if (TileManager.i.CheckMovableTile(selfPos, newPos)) {
             return newPos;
         }
 

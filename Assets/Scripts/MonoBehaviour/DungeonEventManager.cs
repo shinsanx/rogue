@@ -23,7 +23,7 @@ public class DungeonEventManager : MonoBehaviour
         enemyState = GameAssets.i.enemyState;
         stateMachine.init();
 
-        dungeonEventLogic = new DungeonEventLogic(enemyParent, this);
+        dungeonEventLogic = new DungeonEventLogic(enemyParent);
 
         playerState.OnEnterEvent += dungeonEventLogic.PlayerStateStart;
         enemyState.OnEnterEvent += dungeonEventLogic.EnemyStateStart;

@@ -24,46 +24,37 @@ public class TileManager{
         MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateFieldInformation);
     }
 
+    // 基本的な通行可能判定を行う共通メソッド
+    private bool IsBasicallyWalkable(Vector2Int currentPos, Vector2Int targetPos) {
+        //floor =>0 wall =>1
+        bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
+        bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
+        bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
+        return canMoveX && canMoveY && canMove;
+    }
+
     //床が移動可能かどうか判別する
     public bool CheckMovableTile(Vector2Int currentPos, Vector2Int targetPos) {
-        //floor =>0 wall =>1
-        bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
-        bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
-        bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
         bool existCharacter = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
-        // 注意：Enemyでしか判定してない。Playerがいる場所は移動可能になっている
-
-        return canMoveX && canMoveY && canMove && !existCharacter;
+        return IsBasicallyWalkable(currentPos, targetPos) && !existCharacter;
     }
 
+    // 攻撃可能なタイルかどうか判別する
     public bool CheckAttackableTile(Vector2Int currentPos, Vector2Int targetPos) {
-        //floor =>0 wall =>1
-        bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
-        bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
-        bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
-        //bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
-        // 注意：Enemyでしか判定してない。Playerがいる場所は移動可能になっている
-
-        return canMoveX && canMoveY && canMove;
+        return IsBasicallyWalkable(currentPos, targetPos);
     }
 
-    //AstarPathfinding専用。
+    //AstarPathfinding専用。キャラクターがいるかどうかはチェックしない
     public bool CheckWalkableTile(Vector2Int currentPos, Vector2Int targetPos) {
-        bool canMoveY = field.tileInfo[currentPos.x, targetPos.y].mapChipType == 0;
-        bool canMoveX = field.tileInfo[targetPos.x, currentPos.y].mapChipType == 0;
-        bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
-        return canMoveX && canMoveY && canMove;
+        return IsBasicallyWalkable(currentPos, targetPos);
     }
 
     //そのポジションに他オブジェクトがないかチェックする
     public bool CheckTileStandable(Vector2Int targetPos) {
         bool canMove = field.tileInfo[targetPos.x, targetPos.y].mapChipType == 0;
-        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
-
-        return canMove && !existEnemy;
+        bool existCharacter = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
+        return canMove && !existCharacter;
     }
-
-
 
     //aisleとnothingのみ。MapChipTypeとは別
     public int GetTileType(Vector2Int vector) {

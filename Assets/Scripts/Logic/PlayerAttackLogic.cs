@@ -11,8 +11,8 @@ public class PlayerAttackLogic
     private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
 
-    private StateMachine stateMachine;
-    private State enemyState;
+    
+    
 
     //コンストラクタ
     public PlayerAttackLogic(
@@ -24,15 +24,13 @@ public class PlayerAttackLogic
         this.playerAnimLogic = playerAnimLogic;
         this.animationAdapter = animationAdapter;
         this.objectData = objectData;
-        this.playerStatusAdapter = playerStatusAdapter;
-        stateMachine = GameAssets.i.stateMachine;
-        enemyState = GameAssets.i.enemyState;
+        this.playerStatusAdapter = playerStatusAdapter;                
     }
 
     public void Attack(){
         playerAnimLogic.SetAttackAnimation();
         DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition()));
-        EndState();
+        ActionEventManager.NotifyActionComplete();
     }
 
     private Vector2Int GetTargetPosition(){
@@ -46,7 +44,6 @@ public class PlayerAttackLogic
 
     private void DealDamage(GameObject targetObject){
         if(targetObject == null) return;
-        Debug.Log(targetObject.name);
         if(!targetObject.CompareTag("Enemy"))return;
         if(damageCalculate == null){
             damageCalculate = new DamageCalculate();
@@ -64,8 +61,5 @@ public class PlayerAttackLogic
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
         damageable.TakeDamage(damage, objectData.Name);
     }
-
-    private void EndState(){
-        stateMachine.SetState(enemyState);
-    }
+    
 }

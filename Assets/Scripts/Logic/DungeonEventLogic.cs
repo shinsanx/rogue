@@ -16,15 +16,10 @@ public class DungeonEventLogic {
 
     public List<IPositionAdapter> objectsPositionAdapters = new List<IPositionAdapter>();
     public List<Transform> gameObjectsTransform = new List<Transform>();
-    public List<Transform> enemies = new List<Transform>();
+    public List<Transform> enemies = new List<Transform>();        
 
-    private DungeonEventManager dungeonEventManager;
-
-    private int actableEnemies = 0;
-
-    public DungeonEventLogic(GameObject enemyParent, DungeonEventManager dungeonEventManager) {
+    public DungeonEventLogic(GameObject enemyParent) {
         this.enemyParent = enemyParent;
-        this.dungeonEventManager = dungeonEventManager;
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;
@@ -36,23 +31,19 @@ public class DungeonEventLogic {
     }
 
     public void PlayerStateExit() {
-
     }
 
     public async void EnemyStateStart() {        
         await Task.Delay(500); //ビミョー
 
         enemies = new List<Transform>(enemyParent.GetComponentsInChildren<Transform>());
-        enemies.RemoveAt(0); //parent分を引く
-
-        actableEnemies = enemies.Count;
+        enemies.RemoveAt(0); //parent分を引く        
 
         foreach(var enemy in enemies){
             var monster = enemy.GetComponent<IMonsterStatusAdapter>();
             if(monster != null) {
                 //敵の行動を開始する
-                monster.Action = true;
-                actableEnemies -= 1;
+                monster.Action = true;                
             }
         }
 
@@ -60,11 +51,9 @@ public class DungeonEventLogic {
     }
 
     public void EnemyStateExit() {
-
     }         
 
-    public void StartEnemyTurn(){
-        
+    public void StartEnemyTurn(){        
     }
 
     private void EndEnemyTurn(){
