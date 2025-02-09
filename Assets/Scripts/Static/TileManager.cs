@@ -96,9 +96,9 @@ public class TileManager{
 
     //Room内のジョイントポジションを検索する
     public List<Vector2Int> ExtractJointPosInRoom(Vector2Int selfPos) {
-        int roomNum = LookupRoomNum(selfPos);
-        Room room = field.Rooms.FirstOrDefault(r => r.roomNum == roomNum);
-        if (room == null) return null;
+        int roomNum = LookupRoomNum(selfPos);        
+        Room room = field.Rooms.FirstOrDefault(r => r.roomNum == roomNum);        
+        if (room == null) return null;        
         if (room.jointPositions == null) return null;
         return room.jointPositions;
     }
@@ -131,8 +131,6 @@ public class TileManager{
                 }
             }
         }
-
-        Debug.Log($"Room {roomNum} final positions count: {allRoomPositions.Count}");
         return allRoomPositions;
     }
 
@@ -151,6 +149,18 @@ public class TileManager{
             }
         }
         return neighborBranches;
+    }
+
+    // 周囲１マスのポジションを取得
+    public List<Vector2Int> GetSurroundingPositions(Vector2Int selfPos) {
+        List<Vector2Int> surroundingPositions = new List<Vector2Int>();
+        foreach (var direction in DungeonConstants.EightDirections) {
+            Vector2Int neighborPos = selfPos + DungeonConstants.ToVector2Int[direction];
+            
+                surroundingPositions.Add(neighborPos);
+            
+        }
+        return surroundingPositions;
     }
 
 

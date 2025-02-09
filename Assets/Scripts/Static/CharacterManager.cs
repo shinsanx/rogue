@@ -39,7 +39,7 @@ public class CharacterManager : MonoBehaviour {
         for (int i = 0; i < allObjectData.Count; i++) {
             if (allObjectData[i].Id == objectData.Id) {
                 allObjectData[i] = objectData;
-                Debug.Log($"Updated object: {objectData.Name} with Pos: {objectData.Position}");                
+                // Debug.Log($"Updated object: {objectData.Name} with Pos: {objectData.Position}");                
                 return;
             }
         }

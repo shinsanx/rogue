@@ -4,15 +4,18 @@ using UnityEngine;
 using System.Linq;
 using RandomDungeonWithBluePrint;
 using System;
+using TMPro;
 
 
 public class EnemyAILogic {
     // 状態を表すクラスを追加
     private class EnemyAIState {
-        public bool IsInRoom { get; set; }
+        public bool IsInRoomAtStart { get; set; }
+        public bool IsInRoomAtEnd { get; set; }
         public bool IsAdjacentToPlayerAtStart { get; set; }
         public bool IsAdjacentToPlayerAtEnd { get; set; }
         public bool CanSeePlayer { get; set; }
+        public Vector2Int FacingDirection { get; set; }
         public GameObject Player { get; set; }
         public Vector2Int EnterJointPosition { get; set; }
         public Vector2Int LastKnownPlayerPosition { get; set; }
@@ -26,24 +29,22 @@ public class EnemyAILogic {
         }
     }
 
-    private readonly IObjectData objectData;    
+    private readonly IObjectData objectData;
     private readonly EnemyAttackLogic enemyAttackLogic;
-    private readonly EnemyMoveLogic enemyMoveLogic;    
+    private readonly EnemyMoveLogic enemyMoveLogic;
     private readonly AStarPathfinding pathfinding;
-    private readonly EnemyAIState state;    
+    private readonly EnemyAIState state;
 
     //コンストラクタ
     public EnemyAILogic(
         IObjectData objectData,
-        EnemyAnimLogic enemyAnimLogic,
         EnemyAttackLogic enemyAttackLogic,
         EnemyMoveLogic enemyMoveLogic,
-        IAnimationAdapter animationAdapter,
         AStarPathfinding pathfinding) {
-            
-        this.objectData = objectData;        
+
+        this.objectData = objectData;
         this.enemyAttackLogic = enemyAttackLogic;
-        this.enemyMoveLogic = enemyMoveLogic;        
+        this.enemyMoveLogic = enemyMoveLogic;
         this.pathfinding = pathfinding;
         this.state = new EnemyAIState();
     }
@@ -57,41 +58,44 @@ public class EnemyAILogic {
 
     private void UpdateEnemyState() {
         state.Player = CharacterManager.i.GetPlayer();
-        state.IsInRoom = TileManager.i.LookupRoomNum(objectData.Position) != 0;
-        Debug.Log($"state.IsInRoom: {state.IsInRoom}");
+        state.IsInRoomAtStart = TileManager.i.LookupRoomNum(objectData.Position) != 0;
         state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
-        Debug.Log($"state.IsAdjacentToPlayerAtStart: {state.IsAdjacentToPlayerAtStart}");
         state.MonsterView = GetMonsterView();
-        Debug.Log($"state.MonsterView: {state.MonsterView.Count}");
         state.CanSeePlayer = CanSeePlayer();
         Debug.Log($"state.CanSeePlayer: {state.CanSeePlayer}");
 
-        if (state.CanSeePlayer && state.Player != null) {
-            state.LastKnownPlayerPosition = new Vector2Int(
-                Mathf.RoundToInt(state.Player.transform.position.x),
-                Mathf.RoundToInt(state.Player.transform.position.y)
-            );
+        if (state.LastKnownPlayerPosition == objectData.Position) {
+            // LastKnownPlayerPositionに辿り着いた場合はリセットする
+            state.LastKnownPlayerPosition = Vector2Int.zero;
+        }
+
+        if (state.CanSeePlayer) {
+            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position;
         }
     }
 
     private bool IsAdjacentToPlayer() {
         if (state.Player == null) return false;
 
-        Vector2 playerPos = state.Player.transform.position;
+        Vector2 playerPos = state.Player.GetComponent<IObjectData>().Position;
         Vector2 enemyPos = new Vector2(objectData.Position.x, objectData.Position.y);
         return Vector2.Distance(enemyPos, playerPos) <= 1.5f;
     }
 
     private List<Vector2Int> GetMonsterView() {
         // 既存のGetMonsterViewロジックを実装
-        return TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
-
-        //通路の場合は、周囲8マスを視野に入れる？
+        List<Vector2Int> views = TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
+        List<Vector2Int> surroundingPositions = TileManager.i.GetSurroundingPositions(objectData.Position);
+        if (views == null || views.Count == 0) {
+            return surroundingPositions;
+        }
+        views.AddRange(surroundingPositions);
+        return views;
     }
 
     //プレイヤーが視野内にいるかどうかを判定する
     private bool CanSeePlayer() {
-        Vector2Int playerPos = state.Player.transform.position.ToVector2Int();
+        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position;
         return state.MonsterView.Contains(playerPos);
     }
 
@@ -107,17 +111,13 @@ public class EnemyAILogic {
         if (!state.IsAdjacentToPlayerAtStart) return false;
 
         Vector2Int enemyPos = objectData.Position;
-        Vector2Int playerPos = new Vector2Int(
-            Mathf.RoundToInt(state.Player.transform.position.x),
-            Mathf.RoundToInt(state.Player.transform.position.y)
-        );
-        Debug.Log($"playerPos {playerPos}");
+        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position;
         Vector2Int direction = new Vector2Int(
             playerPos.x - enemyPos.x,
             playerPos.y - enemyPos.y
         );
 
-        if (TileManager.i.CheckAttackableTile(enemyPos, enemyPos + direction)) {                        
+        if (TileManager.i.CheckAttackableTile(enemyPos, enemyPos + direction)) {
             enemyAttackLogic.Attack(state.Player, direction);
             return true;
         }
@@ -137,17 +137,19 @@ public class EnemyAILogic {
     }
 
     private Vector2Int DetermineTargetPosition() {
+        // プレイヤーが視野内にいない場合、プレイヤーの最後の位置がない場合は新規に目的地を決める
         if (!state.CanSeePlayer && state.LastKnownPlayerPosition == Vector2Int.zero) {
-            return state.IsInRoom ?
+            return state.IsInRoomAtStart ?
                 DetermineRoomTargetPosition() :
                 DetermineCorridorTargetPosition();
         }
+        Debug.Log("プレイヤーの最後の位置を追いかけます");
         return state.LastKnownPlayerPosition;
     }
 
     private void Move(Vector2Int selfPos, Vector2Int targetPos) {
-        Vector2Int moveDirection = targetPos - selfPos;
-        enemyMoveLogic.Move(targetPos, moveDirection);
+        state.FacingDirection = targetPos - selfPos;
+        enemyMoveLogic.Move(targetPos, state.FacingDirection);
     }
 
 
@@ -193,111 +195,91 @@ public class EnemyAILogic {
     }
 
     private Vector2Int DetermineRoomTargetPosition() {
-        int currentRoomNum = TileManager.i.LookupRoomNum(objectData.Position);
-        List<Vector2Int> roomPositions = TileManager.i.ExtractAllRoomPositions(currentRoomNum);
-
-        if (roomPositions == null || roomPositions.Count == 0) {
-            return objectData.Position;
+        // 自身がJointPositionにいる場合は、通路に入る
+        var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+        if (jointPositions.Any(j => j == objectData.Position) && state.EnterJointPosition != objectData.Position) {
+            var neighborBranchPositions = TileManager.i.GetNeighborBranchPositions(objectData.Position);
+            if (neighborBranchPositions.Count > 0) {
+                Debug.Log("通路に入ります");
+                return neighborBranchPositions[0];
+            }
         }
-
-        // ランダムな位置を選択
-        int randomIndex = UnityEngine.Random.Range(0, roomPositions.Count);
-        return roomPositions[randomIndex];
+        return DetermineJointTargetPosition();
     }
 
-    private Vector2Int DetermineCorridorTargetPosition() {
-        if (state.EnterJointPosition == Vector2Int.zero) {
+    // JointPositionにいる場合の目的地を決める
+    private Vector2Int DetermineJointTargetPosition() {
             var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+
+        if (state.EnterJointPosition == Vector2Int.zero) {
             if (joints != null && joints.Count > 0) {
                 // 最も近いジョイントポイントを選択
                 state.EnterJointPosition = joints
                     .OrderBy(j => Vector2Int.Distance(objectData.Position, j))
                     .First();
             } else {
+                Debug.Log("joints is null or empty");
                 return objectData.Position;
             }
         }
-        return state.EnterJointPosition;
+        Debug.Log("ここで別のジョイントポジションをターゲットにする");
+        //jointPositionの中からランダムで選択する
+        while (true) {
+            int randomIndex = UnityEngine.Random.Range(0, joints.Count);
+            var randomJoint = joints[randomIndex];
+            if (randomJoint != state.EnterJointPosition) {
+                return randomJoint;
+            }
+        }
+    }
+
+    // 通路にいる場合の目的地を決める
+    private Vector2Int DetermineCorridorTargetPosition() {
+
+        // 自身の向いている方向を取得する
+        var facingDirection = GetFacingDirection();
+
+        // 前方5方向で移動可能な方向に移動する
+        var directions = DirectionUtils.GetSurroundingFacingTiles(objectData.Position, facingDirection);
+        foreach (var direction in directions) {
+            if (TileManager.i.CheckTileStandable(direction)) {
+                return direction;
+            }
+        }
+        return objectData.Position;
     }
 
     // ルートのそれぞれのマスに他オブジェクトが存在していないかチェックする
     private bool DiscernReachable(List<Vector2Int> route) {
         return route.All(position => TileManager.i.CheckTileStandable(position));
-    }    
-
-    
+    }
 
     private void UpdateEndState() {
+        state.IsInRoomAtEnd = TileManager.i.LookupRoomNum(objectData.Position) != 0;
+        RecordEnterJointPosition();
         state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
+        if (state.IsAdjacentToPlayerAtEnd) {
+            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position;
+        }
     }
 
     private void NotifyTurnComplete() {
         //GameManager.i.EnemyTurnEnd();
     }
 
-    
+    // 自身の向いている方向を取得する
+    private DungeonConstants.Direction GetFacingDirection() {
+        return DungeonConstants.ToDirection[state.FacingDirection];
+    }
 
-    
-
-    
-
-    
-
-    // //自身がRoom内かどうか判定する
-    // private bool ExistsInRoom(Vector2Int selfPos) {
-    //     int roomNum = TileManager.i.LookupRoomNum(selfPos);
-    //     if (roomNum == 0) return false;
-
-    //     return true;
-    // }
-
-        // //Moveの目的地決定
-    // private void MoveToTarget(Vector2Int selfPos, Vector2Int targetPos) {
-    //     List<Vector2Int> path = pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
-
-    //     if (path != null && path.Count > 0) {
-    //         Vector2Int nextStep = path[0];
-    //         Vector2Int moveDirection = nextStep - selfPos;
-    //         enemyMoveLogic.Move(nextStep, moveDirection);
-    //     }
-    // }
-
-    // //周囲１マスのGameObjectを取り出す
-    // private List<GameObject> GetSurroundingObject(Vector2 selfPos) {
-    //     List<GameObject> surroundingObjects = new List<GameObject>();
-    //     Vector2Int selfPosInt = selfPos.ToVector2Int();
-
-    //     foreach (var direction in DungeonConstants.EightDirections) {
-    //         Vector2Int targetPos = selfPosInt + DungeonConstants.ToVector2Int[direction];
-    //         GameObject go = CharacterManager.i.GetObjectByPosition(targetPos);
-    //         if (go != null) {
-    //             surroundingObjects.Add(go);
-    //         }
-    //     }
-    //     return surroundingObjects;
-    // }
-
-    //ターンスタートプロセス。自身の状態を判定する
-    // private void TurnStartProcess(Vector2Int selfPos) {
-    //     state.Player = null;
-    //     state.IsAdjacentToPlayerAtStart = false;
-    //     state.CanSeePlayer = false;
-    //     state.MonsterView = null;
-
-    //     //プレイヤーと隣接しているか確認する
-    //     state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
-    //     if (state.Player != null) {
-    //         state.IsAdjacentToPlayerAtStart = true;
-    //     }
-    // }
-
-    // private void TurnEndProcess(Vector2Int selfPos) {
-    //     state.IsAdjacentToPlayerAtEnd = false;
-    //     //プレイヤーと隣接しているか確認する
-    //     state.Player = GetSurroundingObject(objectData.Position).FirstOrDefault();
-    //     if (state.Player != null) {
-    //         state.IsAdjacentToPlayerAtEnd = true;
-    //         state.LastKnownPlayerPosition = state.Player.transform.position.ToVector2Int();
-    //     }
-    // }
+    // 自身が入ったJointPositionを記録する
+    private void RecordEnterJointPosition() {
+        if (!state.IsInRoomAtStart && state.IsInRoomAtEnd) {
+            var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+            if (jointPositions.Any(j => j == objectData.Position)) {
+                state.EnterJointPosition = objectData.Position;
+                Debug.Log($"state.EnterJointPosition: {state.EnterJointPosition}");
+            }
+        }
+    }
 }

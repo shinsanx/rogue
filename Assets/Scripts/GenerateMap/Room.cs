@@ -18,7 +18,7 @@ namespace RandomDungeonWithBluePrint {
         public readonly Dictionary<int, List<Vector2Int>> Edge = new Dictionary<int, List<Vector2Int>>();
         public readonly List<Joint> Joints = new List<Joint>();
 
-        public List<Vector2Int> jointPositions = new List<Vector2Int>(); //自作。接続情報の位置
+        public List<Vector2Int> jointPositions { get{return ExtractConnectedJointPositions();} set{jointPositions = value;} } //自作。接続情報の位置
         public int roomNum; //自作
         //public List<GameObject> gameObjects = new List<GameObject>();//自作 CharacterManagerに移管
 
@@ -38,7 +38,7 @@ namespace RandomDungeonWithBluePrint {
             Joints.Add(new Joint {
                 Direction = direction,
                 Position = position
-            });
+            });            
         }
 
         public IEnumerable<Joint> GetUnconnectedJoints(int direction) {
@@ -52,12 +52,7 @@ namespace RandomDungeonWithBluePrint {
 
         //自作
         public List<Vector2Int> ExtractConnectedJointPositions() {
-            List<Joint> joints = Joints.Where(j => j.Connected).ToList();
-            List<Vector2Int> jointPoss = new List<Vector2Int>();
-            foreach(var joint in joints) {
-                jointPoss.Add(joint.Position);
-            }
-            return jointPoss;
+            return Joints.Where(j => j.Connected).Select(j => j.Position).ToList();
         }
     }
 }
