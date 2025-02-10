@@ -9,9 +9,7 @@ using UnityEngine.Rendering;
 public class PlayerMoveLogic
 {    
     private IObjectData objectData;
-    private PlayerAnimLogic playerAnimLogic;
-    private StateMachine stateMachine;
-    private State enemyState;
+    private PlayerAnimLogic playerAnimLogic;        
 
     //コンストラクタ
     public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){        
@@ -72,7 +70,7 @@ public class PlayerMoveLogic
 
     async void LockInputWhileMoving(){
         isMoving = true;
-        await Task.Delay(150);
+        await Task.Delay(150);        
         isMoving = false;
     }
 

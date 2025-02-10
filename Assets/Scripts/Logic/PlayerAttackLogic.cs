@@ -27,9 +27,10 @@ public class PlayerAttackLogic
         this.playerStatusAdapter = playerStatusAdapter;                
     }
 
-    public void Attack(){
+    public async void Attack(){
         playerAnimLogic.SetAttackAnimation();
         DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition()));
+        await Task.Delay(300);
         ActionEventManager.NotifyActionComplete();
     }
 

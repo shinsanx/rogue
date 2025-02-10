@@ -5,6 +5,7 @@ using UnityEngine;
 public static class DirectionUtils {
     private static readonly Dictionary<DungeonConstants.Direction, (Vector2Int forward, Vector2Int left, Vector2Int right)> DirectionVectors
      = new Dictionary<DungeonConstants.Direction, (Vector2Int, Vector2Int, Vector2Int)> {
+        { DungeonConstants.Direction.Stay,      (Vector2Int.zero,   Vector2Int.zero,  Vector2Int.zero) },
         { DungeonConstants.Direction.North,     (Vector2Int.up,    Vector2Int.left,  Vector2Int.right) },
         { DungeonConstants.Direction.South,     (Vector2Int.down,  Vector2Int.left,  Vector2Int.right) },
         { DungeonConstants.Direction.East,      (Vector2Int.right, Vector2Int.up,    Vector2Int.down) },

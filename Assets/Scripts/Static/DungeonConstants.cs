@@ -36,6 +36,7 @@ public static class DungeonConstants {
     public const int DownRight = 315;
 
     public enum Direction {
+        Stay,
         North,
         South,
         East,
@@ -48,6 +49,7 @@ public static class DungeonConstants {
 
 
     public static readonly Dictionary<Vector2Int, Direction> ToDirection = new Dictionary<Vector2Int, Direction> {
+        {new Vector2Int(0, 0), Direction.Stay},
         {new Vector2Int(0,1), Direction.North},
         {new Vector2Int(0, -1), Direction.South},
         {new Vector2Int(1, 0), Direction.East},

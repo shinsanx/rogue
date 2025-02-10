@@ -154,5 +154,10 @@ public class TileManager{
         return surroundingPositions;
     }
 
+    // 指定のポジションが隣接しているか確認する
+    public bool IsAdjacentTo(Vector2Int selfPos, Vector2Int targetPos) {
+        return GetSurroundingPositions(selfPos).Contains(targetPos);
+    }
+
 
 }

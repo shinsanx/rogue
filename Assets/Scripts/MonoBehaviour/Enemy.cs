@@ -10,8 +10,7 @@ using System.Runtime.CompilerServices;
 public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData {
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sr;
-    [SerializeField] MonsterStatusSO monsterSO;
-    [SerializeField] MessageBox messageBox;
+    [SerializeField] MonsterStatusSO monsterSO;    
     
     private EnemyStatusLogic enemyStatusLogic;
     private EnemyAnimLogic enemyAnimLogic;

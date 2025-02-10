@@ -7,13 +7,27 @@ using System.Linq;
 public class AStarPathfinding {
                 
 
-    public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos, List<Vector2Int> monsterView) {
+    public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos, List<Vector2Int> monsterView) {                        
+        
+        // スタート位置から目標位置までの直線距離
+        int directDistance = Mathf.Abs(startPos.x - targetPos.x) + Mathf.Abs(startPos.y - targetPos.y);        
+
         Node startNode = new Node(startPos);
         Node targetNode = new Node(targetPos);
 
-        if (!TileManager.i.CheckTileStandable(targetPos)) {
-            Debug.Log("Target position is not walkable. Finding alternative target.");
-            targetNode = GetAlternativeTarget(targetNode, startPos); // プレイヤー位置を追加
+        // 経路上の各タイルが視界内にあるかチェック
+        for (int x = Mathf.Min(startPos.x, targetPos.x); x <= Mathf.Max(startPos.x, targetPos.x); x++) {
+            for (int y = Mathf.Min(startPos.y, targetPos.y); y <= Mathf.Max(startPos.y, targetPos.y); y++) {
+                Vector2Int pos = new Vector2Int(x, y);
+                if (!monsterView.Contains(pos)) {
+                    Debug.Log($"視界外のタイル検出: {pos}");
+                }
+            }
+        }
+
+        if (!TileManager.i.CheckWalkableTile(startPos, targetPos)) {
+            Debug.Log("Target position is not standable. Finding alternative target.");
+            targetNode = GetAlternativeTarget(targetNode, startPos, monsterView); // プレイヤー位置を追加
             if (targetNode == null) {
                 Debug.Log("No alternative target found.");
                 return null;
@@ -30,49 +44,50 @@ public class AStarPathfinding {
 
         while (openList.Count > 0) {
             loopCount++;
-            if (loopCount >= maxLoopCount) { //無限ループ回避                
-                Debug.Log("Loop count exceeded maximum limit. Pathfinding stopped.");
-                break;
+            if (loopCount >= maxLoopCount) {
+                Debug.Log($"ループ回数が上限({maxLoopCount})に達しました。経路探索を中止します。Start: {startPos}, Target: {targetPos}");
+                return null;
             }
 
-            Node currentNode = openList[0]; //1回目はstartNodeを入れる
-            for (int i = 1; i < openList.Count; i++) { //openListが2個以上あるときの処理
-                if (openList[i].fCost < currentNode.fCost || openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost) { //openListのfCost, もしくはhCostがcurrentNodeよりも小さい場合は入れ替える
-                    currentNode = openList[i];                    
-                }
-            }
-
+            // 最小コストのノードを見つける
+            Node currentNode = openList.OrderBy(n => n.fCost).ThenBy(n => n.hCost).First();
             openList.Remove(currentNode);
-            closedList.Add(currentNode); //currentNodeをopenListからclosedListへ移す
+            closedList.Add(currentNode);
 
-            if (currentNode.position == targetNode.position) { //currentNodeがゴールした場合は終了してパスを辿っていく
+            if (currentNode.position == targetNode.position) {
                 return RetracePath(startNode, currentNode);
             }
 
-            foreach (Node neighbour in GetNeighbours(currentNode)) { //currentNodeの周囲８マスのNodeに対して処理を行う
-                if (!TileManager.i.CheckMovableTile(currentNode.position, neighbour.position) || closedList.Contains(neighbour)) { //移動不可位置とclosedListのNodeは無視する                    
+            foreach (Node neighbour in GetNeighbours(currentNode, monsterView)) {
+                // 移動不可能、既に探索済み、または視界外のノードはスキップ
+                if (!TileManager.i.CheckWalkableTile(currentNode.position, neighbour.position) || 
+                    closedList.Any(n => n.position == neighbour.position) || 
+                    !monsterView.Contains(neighbour.position)) {
                     continue;
                 }
 
-                int newCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour); //totalCostを算出            
-                if (newCostToNeighbour < neighbour.gCost || !openList.Any(node => node.position == neighbour.position)) { //neighbourのgCostがneighbourのtotalCostよりも大きい場合
-                    neighbour.gCost = newCostToNeighbour;
-                    neighbour.hCost = GetDistance(neighbour, targetNode);
-                    neighbour.parent = currentNode;
+                int newCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+                var existingNode = openList.FirstOrDefault(n => n.position == neighbour.position);
 
-                    if (!openList.Any(node => node.position == neighbour.position)) {
-                        openList.Add(neighbour);
-                    }
+                if (existingNode != null && newCostToNeighbour >= existingNode.gCost) {
+                    continue;
+                }
 
-                    if (openList.Count > maxOpenListSize) {
-                        Debug.Log("Open list size exceeded maximum limit. Pathfinding stopped.");
+                neighbour.gCost = newCostToNeighbour;
+                neighbour.hCost = GetDistance(neighbour, targetNode);
+                neighbour.parent = currentNode;
+
+                if (existingNode == null) {
+                    if (openList.Count >= maxOpenListSize) {
+                        Debug.Log($"OpenListが上限({maxOpenListSize})に達しました。経路探索を中止します。");
                         return null;
                     }
+                    openList.Add(neighbour);
                 }
             }
         }
 
-        Debug.Log("Path not found.");
+        Debug.Log($"経路が見つかりませんでした。Start: {startPos}, Target: {targetPos}");
         return null;
     }
 
@@ -96,12 +111,15 @@ public class AStarPathfinding {
         return path;
     }
 
-    private List<Node> GetNeighbours(Node node) {
+    private List<Node> GetNeighbours(Node node, List<Vector2Int> monsterView) {
         List<Node> neighbours = new List<Node>();
         foreach (var direction in DungeonConstants.EightDirections) {
             Vector2Int neighbourPos = node.position + DungeonConstants.ToVector2Int[direction];
-            neighbours.Add(new Node(neighbourPos));
-        }
+            
+            if (monsterView.Contains(neighbourPos)) {
+                neighbours.Add(new Node(neighbourPos));
+            }
+        }        
         return neighbours;
     }
 
@@ -111,17 +129,14 @@ public class AStarPathfinding {
         return Mathf.Max(dstX, dstY);
     }
 
-    private Node GetAlternativeTarget(Node targetNode, Vector2Int startPos) {
-        // Implementation of GetAlternativeTarget
-        // Find the nearest standable node to the original targetNode
-        // Consider the player's position (startPos) in determining the nearest node
-
-        List<Node> neighbours = GetNeighbours(targetNode);
+    private Node GetAlternativeTarget(Node targetNode, Vector2Int startPos, List<Vector2Int> monsterView) {
+        List<Node> neighbours = GetNeighbours(targetNode, monsterView);
         Node closestNode = null;
         int closestDistance = int.MaxValue;
 
         foreach (Node neighbour in neighbours) {
-            if (TileManager.i.CheckTileStandable(neighbour.position)) {
+            if (TileManager.i.CheckTileStandable(neighbour.position) && 
+                monsterView.Contains(neighbour.position)) {
                 int distance = GetDistance(neighbour, new Node(startPos));
                 if (distance < closestDistance) {
                     closestNode = neighbour;

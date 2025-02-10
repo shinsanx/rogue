@@ -12,7 +12,7 @@ public class DungeonEventManager : MonoBehaviour
     StateMachine stateMachine;
     State playerState;
     State enemyState;
-    [SerializeField] GameObject enemyParent;
+    [SerializeField] GameObject enemyParent;    
     DungeonEventLogic dungeonEventLogic;
     
     

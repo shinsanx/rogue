@@ -19,6 +19,7 @@ public class EnemyAILogic {
         public GameObject Player { get; set; }
         public Vector2Int EnterJointPosition { get; set; }
         public Vector2Int LastKnownPlayerPosition { get; set; }
+        public Vector2Int TargetPosition { get; set; }
         public List<Vector2Int> MonsterView { get; set; }
         public List<Vector2Int> RouteCache { get; set; }
 
@@ -26,6 +27,7 @@ public class EnemyAILogic {
             MonsterView = new List<Vector2Int>();
             RouteCache = new List<Vector2Int>();
             LastKnownPlayerPosition = Vector2Int.zero;
+            TargetPosition = Vector2Int.zero;
         }
     }
 
@@ -66,6 +68,11 @@ public class EnemyAILogic {
         if (state.LastKnownPlayerPosition == objectData.Position) {
             // LastKnownPlayerPositionに辿り着いた場合はリセットする
             state.LastKnownPlayerPosition = Vector2Int.zero;
+        }
+
+        if (state.TargetPosition == objectData.Position) {
+            // 目的地が自分の位置にある場合はリセットする
+            state.TargetPosition = Vector2Int.zero;
         }
 
         if (state.CanSeePlayer) {
@@ -136,13 +143,29 @@ public class EnemyAILogic {
     }
 
     private Vector2Int DetermineTargetPosition() {
-        // プレイヤーが視野内にいない場合、プレイヤーの最後の位置がない場合は新規に目的地を決める
-        if (!state.CanSeePlayer && state.LastKnownPlayerPosition == Vector2Int.zero) {
-            return state.IsInRoomAtStart ?
-                DetermineRoomTargetPosition() :
-                DetermineCorridorTargetPosition();
+        // 既に目的地が設定されている場合はそれを返す
+        if (state.TargetPosition != Vector2Int.zero) {
+            return state.TargetPosition;
         }
-        return state.LastKnownPlayerPosition;
+
+        // プレイヤーの最後の位置情報がある場合はそれを返す
+        if (state.LastKnownPlayerPosition != Vector2Int.zero) {
+
+            // プレイヤーが角越しに隣接している場合の迂回処理
+            if (TileManager.i.IsAdjacentTo(objectData.Position, state.LastKnownPlayerPosition)) {
+                if (!TileManager.i.CheckMovableTile(objectData.Position, state.LastKnownPlayerPosition)) {                    
+                    return MoveAlternativeTarget(objectData.Position, state.LastKnownPlayerPosition);
+                }
+            }
+
+
+            return state.LastKnownPlayerPosition;
+        }
+
+        // 新規に目的地を設定する
+        return state.IsInRoomAtStart ?
+            DetermineRoomTargetPosition() :
+            DetermineCorridorTargetPosition();
     }
 
     private void Move(Vector2Int selfPos, Vector2Int targetPos) {
@@ -156,6 +179,7 @@ public class EnemyAILogic {
     private List<Vector2Int> MakeRoute(Vector2Int selfPos, Vector2Int targetPos) {
         // プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する
         if (state.CanSeePlayer) {
+            Debug.Log("プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する");
             return pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
         }
 
@@ -179,6 +203,36 @@ public class EnemyAILogic {
 
         // y方向の移動量(-1, 0, 1)
         int moveY = Mathf.Clamp(deltaY, -1, 1);
+
+
+        // 新しい位置を計算
+        Vector2Int newPos = new Vector2Int(selfPos.x + moveX, selfPos.y + moveY);
+
+        // 移動可能か確認
+        if (TileManager.i.CheckMovableTile(selfPos, newPos)) {
+            return newPos;
+        }
+
+        // 移動できない場合はその場に留まる
+        return selfPos;
+    }
+
+    private Vector2Int MoveAlternativeTarget(Vector2Int selfPos, Vector2Int targetPos) {
+        // 移動方向を決定する
+        int deltaX = targetPos.x - selfPos.x;
+        int deltaY = targetPos.y - selfPos.y;
+
+        // x方向の移動量(-1, 0, 1)
+        int moveX = Mathf.Clamp(deltaX, -1, 1);
+        if (TileManager.i.CheckMovableTile(selfPos, new Vector2Int(selfPos.x + moveX, selfPos.y))) {
+            return new Vector2Int(selfPos.x + moveX, selfPos.y);
+        }
+
+        // y方向の移動量(-1, 0, 1)
+        int moveY = Mathf.Clamp(deltaY, -1, 1);
+        if (TileManager.i.CheckMovableTile(selfPos, new Vector2Int(selfPos.x, selfPos.y + moveY))) {
+            return new Vector2Int(selfPos.x, selfPos.y + moveY);
+        }
 
         // 新しい位置を計算
         Vector2Int newPos = new Vector2Int(selfPos.x + moveX, selfPos.y + moveY);
@@ -207,7 +261,7 @@ public class EnemyAILogic {
 
     // JointPositionにいる場合の目的地を決める
     private Vector2Int DetermineJointTargetPosition() {
-            var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+        var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position);
 
         if (state.EnterJointPosition == Vector2Int.zero) {
             if (joints != null && joints.Count > 0) {
@@ -226,6 +280,7 @@ public class EnemyAILogic {
             int randomIndex = UnityEngine.Random.Range(0, joints.Count);
             var randomJoint = joints[randomIndex];
             if (randomJoint != state.EnterJointPosition) {
+                state.TargetPosition = randomJoint;
                 return randomJoint;
             }
         }
