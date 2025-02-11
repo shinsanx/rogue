@@ -72,4 +72,10 @@ public class MessageBus {
         return returnValue;
     }
 
+    public void Unsubscribe<T>(string message, MethodWithReturnValue<T> callback) {
+        if (delegateSubscribers.ContainsKey(message)) {
+            delegateSubscribers[message] = Delegate.Remove(delegateSubscribers[message], callback);
+        }
+    }
+
 }

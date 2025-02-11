@@ -6,108 +6,120 @@ using System.Linq;
 
 public class AStarPathfinding {
                 
+    // マンハッタン距離の最大値
+    private int maxDistance = 20;
 
-    public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos, List<Vector2Int> monsterView) {                        
-        
-        // スタート位置から目標位置までの直線距離
-        int directDistance = Mathf.Abs(startPos.x - targetPos.x) + Mathf.Abs(startPos.y - targetPos.y);        
+    public List<Vector2Int> FindPath(Vector2Int startPos, Vector2Int targetPos, List<Vector2Int> monsterView) {
+        // 視界外の場合は即座にnullを返す
+        if (!monsterView.Contains(targetPos)) {
+            Debug.Log("targetが視野外です。");
+            return null;
+        }
 
+        // マンハッタン距離で目標が遠すぎる場合は即座にnullを返す
+        int manhattanDistance = Mathf.Abs(startPos.x - targetPos.x) + Mathf.Abs(startPos.y - targetPos.y);
+        if (manhattanDistance > maxDistance) { // 適切な距離制限を設定
+            Debug.Log("マンハッタン距離が遠すぎます。");
+            return null;
+        }
+
+        bool isTargetPlayer = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Player";
         Node startNode = new Node(startPos);
         Node targetNode = new Node(targetPos);
 
-        // 経路上の各タイルが視界内にあるかチェック
-        for (int x = Mathf.Min(startPos.x, targetPos.x); x <= Mathf.Max(startPos.x, targetPos.x); x++) {
-            for (int y = Mathf.Min(startPos.y, targetPos.y); y <= Mathf.Max(startPos.y, targetPos.y); y++) {
-                Vector2Int pos = new Vector2Int(x, y);
-                if (!monsterView.Contains(pos)) {
-                    Debug.Log($"視界外のタイル検出: {pos}");
-                }
-            }
-        }
-
-        if (!TileManager.i.CheckWalkableTile(startPos, targetPos)) {
-            Debug.Log("Target position is not standable. Finding alternative target.");
-            targetNode = GetAlternativeTarget(targetNode, startPos, monsterView); // プレイヤー位置を追加
-            if (targetNode == null) {
-                Debug.Log("No alternative target found.");
-                return null;
-            }
-        }
-
+        // HashSetを使用してパフォーマンスを向上
+        HashSet<Vector2Int> openSet = new HashSet<Vector2Int>();
+        HashSet<Vector2Int> closedSet = new HashSet<Vector2Int>();
         List<Node> openList = new List<Node>();
-        HashSet<Node> closedList = new HashSet<Node>();
+        
+        // startNodeを初期ノードとして追加
+        startNode.gCost = 0;
+        startNode.hCost = GetDistance(startNode, targetNode);
         openList.Add(startNode);
+        openSet.Add(startPos);
 
         int loopCount = 0;
-        int maxLoopCount = 1000; // 最大ループ回数
-        int maxOpenListSize = 100; // openListの最大サイズ
+        const int maxLoopCount = 100; // ループ回数を制限
+        const int maxOpenListSize = 50; // openListのサイズを制限
 
         while (openList.Count > 0) {
-            loopCount++;
-            if (loopCount >= maxLoopCount) {
-                Debug.Log($"ループ回数が上限({maxLoopCount})に達しました。経路探索を中止します。Start: {startPos}, Target: {targetPos}");
+            if (++loopCount > maxLoopCount) {
+                Debug.Log("ループ回数が多すぎます。");
                 return null;
             }
 
-            // 最小コストのノードを見つける
-            Node currentNode = openList.OrderBy(n => n.fCost).ThenBy(n => n.hCost).First();
-            openList.Remove(currentNode);
-            closedList.Add(currentNode);
+            // 最小コストのノードを効率的に取得
+            int currentIndex = 0;
+            Node currentNode = openList[0];
+            for (int i = 1; i < openList.Count; i++) {
+                if (openList[i].fCost < currentNode.fCost || 
+                    (openList[i].fCost == currentNode.fCost && openList[i].hCost < currentNode.hCost)) {
+                    currentNode = openList[i];
+                    currentIndex = i;
+                }
+            }
 
-            if (currentNode.position == targetNode.position) {
+            // リストの操作を最適化
+            openList[currentIndex] = openList[openList.Count - 1];
+            openList.RemoveAt(openList.Count - 1);
+            openSet.Remove(currentNode.position);
+            closedSet.Add(currentNode.position);
+
+            if (currentNode.position == targetPos) {
                 return RetracePath(startNode, currentNode);
             }
 
-            foreach (Node neighbour in GetNeighbours(currentNode, monsterView)) {
-                // 移動不可能、既に探索済み、または視界外のノードはスキップ
-                if (!TileManager.i.CheckWalkableTile(currentNode.position, neighbour.position) || 
-                    closedList.Any(n => n.position == neighbour.position) || 
-                    !monsterView.Contains(neighbour.position)) {
+            // 隣接ノードの処理を最適化
+            foreach (var direction in DungeonConstants.EightDirections) {
+                Vector2Int neighbourPos = currentNode.position + DungeonConstants.ToVector2Int[direction];
+                
+                // キャラクターの存在チェックを追加
+                bool isTargetPosition = neighbourPos == targetPos;
+                if (!monsterView.Contains(neighbourPos) || 
+                    closedSet.Contains(neighbourPos) || 
+                    (!isTargetPosition && !TileManager.i.CheckTileStandable(neighbourPos)) ||  // キャラクターがいる場合は迂回
+                    (!isTargetPlayer && isTargetPosition && !TileManager.i.CheckTileStandable(neighbourPos))) {
                     continue;
                 }
 
-                int newCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
-                var existingNode = openList.FirstOrDefault(n => n.position == neighbour.position);
+                bool isDiagonal = direction == DungeonConstants.UpRight || 
+                                direction == DungeonConstants.UpLeft || 
+                                direction == DungeonConstants.DownRight || 
+                                direction == DungeonConstants.DownLeft;
+                int newCost = currentNode.gCost + (isDiagonal ? 14 : 10);
 
-                if (existingNode != null && newCostToNeighbour >= existingNode.gCost) {
-                    continue;
-                }
-
-                neighbour.gCost = newCostToNeighbour;
-                neighbour.hCost = GetDistance(neighbour, targetNode);
-                neighbour.parent = currentNode;
-
-                if (existingNode == null) {
+                Node neighbour = new Node(neighbourPos);
+                if (!openSet.Contains(neighbourPos)) {
                     if (openList.Count >= maxOpenListSize) {
-                        Debug.Log($"OpenListが上限({maxOpenListSize})に達しました。経路探索を中止します。");
+                        Debug.Log("openListのサイズが多すぎます。");
                         return null;
                     }
+                    neighbour.gCost = newCost;
+                    neighbour.hCost = GetDistance(neighbour, targetNode);
+                    neighbour.parent = currentNode;
                     openList.Add(neighbour);
+                    openSet.Add(neighbourPos);
+                }
+                else if (newCost < neighbour.gCost) {
+                    neighbour.gCost = newCost;
+                    neighbour.parent = currentNode;
                 }
             }
         }
-
         Debug.Log($"経路が見つかりませんでした。Start: {startPos}, Target: {targetPos}");
         return null;
     }
 
-    //ゴールから一つずつNodeのparentを辿っていく
     private List<Vector2Int> RetracePath(Node startNode, Node endNode) {
-        List<Vector2Int> path = new List<Vector2Int>();
-        Node currentNode = endNode;
+        var path = new List<Vector2Int>(maxDistance); // キャパシティを予め確保
+        var currentNode = endNode;
 
-        int loopCount = 0;
         while (currentNode != startNode) {
-            loopCount++;
-            if (loopCount >= 100) { //無限ループ回避                
-                Debug.Log("無限ループ2");
-                break;
-            }
-
             path.Add(currentNode.position);
             currentNode = currentNode.parent;
         }
-        path.Reverse();
+        
+        path.Reverse();        
         return path;
     }
 
@@ -126,7 +138,22 @@ public class AStarPathfinding {
     private int GetDistance(Node nodeA, Node nodeB) {
         int dstX = Mathf.Abs(nodeA.position.x - nodeB.position.x);
         int dstY = Mathf.Abs(nodeA.position.y - nodeB.position.y);
-        return Mathf.Max(dstX, dstY);
+
+        // 斜め移動を優先するためのコスト計算
+        // 斜め移動のコストを14（√2 * 10）、直線移動のコストを10とする
+        int diagonalSteps = Mathf.Min(dstX, dstY);  // 斜め移動できる回数
+        int straightSteps = Mathf.Abs(dstX - dstY); // 残りの直線移動
+
+        return (diagonalSteps * 14) + (straightSteps * 10);
+    }
+
+    private bool IsDiagonalMove(Vector2Int from, Vector2Int to) {
+        return Mathf.Abs(from.x - to.x) == 1 && Mathf.Abs(from.y - to.y) == 1;
+    }
+
+    private int GetMoveCost(Node currentNode, Node neighbour) {
+        // 斜め移動の場合は14、直線移動の場合は10のコストを返す
+        return IsDiagonalMove(currentNode.position, neighbour.position) ? 14 : 10;
     }
 
     private Node GetAlternativeTarget(Node targetNode, Vector2Int startPos, List<Vector2Int> monsterView) {
@@ -135,7 +162,7 @@ public class AStarPathfinding {
         int closestDistance = int.MaxValue;
 
         foreach (Node neighbour in neighbours) {
-            if (TileManager.i.CheckTileStandable(neighbour.position) && 
+            if (TileManager.i.CheckMovableTile(startPos,neighbour.position) && 
                 monsterView.Contains(neighbour.position)) {
                 int distance = GetDistance(neighbour, new Node(startPos));
                 if (distance < closestDistance) {
@@ -146,5 +173,16 @@ public class AStarPathfinding {
         }
 
         return closestNode;
+    }
+
+    private Vector2Int? FindNearestAccessibleTile(Vector2Int targetPos, List<Vector2Int> monsterView) {
+        // 目標位置の周囲8マスをチェック
+        foreach (var direction in DungeonConstants.EightDirections) {
+            Vector2Int checkPos = targetPos + DungeonConstants.ToVector2Int[direction];
+            if (TileManager.i.CheckTileStandable(checkPos) && monsterView.Contains(checkPos)) {
+                return checkPos;
+            }
+        }
+        return null;
     }
 }

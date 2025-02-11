@@ -75,7 +75,7 @@ public class MessageBox : MonoBehaviour {
             }
         }
         catch (OperationCanceledException) {
-            Debug.Log("メッセージ処理がキャンセルされました。");
+            // Debug.Log("メッセージ処理がキャンセルされました。");
         }
         catch (Exception ex) {
             Debug.LogError($"予期せぬエラーが発生しました: {ex.Message}");

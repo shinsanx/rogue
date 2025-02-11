@@ -10,8 +10,7 @@ public class PlayerAttackLogic
     private IObjectData objectData;
     private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
-
-    
+    private bool isAttacking = false;
     
 
     //コンストラクタ
@@ -27,10 +26,11 @@ public class PlayerAttackLogic
         this.playerStatusAdapter = playerStatusAdapter;                
     }
 
-    public async void Attack(){
+    public void Attack(){
+        if(isAttacking) return;
         playerAnimLogic.SetAttackAnimation();
-        DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition()));
-        await Task.Delay(300);
+        DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition())); 
+        LockInputWhileAttacking();
         ActionEventManager.NotifyActionComplete();
     }
 
@@ -61,6 +61,12 @@ public class PlayerAttackLogic
         int damage = damageCalculate.CalculateAttackDamage(playerStatusAdapter.Level, playerStatusAdapter.Muscle, weaponPw, monsterStatusAdapter.Defence);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
         damageable.TakeDamage(damage, objectData.Name);
+    }
+
+    async void LockInputWhileAttacking(){
+        isAttacking = true;
+        await Task.Delay(500);        
+        isAttacking = false;
     }
     
 }

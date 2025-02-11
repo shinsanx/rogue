@@ -113,7 +113,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
 
     public event System.Action<IObjectData> OnObjectUpdated;
 
-    private void Start() {
+    private void Awake() {
         InitializeEnemy();
         Position = transform.position.ToVector2Int();
     }

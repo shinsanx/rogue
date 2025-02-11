@@ -32,6 +32,7 @@ namespace RandomDungeonWithBluePrint {
             currentField = field;
             MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);
             MessageBus.Instance.Publish("UpdateFieldInformation", currentField);
+            MessageBus.Instance.Publish("UpdateMiniMap", currentField);
             fieldView.ShowField(field);
             onFieldUpdate?.Invoke(field);
         }

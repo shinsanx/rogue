@@ -144,21 +144,20 @@ public class EnemyAILogic {
 
     private Vector2Int DetermineTargetPosition() {
         // 既に目的地が設定されている場合はそれを返す
-        if (state.TargetPosition != Vector2Int.zero) {
+        if (state.TargetPosition != Vector2Int.zero) {                        
+            // Debug.Log($"TargetPositionを使用: {state.TargetPosition}");
             return state.TargetPosition;
         }
 
         // プレイヤーの最後の位置情報がある場合はそれを返す
         if (state.LastKnownPlayerPosition != Vector2Int.zero) {
-
+            // Debug.Log($"LastKnownPlayerPositionを使用: {state.LastKnownPlayerPosition}");
             // プレイヤーが角越しに隣接している場合の迂回処理
             if (TileManager.i.IsAdjacentTo(objectData.Position, state.LastKnownPlayerPosition)) {
-                if (!TileManager.i.CheckMovableTile(objectData.Position, state.LastKnownPlayerPosition)) {                    
+                if (!TileManager.i.CheckMovableTile(objectData.Position, state.LastKnownPlayerPosition)) {
                     return MoveAlternativeTarget(objectData.Position, state.LastKnownPlayerPosition);
                 }
             }
-
-
             return state.LastKnownPlayerPosition;
         }
 
@@ -167,6 +166,7 @@ public class EnemyAILogic {
             DetermineRoomTargetPosition() :
             DetermineCorridorTargetPosition();
     }
+
 
     private void Move(Vector2Int selfPos, Vector2Int targetPos) {
         state.FacingDirection = targetPos - selfPos;
@@ -179,7 +179,7 @@ public class EnemyAILogic {
     private List<Vector2Int> MakeRoute(Vector2Int selfPos, Vector2Int targetPos) {
         // プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する
         if (state.CanSeePlayer) {
-            Debug.Log("プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する");
+            // Debug.Log("A*アルゴリズムで詳細なパスを計算する");
             return pathfinding.FindPath(selfPos, targetPos, state.MonsterView);
         }
 
@@ -217,6 +217,7 @@ public class EnemyAILogic {
         return selfPos;
     }
 
+    // プレイヤーが角越しに隣接している場合の迂回処理
     private Vector2Int MoveAlternativeTarget(Vector2Int selfPos, Vector2Int targetPos) {
         // 移動方向を決定する
         int deltaX = targetPos.x - selfPos.x;
