@@ -8,7 +8,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStatusAdapter, IObjectData {
     // === Serialized Fields ===
-    [SerializeField] private RandomDungeonWithBluePrint.RandomMapTest randomMapTest;
+    [SerializeField] private RandomDungeonWithBluePrint.RandomMapGenerator randomMapGenerator;
     [SerializeField] private DungeonEventManager dungeonEventManager;
     [SerializeField] private Animator animator;
     [SerializeField] private UserInput userInput;
@@ -50,7 +50,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         set {
             playerPosition = value;
             transform.DOMove(value.ToVector2() + moveOffset, 0.3f).SetEase(Ease.Linear);
-            OnObjectUpdated.Invoke(this);
+            OnObjectUpdated?.Invoke(this);
         }
     }
     
@@ -130,12 +130,13 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         Id = CharacterManager.GetUniqueID();
     }
 
-    private void Start() {
-        InitializePlayer();
-    }
+    // private void Start() {
+    //     InitializePlayer();
+    // }
 
     // === Methods ===
-    private void InitializePlayer() {
+    public void InitializePlayer() {
+        CharacterManager.i.AddCharacter(this);
         playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);        
         playerAnimLogic = new PlayerAnimLogic(this);
         playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic);
@@ -146,10 +147,8 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
-        randomMapTest.onFieldUpdate.AddListener(TileManager.i.UpdateFieldInformation);
         playerStatusDataLogic.SetStatusDefault(this);
         playerStatusDataLogic.SetObjectDataDefault(this);
-        CharacterManager.i.AddCharacter(this);
         MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
         stateMachine = GameAssets.i.stateMachine;
 

@@ -113,7 +113,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
 
     public event System.Action<IObjectData> OnObjectUpdated;
 
-    private void Awake() {
+    private void Start() {
         InitializeEnemy();
         Position = transform.position.ToVector2Int();
     }
@@ -129,9 +129,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
         CharacterManager.i.AddCharacter(this);
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
-
     }
-
+    
 
     private void OnEnemyDestroyed(){
         CharacterManager.i.RemoveCharacter(this);

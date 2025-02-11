@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace RandomDungeonWithBluePrint {
-    public class RandomMapTest : MonoBehaviour {
+    public class RandomMapGenerator : MonoBehaviour {
 
         [Serializable]
         public class BluePrintWithWeight {
@@ -17,24 +17,20 @@ namespace RandomDungeonWithBluePrint {
         [SerializeField] private int seed = default;
         [SerializeField] private Button generateButton = default;
         [SerializeField] private FieldView fieldView = default;
-        [SerializeField] private BluePrintWithWeight[] bluePrints = default;
-        public UnityEvent<Field> onFieldUpdate;//フィールドを生成したときにPlayerにfieldを渡すときのEvent.Playerクラスからメソッドを渡す
+        [SerializeField] private BluePrintWithWeight[] bluePrints = default;        
         public Field currentField; //現在生成されているField
 
-        private void Awake() { //マップ生成が発火するところ
-            Random.InitState(seed);
-            generateButton.onClick.AddListener(() => Create(Raffle()));
-            generateButton.onClick.Invoke();
-        }
+        // private void Awake() { //マップ生成が発火するところ
+        //     Initialize();
+        // }
 
         private void Create(BluePrintWithWeight bluePrint) {
             var field = FieldBuilder.Build(bluePrint.BluePrint);
             currentField = field;
             MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);
-            MessageBus.Instance.Publish("UpdateFieldInformation", currentField);
-            MessageBus.Instance.Publish("UpdateMiniMap", currentField);
+            MessageBus.Instance.Publish("UpdateFieldInformation", currentField);            
             fieldView.ShowField(field);
-            onFieldUpdate?.Invoke(field);
+            TileManager.i.UpdateFieldInformation(currentField);            
         }
 
         private BluePrintWithWeight Raffle() {
@@ -46,16 +42,24 @@ namespace RandomDungeonWithBluePrint {
                     pick = i;
                     break;
                 }
-
                 rand -= candidate[i].Weight;
             }
-
             return candidate[pick];
         }
 
         //自作
         public Field GetCurrentField(object data) {
             return currentField;
+        }
+
+        public void CreateMiniMap(){
+            MessageBus.Instance.Publish("UpdateMiniMap", currentField);
+        }        
+
+        public void Initialize() {
+            Random.InitState(seed);
+            generateButton.onClick.AddListener(() => Create(Raffle()));
+            generateButton.onClick.Invoke();
         }
     }
 }

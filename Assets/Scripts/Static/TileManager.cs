@@ -159,5 +159,21 @@ public class TileManager{
         return GetSurroundingPositions(selfPos).Contains(targetPos);
     }
 
+    // Character自動配置用
+    // ランダムでRoomを選択して、そのRoom内のランダムなポジションを返す
+    public Vector2Int GetRandomPosition(){
+        // Fieldの中からランダムでRoomを選択
+        int roomNum = Random.Range(1, field.Rooms.Count + 1);
+        return GetRandomRoomPositions(roomNum);
+    }
+
+    // 指定されたRoomの中からランダムなポジションを返す
+    private Vector2Int GetRandomRoomPositions(int roomNum){
+        List<Vector2Int> roomPositions = ExtractAllRoomPositions(roomNum);
+        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];
+        Debug.Log(randomPosition+"が選択されました");
+        return randomPosition;
+    }
+
 
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 using System.Threading.Tasks;
 
-public class DungeonEventLogic {
+public class DungeonStateLogic {
 
     private StateMachine stateMachine;
     private State playerState;
@@ -17,7 +17,7 @@ public class DungeonEventLogic {
     public List<Transform> gameObjectsTransform = new List<Transform>();
     public List<Transform> enemies = new List<Transform>();        
 
-    public DungeonEventLogic(GameObject enemyParent) {
+    public DungeonStateLogic(GameObject enemyParent) {
         this.enemyParent = enemyParent;        
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using RandomDungeonWithBluePrint;
+using JetBrains.Annotations;
 
 public class AutoMapping : MonoBehaviour {
     public GameObject roads;
@@ -9,16 +10,18 @@ public class AutoMapping : MonoBehaviour {
     public GameObject items;
     public GameObject roadImagePrefab;
     public GameObject enemyImagePrefab;
+    public GameObject playerImagePrefab;
     // public GameObject itemImagePrefab;
-    private Field currentField;    
+    private Field currentField;
 
-    [SerializeField] private float tileSize = 10f; // タイルの大きさ
+    float scale;
+    Vector2 startPosition;
+    
     private RectTransform roadsRect;
 
-    private void Awake() {
-        MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateMap);
-        roadsRect = roads.GetComponent<RectTransform>();
-    }
+    // private void Start() {
+    //     Initialize();
+    // }
 
     private void UpdateMap(object data) {
         if (data is Field field) {
@@ -32,17 +35,17 @@ public class AutoMapping : MonoBehaviour {
         ClearMap();
 
         Vector2Int mapSize = currentField.Size;
-        
+
         float scaleX = roadsRect.rect.width / mapSize.x;
         float scaleY = roadsRect.rect.height / mapSize.y;
-        float scale = Mathf.Min(scaleX, scaleY);
+        scale = Mathf.Min(scaleX, scaleY);
 
         // マップ全体のサイズを計算
         float totalWidth = mapSize.x * scale;
         float totalHeight = mapSize.y * scale;
 
         // 中心からのオフセットを計算
-        Vector2 startPosition = new Vector2(
+        startPosition = new Vector2(
             -totalWidth * 0.5f,
             -totalHeight * 0.5f
         );
@@ -51,37 +54,47 @@ public class AutoMapping : MonoBehaviour {
         for (int x = 0; x < mapSize.x; x++) {
             for (int y = 0; y < mapSize.y; y++) {
                 int tileType = currentField.Grid[x, y];
-                
-                if (tileType == (int)Constants.MapChipType.Floor || 
+
+                if (tileType == (int)Constants.MapChipType.Floor ||
                     tileType >= (int)Constants.MapChipType.Up) {
                     CreateUIElement(roadImagePrefab, roads.transform, new Vector2Int(x, y), scale, startPosition);
                 }
             }
         }
 
-        // 敵を描画
+        CreateCharacterUI();
+    }
+    
+    // 敵とプレイヤーを描画
+    public void CreateCharacterUI() {
         foreach (var objectData in CharacterManager.i.allObjectData) {
-            if (objectData.Type == "Enemy") {
-                CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position, scale, startPosition);
+            switch (objectData.Type) {
+                case "Enemy":
+                    CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position, scale, startPosition);
+                    break;
+                case "Player":
+                    CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position, scale, startPosition);
+                    break;
             }
         }
     }
 
+    // キャラクターのUIを描画
     private void CreateUIElement(GameObject prefab, Transform parent, Vector2Int position, float scale, Vector2 startPosition) {
         GameObject element = Instantiate(prefab, Vector3.zero, Quaternion.identity);
         element.transform.SetParent(parent);
-        
+
         RectTransform rectTransform = element.GetComponent<RectTransform>();
-        
+
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        
+
         Vector2 pos = startPosition + new Vector2(
             position.x * scale + scale * 0.5f,
             position.y * scale + scale * 0.5f
         );
-        
+
         rectTransform.anchoredPosition = pos;
         rectTransform.sizeDelta = new Vector2(scale, scale);
         rectTransform.localScale = Vector3.one;
@@ -99,5 +112,10 @@ public class AutoMapping : MonoBehaviour {
 
     private void OnDestroy() {
         MessageBus.Instance.Unsubscribe("UpdateFieldInformation", UpdateMap);
+    }
+
+    public void Initialize() {
+        MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateMap);
+        roadsRect = roads.GetComponent<RectTransform>();
     }
 }

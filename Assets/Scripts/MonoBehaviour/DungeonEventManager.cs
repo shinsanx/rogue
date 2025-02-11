@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using RandomDungeonWithBluePrint;
 using UnityEngine;
 
 public class DungeonEventManager : MonoBehaviour
@@ -7,29 +8,29 @@ public class DungeonEventManager : MonoBehaviour
     //Todo: マップ生成
     //プレイヤーをランダムな位置へ召喚
     //アイテムの生成
-    //モンスターの生成
+    //モンスターの生成                    
 
-    StateMachine stateMachine;
-    State playerState;
-    State enemyState;
-    [SerializeField] GameObject enemyParent;    
-    DungeonEventLogic dungeonEventLogic;
-    
+    [SerializeField] RandomMapGenerator randomMapGenerator;
+    [SerializeField] AutoMapping autoMapping;
+    [SerializeField] Player player;
+    [SerializeField] GameObject enemyParent;
     
     void Start()
     {
-        stateMachine = GameAssets.i.stateMachine;
-        playerState = GameAssets.i.playerState;
-        enemyState = GameAssets.i.enemyState;
-        stateMachine.init();
+        // ミニマップの初期化
+        autoMapping.Initialize();
+        // マップ生成
+        randomMapGenerator.Initialize();
 
-        dungeonEventLogic = new DungeonEventLogic(enemyParent);
+        // プレイヤーをランダムな位置へ召喚
+        player.InitializePlayer();
+        player.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
+        // モンスターの生成
+        // アイテムの生成
+        // ミニマップの生成
+        randomMapGenerator.CreateMiniMap();
+        // StateMachineの初期化
 
-        playerState.OnEnterEvent += dungeonEventLogic.PlayerStateStart;
-        enemyState.OnEnterEvent += dungeonEventLogic.EnemyStateStart;
-
-        playerState.OnExitEvent += dungeonEventLogic.PlayerStateExit;
-        enemyState.OnExitEvent += dungeonEventLogic.EnemyStateExit;
                 
 
     }

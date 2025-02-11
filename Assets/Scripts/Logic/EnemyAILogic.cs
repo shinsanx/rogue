@@ -253,7 +253,7 @@ public class EnemyAILogic {
         if (jointPositions.Any(j => j == objectData.Position) && state.EnterJointPosition != objectData.Position) {
             var neighborBranchPositions = TileManager.i.GetNeighborBranchPositions(objectData.Position);
             if (neighborBranchPositions.Count > 0) {
-                Debug.Log("通路に入ります");
+                // Debug.Log("通路に入ります");
                 return neighborBranchPositions[0];
             }
         }
@@ -275,7 +275,7 @@ public class EnemyAILogic {
                 return objectData.Position;
             }
         }
-        Debug.Log("ここで別のジョイントポジションをターゲットにする");
+        // Debug.Log("ここで別のジョイントポジションをターゲットにする");
         //jointPositionの中からランダムで選択する
         while (true) {
             int randomIndex = UnityEngine.Random.Range(0, joints.Count);
