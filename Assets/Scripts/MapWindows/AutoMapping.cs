@@ -18,6 +18,8 @@ public class AutoMapping : MonoBehaviour {
     Vector2 startPosition;
     
     private RectTransform roadsRect;
+        Vector2 offset = new Vector2(0.5f, 0.5f);
+
 
     // private void Start() {
     //     Initialize();
@@ -115,7 +117,7 @@ public class AutoMapping : MonoBehaviour {
     }
 
     public void Initialize() {
-        MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateMap);
+        MessageBus.Instance.Subscribe("UpdateMiniMap", UpdateMap);
         roadsRect = roads.GetComponent<RectTransform>();
     }
 }

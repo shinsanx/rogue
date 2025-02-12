@@ -5,6 +5,7 @@ using System.Linq;
 using RandomDungeonWithBluePrint;
 using System;
 using TMPro;
+using System.Linq.Expressions;
 
 
 public class EnemyAILogic {
@@ -23,7 +24,7 @@ public class EnemyAILogic {
         public List<Vector2Int> MonsterView { get; set; }
         public List<Vector2Int> RouteCache { get; set; }
 
-        public EnemyAIState() {
+        public EnemyAIState() {            
             MonsterView = new List<Vector2Int>();
             RouteCache = new List<Vector2Int>();
             LastKnownPlayerPosition = Vector2Int.zero;

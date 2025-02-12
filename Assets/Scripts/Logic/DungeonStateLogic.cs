@@ -17,7 +17,7 @@ public class DungeonStateLogic {
     public List<Transform> gameObjectsTransform = new List<Transform>();
     public List<Transform> enemies = new List<Transform>();        
 
-    public DungeonStateLogic(GameObject enemyParent) {
+    public DungeonStateLogic(GameObject enemyParent) {        
         this.enemyParent = enemyParent;        
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
@@ -31,7 +31,7 @@ public class DungeonStateLogic {
     public void PlayerStateExit() {        
     }
 
-    public async void EnemyStateStart() {        
+    public async void EnemyStateStart() {         
         await Task.Delay(10); //ビミョー
 
         enemies = new List<Transform>(enemyParent.GetComponentsInChildren<Transform>());

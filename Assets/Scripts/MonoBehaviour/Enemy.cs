@@ -111,14 +111,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     string IObjectData.Type { get; set; }
     int IObjectData.RoomNum { get; set; }
 
-    public event System.Action<IObjectData> OnObjectUpdated;
+    public event System.Action<IObjectData> OnObjectUpdated;    
 
-    private void Start() {
-        InitializeEnemy();
-        Position = transform.position.ToVector2Int();
-    }
-
-    private void InitializeEnemy() {
+    public void InitializeEnemy() {
+        CharacterManager.i.AddCharacter(this);
         _enemyPosition = transform.position.ToVector2Int();
         enemyAnimLogic = new EnemyAnimLogic(this, sr);
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
@@ -127,7 +123,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);
         enemyAILogic = new EnemyAILogic(this, enemyAttackLogic, enemyMoveLogic, new AStarPathfinding());
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
-        CharacterManager.i.AddCharacter(this);
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
     }
     

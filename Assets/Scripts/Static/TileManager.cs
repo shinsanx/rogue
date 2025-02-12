@@ -171,7 +171,6 @@ public class TileManager{
     private Vector2Int GetRandomRoomPositions(int roomNum){
         List<Vector2Int> roomPositions = ExtractAllRoomPositions(roomNum);
         Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];
-        Debug.Log(randomPosition+"が選択されました");
         return randomPosition;
     }
 

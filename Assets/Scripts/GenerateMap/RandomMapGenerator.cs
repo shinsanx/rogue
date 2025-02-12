@@ -13,22 +13,16 @@ namespace RandomDungeonWithBluePrint {
             public FieldBluePrint BluePrint = default;
             public int Weight = default;//BluePringを複数設定した場合の重さ
         }
-
-        [SerializeField] private int seed = default;
+        
         [SerializeField] private Button generateButton = default;
         [SerializeField] private FieldView fieldView = default;
         [SerializeField] private BluePrintWithWeight[] bluePrints = default;        
         public Field currentField; //現在生成されているField
 
-        // private void Awake() { //マップ生成が発火するところ
-        //     Initialize();
-        // }
-
         private void Create(BluePrintWithWeight bluePrint) {
             var field = FieldBuilder.Build(bluePrint.BluePrint);
             currentField = field;
-            MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);
-            MessageBus.Instance.Publish("UpdateFieldInformation", currentField);            
+            MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);            
             fieldView.ShowField(field);
             TileManager.i.UpdateFieldInformation(currentField);            
         }
@@ -57,7 +51,7 @@ namespace RandomDungeonWithBluePrint {
         }        
 
         public void Initialize() {
-            Random.InitState(seed);
+            Random.InitState(DateTime.Now.Millisecond);            
             generateButton.onClick.AddListener(() => Create(Raffle()));
             generateButton.onClick.Invoke();
         }

@@ -23,6 +23,9 @@ public class PlayerStatusDataLogic
     }
 
     public void LevelUp(){
+        if(playerStatusAdapter.Level == 1){
+            return;
+        }
         int randUpHP = Random.Range(3,7);
         playerStatusAdapter.MaxHealth += randUpHP;
         playerStatusAdapter.health += randUpHP;

@@ -7,7 +7,7 @@ public static class ActionEventManager
     public static event System.Action OnPlayerActionComplete;
 
     public static void NotifyActionComplete()
-    {
+    {        
         OnPlayerActionComplete?.Invoke();
     }
 }

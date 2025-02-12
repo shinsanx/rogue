@@ -7,7 +7,7 @@ public class PlayerState : State
 {
     public override void OnEnter() {
         base.OnEnter();
-        // Debug.Log("PlayerState start");
+        //  Debug.Log("PlayerState start");
         // PlayerStateがスタートしたときの処理を書く
     }
 

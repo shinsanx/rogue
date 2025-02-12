@@ -7,7 +7,7 @@ public class EnemyState : State
 {
     public override void OnEnter() {
         base.OnEnter();
-        // Debug.Log("EnemyState start");
+        //  Debug.Log("EnemyState start");
         // EnemyStateがスタートしたときの処理を書く
     }
 

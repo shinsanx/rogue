@@ -14,25 +14,35 @@ public class DungeonEventManager : MonoBehaviour
     [SerializeField] AutoMapping autoMapping;
     [SerializeField] Player player;
     [SerializeField] GameObject enemyParent;
-    
-    void Start()
+    [SerializeField] GameObject enemyPrefab;
+    [SerializeField] StatusUI statusUI;
+    [SerializeField] int generateEnemyCount;
+    [SerializeField] DungeonStateManager dungeonStateManager;    
+
+    private void Start()
     {
         // ミニマップの初期化
         autoMapping.Initialize();
+        
         // マップ生成
         randomMapGenerator.Initialize();
+        statusUI.Initialize();
+        
+        dungeonStateManager.Initialize();
 
         // プレイヤーをランダムな位置へ召喚
         player.InitializePlayer();
         player.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
         // モンスターの生成
+        for (int i = 0; i < generateEnemyCount; i++) {
+            GameObject enemy = Instantiate(enemyPrefab, enemyParent.transform);
+            enemy.GetComponent<Enemy>().InitializeEnemy();
+            enemy.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
+        }
         // アイテムの生成
         // ミニマップの生成
         randomMapGenerator.CreateMiniMap();
         // StateMachineの初期化
-
-                
-
     }
     
 }

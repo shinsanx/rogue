@@ -15,16 +15,6 @@ public class StatusUI : MonoBehaviour
 
     private Player player;
 
-
-    private void Start(){
-
-        player = FindObjectOfType<Player>();
-        if(player != null){
-            player.OnHealthChanged += UpdateHPText;
-            player.OnLvChanged += UpdateLvText;
-        }                
-    }
-
     private void OnDestroy() {
         if(player != null){
             player.OnHealthChanged -= UpdateHPText;
@@ -41,8 +31,16 @@ public class StatusUI : MonoBehaviour
         healthBarGage.fillAmount = (float)currentHp / (float)maxHp;
     }
 
-    public void UpdateLvText(int level){
+    public void UpdateLvText(int level){        
         string updateTxt = null;
         currentLvTxt.text = updateTxt.ConvertNumToUpperString(level);
+    }
+
+    public void Initialize(){
+        player = FindObjectOfType<Player>();
+        if(player != null){            
+            player.OnHealthChanged += UpdateHPText;
+            player.OnLvChanged += UpdateLvText;
+        }
     }
 }

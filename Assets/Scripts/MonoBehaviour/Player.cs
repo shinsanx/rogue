@@ -15,7 +15,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
-    private PlayerAttackLogic playerAttackLogic;    
+    private PlayerAttackLogic playerAttackLogic;
     private PlayerAnimLogic playerAnimLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
@@ -27,7 +27,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private int _currentHp;
     private int _maxHp;
     private int _currentLv;
-    private int _totalExp;    
+    private int _totalExp;
 
     // === Events ===
     // CharacterManagerで実装。
@@ -53,7 +53,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
             OnObjectUpdated?.Invoke(this);
         }
     }
-    
+
 
 
     // IAnimationAdapter
@@ -130,14 +130,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         Id = CharacterManager.GetUniqueID();
     }
 
-    // private void Start() {
-    //     InitializePlayer();
-    // }
-
     // === Methods ===
     public void InitializePlayer() {
         CharacterManager.i.AddCharacter(this);
-        playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);        
+        playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         playerAnimLogic = new PlayerAnimLogic(this);
         playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic);
         playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
