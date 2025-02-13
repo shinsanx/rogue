@@ -11,10 +11,19 @@ public class UserInput : MonoBehaviour
     public UnityEvent onAttack;
     Vector2 inputVector;
     public bool isMoveButtonLongPrresed = false;
+    private bool isInputLocked = true;  // 入力ロックのフラグ
 
-    
+    private async void Start()
+    {
+        // 2秒間入力をロック
+        isInputLocked = true;
+        await Task.Delay(3000);
+        isInputLocked = false;
+    }
+
     //移動
     public void OnMove(InputAction.CallbackContext context){
+        if (isInputLocked) return;  // ロック中は入力を無視
 
         if(context.started){        
             isMoveButtonLongPrresed = true;
@@ -30,6 +39,8 @@ public class UserInput : MonoBehaviour
 
     //長押し移動
     public void OnLongPress(InputAction.CallbackContext context){
+        if (isInputLocked) return;  // ロック中は入力を無視
+
         if(context.performed){
             MoveContinuously();
         }
@@ -44,9 +55,10 @@ public class UserInput : MonoBehaviour
     }
 
     public void OnAttack(InputAction.CallbackContext context){
+        if (isInputLocked) return;  // ロック中は入力を無視
+
         if(context.started) return;
         if(context.canceled) return;
         onAttack?.Invoke();
     }
-
 }

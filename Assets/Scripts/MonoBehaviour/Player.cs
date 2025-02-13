@@ -30,7 +30,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private int _totalExp;
 
     // === Events ===
-    // CharacterManagerで実装。
+    // CharacterManagerのAddCharacterで実装。
     public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
 
     // StatusUIで実装。

@@ -55,11 +55,10 @@ public class EnemyAILogic {
     public void AIStart() {
         UpdateEnemyState();
         ExecuteAction();
-        UpdateEndState();
-        NotifyTurnComplete();
+        UpdateEndState();        
     }
 
-    private void UpdateEnemyState() {
+    private void UpdateEnemyState() {        
         state.Player = CharacterManager.i.GetPlayer();
         state.IsInRoomAtStart = TileManager.i.LookupRoomNum(objectData.Position) != 0;
         state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
@@ -108,7 +107,7 @@ public class EnemyAILogic {
 
 
     // 攻撃と移動をする
-    private void ExecuteAction() {
+    private void ExecuteAction() {        
         if (TryAttackPlayer()) return;
         if (TryMove()) return;
     }
@@ -309,17 +308,13 @@ public class EnemyAILogic {
         return route.All(position => TileManager.i.CheckTileStandable(position));
     }
 
-    private void UpdateEndState() {
+    private void UpdateEndState() {        
         state.IsInRoomAtEnd = TileManager.i.LookupRoomNum(objectData.Position) != 0;
         RecordEnterJointPosition();
         state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
         if (state.IsAdjacentToPlayerAtEnd) {
             state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position;
         }
-    }
-
-    private void NotifyTurnComplete() {
-        //GameManager.i.EnemyTurnEnd();
     }
 
     // 自身の向いている方向を取得する

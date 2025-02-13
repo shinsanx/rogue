@@ -28,7 +28,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     //=== IPositionAdapter ===
     public Vector2Int Position {
         get { return _enemyPosition; }
-        set {
+        set {         
+            // Debug.Log("Enemy.cs: Position: " + value);
             transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
             _enemyPosition = value;
             OnObjectUpdated.Invoke(this);            
@@ -105,6 +106,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         set { enemyAILogic.AIStart(); }
     }
 
+    public void ActionStart() {
+        enemyAILogic.AIStart();
+    }
+
     // IObjectData
     public int Id { get; set; }
     public string Name { get; set; }
@@ -114,15 +119,17 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     public event System.Action<IObjectData> OnObjectUpdated;    
 
     public void InitializeEnemy() {
-        CharacterManager.i.AddCharacter(this);
-        _enemyPosition = transform.position.ToVector2Int();
-        enemyAnimLogic = new EnemyAnimLogic(this, sr);
+        //Position = transform.position.ToVector2Int();
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
-        enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
+        enemyAnimLogic = new EnemyAnimLogic(this, sr);
+        enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);
         enemyAILogic = new EnemyAILogic(this, enemyAttackLogic, enemyMoveLogic, new AStarPathfinding());
+        
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
+        CharacterManager.i.AddCharacter(this);
+
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
     }
     

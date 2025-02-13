@@ -15,7 +15,7 @@ public class DungeonStateLogic {
 
     public List<IPositionAdapter> objectsPositionAdapters = new List<IPositionAdapter>();
     public List<Transform> gameObjectsTransform = new List<Transform>();
-    public List<Transform> enemies = new List<Transform>();        
+    public List<Enemy> enemies = new List<Enemy>();        
 
     public DungeonStateLogic(GameObject enemyParent) {        
         this.enemyParent = enemyParent;        
@@ -34,19 +34,32 @@ public class DungeonStateLogic {
     public async void EnemyStateStart() {         
         await Task.Delay(10); //ビミョー
 
-        enemies = new List<Transform>(enemyParent.GetComponentsInChildren<Transform>());
-        enemies.RemoveAt(0); //parent分を引く
+        enemies = CharacterManager.i.GetAllEnemies();                
+        int completedActions = 0;
+        int totalEnemies = enemies.Count;
 
-        foreach(var enemy in enemies){
-            var monster = enemy.GetComponent<IMonsterStatusAdapter>();
-            if(monster != null) {
-                //敵の行動を開始する
-                monster.Action = true;                
+        // 一つのイベントハンドラを作成
+        Action<object> actionCompleteHandler = null;
+        actionCompleteHandler = (object data) => {
+            if (data is int enemyId && enemies.Any(e => e.Id == enemyId)) {
+                completedActions++;
+                
+                // すべての敵のアクションが完了したらクリーンアップしてターン終了
+                if (completedActions >= totalEnemies) {
+                    MessageBus.Instance.Unsubscribe("EnemyActionComplete", actionCompleteHandler);
+                    EndEnemyTurn();
+                }
             }
-        }
+        };
 
-        EndEnemyTurn();
-    }    
+        // 一度だけSubscribeする
+        MessageBus.Instance.Subscribe("EnemyActionComplete", actionCompleteHandler);
+
+        // 全ての敵のアクションを開始
+        foreach(var enemy in enemies) {
+            enemy.ActionStart();
+        }
+    }
 
     public void EnemyStateExit() {
     }         
@@ -55,6 +68,7 @@ public class DungeonStateLogic {
     }
 
     private void EndEnemyTurn(){
+        MessageBus.Instance.Publish("CreateCharacterUI", null);
         stateMachine.SetState(playerState);
     }
 

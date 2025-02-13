@@ -12,9 +12,6 @@ public class DungeonStateManager : MonoBehaviour {
     [SerializeField] GameObject enemyParent;
     DungeonStateLogic dungeonStateLogic;
 
-    // void Start() {
-    //     Initialize();
-    // }
 
     public void Initialize() {
         stateMachine = GameAssets.i.stateMachine;

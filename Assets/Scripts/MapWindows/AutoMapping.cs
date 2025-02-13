@@ -18,12 +18,8 @@ public class AutoMapping : MonoBehaviour {
     Vector2 startPosition;
     
     private RectTransform roadsRect;
-        Vector2 offset = new Vector2(0.5f, 0.5f);
+    private Vector2 offset = new Vector2(0.5f, 0f);
 
-
-    // private void Start() {
-    //     Initialize();
-    // }
 
     private void UpdateMap(object data) {
         if (data is Field field) {
@@ -69,20 +65,29 @@ public class AutoMapping : MonoBehaviour {
     
     // 敵とプレイヤーを描画
     public void CreateCharacterUI() {
+        if (currentField == null) return;
+        ClearCharacterUI();
+        
         foreach (var objectData in CharacterManager.i.allObjectData) {
             switch (objectData.Type) {
                 case "Enemy":
-                    CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position, scale, startPosition);
+                    CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position + offset, scale, startPosition);
                     break;
                 case "Player":
-                    CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position, scale, startPosition);
+                    CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position + offset, scale, startPosition);
                     break;
             }
         }
     }
 
+    private void ClearCharacterUI() {
+        foreach (Transform child in enemies.transform) {
+            Destroy(child.gameObject);
+        }
+    }
+
     // キャラクターのUIを描画
-    private void CreateUIElement(GameObject prefab, Transform parent, Vector2Int position, float scale, Vector2 startPosition) {
+    private void CreateUIElement(GameObject prefab, Transform parent, Vector2 position, float scale, Vector2 startPosition) {
         GameObject element = Instantiate(prefab, Vector3.zero, Quaternion.identity);
         element.transform.SetParent(parent);
 
@@ -113,11 +118,12 @@ public class AutoMapping : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        MessageBus.Instance.Unsubscribe("UpdateFieldInformation", UpdateMap);
+        MessageBus.Instance.Unsubscribe("UpdateMiniMap", UpdateMap);
     }
 
     public void Initialize() {
         MessageBus.Instance.Subscribe("UpdateMiniMap", UpdateMap);
+        MessageBus.Instance.Subscribe("CreateCharacterUI", (object data) => CreateCharacterUI());
         roadsRect = roads.GetComponent<RectTransform>();
     }
 }

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using RandomDungeonWithBluePrint;
 using UnityEngine;
 
-public class DungeonEventManager : MonoBehaviour
-{
+public class DungeonEventManager : MonoBehaviour {
     //Todo: マップ生成
     //プレイヤーをランダムな位置へ召喚
     //アイテムの生成
@@ -17,17 +16,21 @@ public class DungeonEventManager : MonoBehaviour
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] StatusUI statusUI;
     [SerializeField] int generateEnemyCount;
-    [SerializeField] DungeonStateManager dungeonStateManager;    
+    [SerializeField] DungeonStateManager dungeonStateManager;
 
-    private void Start()
-    {
+    private void Start() {
         // ミニマップの初期化
         autoMapping.Initialize();
-        
         // マップ生成
         randomMapGenerator.Initialize();
+
+        // キャラクターマネージャーの初期化
+        CharacterManager.i.Initialize();
+
+        // ステータスUIの初期化
         statusUI.Initialize();
-        
+
+        // ダンジョンステートマネージャーの初期化
         dungeonStateManager.Initialize();
 
         // プレイヤーをランダムな位置へ召喚
@@ -44,5 +47,5 @@ public class DungeonEventManager : MonoBehaviour
         randomMapGenerator.CreateMiniMap();
         // StateMachineの初期化
     }
-    
+
 }

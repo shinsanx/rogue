@@ -39,7 +39,7 @@ public class CharacterManager : MonoBehaviour {
         for (int i = 0; i < allObjectData.Count; i++) {
             if (allObjectData[i].Id == objectData.Id) {
                 allObjectData[i] = objectData;
-                // Debug.Log($"Updated object: {objectData.Name} with Pos: {objectData.Position}");                
+                //  Debug.Log($"Updated object: {objectData.Name} with Pos: {objectData.Position}");                
                 return;
             }
         }
@@ -50,8 +50,8 @@ public class CharacterManager : MonoBehaviour {
     public void AddCharacter(IObjectData character) {
         allObjectData.Add(character);
         character.OnObjectUpdated += UpdateObjectInfo;
-        // Debug.Log($"registered: {character.Name}");
-        // Debug.Log($"ID: {character.Id}");
+         Debug.Log($"registered: {character.Name}");
+         Debug.Log($"ID: {character.Id}");
     }
 
     // キャラクターを削除するメソッド
@@ -115,5 +115,22 @@ public class CharacterManager : MonoBehaviour {
         return null;
     }
 
+    //すべてのEnemyを取得する
+    public List<Enemy> GetAllEnemies() {
+        // Enemyタイプのオブジェクトのみを抽出
+        var enemyObjects = allObjectData.Where(obj => obj.Type == "Enemy");
+        
+        // Enemyクラスにキャスト
+        var enemies = enemyObjects.Select(obj => obj as Enemy);
+        
+        // nullでないものだけを取得
+        var validEnemies = enemies.Where(enemy => enemy != null);
+        
+        return validEnemies.ToList();
+    }
+
+    public void Initialize() {
+        allObjectData = new List<IObjectData>();
+    }
 
 }

@@ -1656,7 +1656,7 @@ MonoBehaviour:
   enemyParent: {fileID: 304789717}
   enemyPrefab: {fileID: 1233923294277433561, guid: f7f3d723095c5446fa08126d9df89abb, type: 3}
   statusUI: {fileID: 972607837}
-  generateEnemyCount: 5
+  generateEnemyCount: 1
   dungeonStateManager: {fileID: 672341468}
 --- !u!114 &672341468
 MonoBehaviour:
