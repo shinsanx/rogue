@@ -14,10 +14,10 @@ public class DungeonStateManager : MonoBehaviour {
 
 
     public void Initialize() {
+        Debug.Log("DungeonStateManager Initialize - Beginning");  // デバッグログを追加
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
-        enemyState = GameAssets.i.enemyState;
-        stateMachine.init();
+        enemyState = GameAssets.i.enemyState;        
 
         dungeonStateLogic = new DungeonStateLogic(enemyParent);
 
@@ -26,6 +26,8 @@ public class DungeonStateManager : MonoBehaviour {
 
         playerState.OnExitEvent += dungeonStateLogic.PlayerStateExit;
         enemyState.OnExitEvent += dungeonStateLogic.EnemyStateExit;
+        
+        Debug.Log("DungeonStateManager Initialize - Complete");  // デバッグログを追加
     }
 
 }

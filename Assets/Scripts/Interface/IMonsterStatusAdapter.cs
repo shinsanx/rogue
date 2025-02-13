@@ -12,6 +12,5 @@ public interface IMonsterStatusAdapter
     public string Attribute {get; set;}
     public float ItemDropRate {get; set;}
     public Sprite Sprite{get;set;}
-    public RuntimeAnimatorController AnimatorController{get;set;}
-    public bool Action {get;set;}
+    public RuntimeAnimatorController AnimatorController{get;set;}    
 }

@@ -2,16 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using Unity.VisualScripting;
-using System.Runtime.CompilerServices;
-
+using System;
 [RequireComponent(typeof(Animator))]
 
 public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData {
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sr;
-    [SerializeField] MonsterStatusSO monsterSO;    
-    
+    [SerializeField] MonsterStatusSO monsterSO;
+
     private EnemyStatusLogic enemyStatusLogic;
     private EnemyAnimLogic enemyAnimLogic;
     private EnemyAttackLogic enemyAttackLogic;
@@ -28,11 +26,11 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     //=== IPositionAdapter ===
     public Vector2Int Position {
         get { return _enemyPosition; }
-        set {         
+        set {
             // Debug.Log("Enemy.cs: Position: " + value);
             transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
             _enemyPosition = value;
-            OnObjectUpdated.Invoke(this);            
+            OnObjectUpdated.Invoke(this);
         }
     }
 
@@ -101,13 +99,15 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         set { animator.runtimeAnimatorController = value; }
     }
 
-    public bool Action {
-        get { return true; }
-        set { enemyAILogic.AIStart(); }
-    }
 
-    public void ActionStart() {
-        enemyAILogic.AIStart();
+
+    public async void ActionStart() {
+        try {            
+            await enemyAILogic.AIStart();            
+            MessageBus.Instance.Publish("EnemyActionComplete", Id);
+        } catch (Exception e) {
+            Debug.LogError($"Enemy {Id} action failed: {e.Message}");
+        }
     }
 
     // IObjectData
@@ -116,25 +116,25 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     string IObjectData.Type { get; set; }
     int IObjectData.RoomNum { get; set; }
 
-    public event System.Action<IObjectData> OnObjectUpdated;    
+    public event System.Action<IObjectData> OnObjectUpdated;
 
     public void InitializeEnemy() {
-        //Position = transform.position.ToVector2Int();
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAnimLogic = new EnemyAnimLogic(this, sr);
         enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);
         enemyAILogic = new EnemyAILogic(this, enemyAttackLogic, enemyMoveLogic, new AStarPathfinding());
-        
+
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
+        Id = CharacterManager.GetUniqueID(); // Assign a unique ID
         CharacterManager.i.AddCharacter(this);
 
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
     }
-    
 
-    private void OnEnemyDestroyed(){
+
+    private void OnEnemyDestroyed() {
         CharacterManager.i.RemoveCharacter(this);
         Destroy(gameObject);
     }
@@ -148,6 +148,5 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     }
 
     private void OnEnable() {
-        Id = CharacterManager.GetUniqueID(); // Assign a unique ID
     }
 }

@@ -19,8 +19,12 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] DungeonStateManager dungeonStateManager;
 
     private void Start() {
+        // StateMachineの初期化を最初に行う
+        GameAssets.i.stateMachine.init();
+
         // ミニマップの初期化
         autoMapping.Initialize();
+        
         // マップ生成
         randomMapGenerator.Initialize();
 
@@ -36,16 +40,19 @@ public class DungeonEventManager : MonoBehaviour {
         // プレイヤーをランダムな位置へ召喚
         player.InitializePlayer();
         player.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
+        
         // モンスターの生成
         for (int i = 0; i < generateEnemyCount; i++) {
             GameObject enemy = Instantiate(enemyPrefab, enemyParent.transform);
             enemy.GetComponent<Enemy>().InitializeEnemy();
             enemy.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
         }
+        
         // アイテムの生成
         // ミニマップの生成
         randomMapGenerator.CreateMiniMap();
-        // StateMachineの初期化
+
+        Debug.Log("Initialize completed");
     }
 
 }

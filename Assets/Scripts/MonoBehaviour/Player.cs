@@ -29,6 +29,8 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private int _currentLv;
     private int _totalExp;
 
+    private bool isMoving = false;
+
     // === Events ===
     // CharacterManagerのAddCharacterで実装。
     public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
@@ -49,12 +51,17 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => playerPosition;
         set {
             playerPosition = value;
-            transform.DOMove(value.ToVector2() + moveOffset, 0.3f).SetEase(Ease.Linear);
-            OnObjectUpdated?.Invoke(this);
+            isMoving = true;
+            transform.DOMove(value.ToVector2() + moveOffset, 0.3f)
+                .SetEase(Ease.Linear)
+                .OnComplete(() => {
+                    isMoving = false;
+                    OnObjectUpdated?.Invoke(this);
+                });
         }
     }
 
-
+    public bool IsMoving() => isMoving;
 
     // IAnimationAdapter
     public bool AttackAnimation {
@@ -125,17 +132,14 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     public int BasicAttackPower { get; set; }
     public int DefencePower { get; set; }
 
-    // === Unity Methods ===
-    private void OnEnable() {
-        Id = CharacterManager.GetUniqueID();
-    }
 
     // === Methods ===
     public void InitializePlayer() {
+        Id = CharacterManager.GetUniqueID();
         CharacterManager.i.AddCharacter(this);
         playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         playerAnimLogic = new PlayerAnimLogic(this);
-        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic);
+        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this);
         playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this);
         createMessageLogic = new CreateMessageLogic();

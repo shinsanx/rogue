@@ -1,12 +1,8 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using RandomDungeonWithBluePrint;
-using System;
-using TMPro;
-using System.Linq.Expressions;
-
+using System.Threading.Tasks;
 
 public class EnemyAILogic {
     // 状態を表すクラスを追加
@@ -52,10 +48,10 @@ public class EnemyAILogic {
         this.state = new EnemyAIState();
     }
 
-    public void AIStart() {
+    public async Task AIStart() {
         UpdateEnemyState();
         ExecuteAction();
-        UpdateEndState();        
+        UpdateEndState();
     }
 
     private void UpdateEnemyState() {        

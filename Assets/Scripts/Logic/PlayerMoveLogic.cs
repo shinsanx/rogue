@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine.Tilemaps;
-using UnityEngine.Rendering;
-
+using System;
 public class PlayerMoveLogic
 {    
     private IObjectData objectData;
     private PlayerAnimLogic playerAnimLogic;        
+    private StateMachine stateMachine;
+    private Player player;
 
     //コンストラクタ
-    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic){        
+    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic, Player player){        
         this.objectData = objectData;
-        this.playerAnimLogic = playerAnimLogic;                
+        this.playerAnimLogic = playerAnimLogic;
+        this.stateMachine = GameAssets.i.stateMachine;
+        this.player = player;
     }
 
     Vector2 inputVector;
@@ -25,8 +27,8 @@ public class PlayerMoveLogic
     List<Vector2Int> inputs = new List<Vector2Int>();
 
     public void MoveByInput(Vector2 inputVector){
-
-        this.inputVector = inputVector;
+        try {
+            this.inputVector = inputVector;
 
         roundX = Mathf.Round(inputVector.x);
         roundY = Mathf.Round(inputVector.y);
@@ -35,14 +37,18 @@ public class PlayerMoveLogic
         Vector2Int currentPos = objectData.Position;
         Vector2Int targetPos = inputVectorInt + currentPos;
 
-        if(isMoving) return;
-        inputs.Add(inputVectorInt);
-        DevideInput(currentPos, targetPos);
+            if(isMoving) return;
+            inputs.Add(inputVectorInt);
+            DevideInput(currentPos, targetPos);
+        } catch (Exception e) {
+            Debug.LogError($"PlayerMoveLogic MoveByInput failed: {e.Message}");
+        }
     }
 
     async void DevideInput(Vector2Int currentPos, Vector2Int targetPos){
-        //0.03秒待つ
-        await Task.Delay(30);
+        try {
+            //0.03秒待つ
+            await Task.Delay(30);
 
         if(inputs.Count == 1) Move(currentPos, targetPos);
 
@@ -53,24 +59,40 @@ public class PlayerMoveLogic
         } else if(inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownRight])){
             Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownRight]);
         }else if(inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownLeft])){
-            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownLeft]);
+                Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownLeft]);
+            }
+            inputs.Clear();
+        } catch (Exception e) {
+            Debug.LogError($"PlayerMoveLogic DevideInput failed: {e.Message}");
         }
-        inputs.Clear();
     }    
 
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
+        try {
+            if (stateMachine.CurrentState != GameAssets.i.playerState){
+                Debug.Log("enemyStateで動けません");
+                return;
+        }
+        
+        if (player.IsMoving()) {
+            Debug.Log("playerが動いています");
+            return;
+        }
+
         playerAnimLogic.SetMoveAnimation(new Vector2(inputVector.x, inputVector.y));
-        if(!TileManager.i.CheckMovableTile(currentPos, targetPos))return;
-        if(isMoving == true) return;
-        LockInputWhileMoving();
-        Vector2 newPosition = targetPos + moveOffset;
-        objectData.Position = newPosition.ToVector2Int();
-        ActionEventManager.NotifyActionComplete();
+        if(!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
+
+            Vector2 newPosition = targetPos + moveOffset;
+            objectData.Position = newPosition.ToVector2Int();
+            ActionEventManager.NotifyActionComplete();
+        } catch (Exception e) {
+            Debug.LogError($"PlayerMoveLogic Move failed: {e.Message}");
+        }
     }
 
     async void LockInputWhileMoving(){
         isMoving = true;
-        await Task.Delay(150);        
+        await Task.Delay(15);        
         isMoving = false;
     }
 

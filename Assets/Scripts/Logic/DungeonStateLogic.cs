@@ -25,49 +25,57 @@ public class DungeonStateLogic {
     }
 
     public void PlayerStateStart() {
-        // TODO:UIを有効化してプレイヤーのアクションを待つ        
+        Debug.Log("PlayerStateStart - Beginning");  // デバッグログを追加
+        // TODO:UIを有効化してプレイヤーのアクションを待つ     
     }
 
     public void PlayerStateExit() {        
     }
 
     public async void EnemyStateStart() {         
-        await Task.Delay(10); //ビミョー
+        Debug.Log("EnemyStateStart - Beginning");
+        await Task.Delay(10);
 
-        enemies = CharacterManager.i.GetAllEnemies();                
+        enemies = CharacterManager.i.GetAllEnemies();
+        Debug.Log($"Found {enemies.Count} enemies");
+                
         int completedActions = 0;
         int totalEnemies = enemies.Count;
 
         // 一つのイベントハンドラを作成
         Action<object> actionCompleteHandler = null;
         actionCompleteHandler = (object data) => {
+            Debug.Log($"Enemy action complete received: {data}");
             if (data is int enemyId && enemies.Any(e => e.Id == enemyId)) {
                 completedActions++;
+                Debug.Log($"Completed actions: {completedActions}/{totalEnemies}");
                 
                 // すべての敵のアクションが完了したらクリーンアップしてターン終了
                 if (completedActions >= totalEnemies) {
+                    Debug.Log("All enemies completed their actions");
                     MessageBus.Instance.Unsubscribe("EnemyActionComplete", actionCompleteHandler);
                     EndEnemyTurn();
                 }
             }
         };
 
-        // 一度だけSubscribeする
         MessageBus.Instance.Subscribe("EnemyActionComplete", actionCompleteHandler);
+        Debug.Log("Starting enemy actions");
 
-        // 全ての敵のアクションを開始
         foreach(var enemy in enemies) {
+            Debug.Log($"Starting action for enemy ID: {enemy.Id}");
             enemy.ActionStart();
         }
     }
 
-    public void EnemyStateExit() {
+    public void EnemyStateExit() {        
     }         
 
     public void StartEnemyTurn(){        
     }
 
     private void EndEnemyTurn(){
+        Debug.Log("EndEnemyTurn");
         MessageBus.Instance.Publish("CreateCharacterUI", null);
         stateMachine.SetState(playerState);
     }
