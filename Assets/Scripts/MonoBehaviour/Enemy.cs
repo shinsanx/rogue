@@ -5,7 +5,7 @@ using DG.Tweening;
 using System;
 [RequireComponent(typeof(Animator))]
 
-public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData {
+public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData, IEnemyAIState {
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sr;
     [SerializeField] MonsterStatusSO monsterSO;
@@ -17,13 +17,12 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     private EnemyMoveLogic enemyMoveLogic;
 
     Vector2 moveOffset = new Vector2(.5f, .5f);
-    private Vector2Int _enemyPosition; //startでtransform.position入れてるけど危険
+    private Vector2Int _enemyPosition;
     private int _hp;
 
-
-
-
-    //=== IPositionAdapter ===
+    // ========================================================
+    // IPositionAdapter
+    // ========================================================
     public Vector2Int Position {
         get { return _enemyPosition; }
         set {
@@ -34,8 +33,19 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         }
     }
 
+    // ========================================================
+    // IObjectData
+    // ========================================================
+    public int Id { get; set; }
+    public string Name { get; set; }
+    string IObjectData.Type { get; set; }
+    int IObjectData.RoomNum { get; set; }
+    // ========================================================
 
-    // === IAnimationAdapter ===
+
+    // ========================================================
+    // IAnimationAdapter
+    // ========================================================
     private Vector2 enemyFaceDirection;
     public Vector2 MoveAnimationDirection {
         get { return enemyFaceDirection; }
@@ -43,29 +53,28 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
             enemyFaceDirection = new Vector2(value.x, value.y);
             SetAnimatorDirection(value);
         }
-    }
-
+    }        
     private void SetAnimatorDirection(Vector2 direction) {
         animator.SetFloat("x", direction.x);
         animator.SetFloat("y", direction.y);
     }
-
     //攻撃時に再生されるアニメーション    
     public bool AttackAnimation {
         set { TriggerAnimator("AtkTrigger"); }
     }
-
     //ダメージを受けた時に再生されるアニメーション
     public bool TakeDamageAnimation {
         set { TriggerAnimator("TakeDamageTrigger"); }
     }
-
     private void TriggerAnimator(string triggerName) {
         animator.SetTrigger(triggerName);
     }
+    // ========================================================
 
-    string IObjectData.Name { get; set; }
 
+    // ========================================================
+    // IMonsterStatusAdapter
+    // ========================================================
     int IMonsterStatusAdapter.HP {
         get { return _hp; }
         set {
@@ -81,7 +90,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
             }
         }
     }
-
     public int AttackPower { get; set; }
     public int Defence { get; set; }
     public int Exp { get; set; }
@@ -93,29 +101,56 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         get { return null; }
         set { sr.sprite = value; }
     }
-
     public RuntimeAnimatorController AnimatorController {
         get { return animator.runtimeAnimatorController; }
         set { animator.runtimeAnimatorController = value; }
     }
+    // ========================================================    
+    
+
+    // ========================================================
+    // IEnemyAIState
+    // ========================================================
+    public bool IsInRoomAtStart { get; set; }
+    public bool IsInRoomAtEnd { get; set; }
+    public bool IsAdjacentToPlayerAtStart { get; set; }
+    public bool IsAdjacentToPlayerAtEnd { get; set; }
+    public bool CanSeePlayer { get; set; }
+    public Vector2Int FacingDirection { get; set; }
+    public Vector2Int EnterJointPosition { get; set; }
+    public Vector2Int LastKnownPlayerPosition { get; set; }
+    public Vector2Int TargetPosition { get; set; }
+    public Vector2Int StartPosition { get; set; }
+    public Vector2Int EndPosition { get; set; }
+    public List<Vector2Int> MonsterView { get; set; }
+    public List<Vector2Int> RouteCache { get; set; }
+    // ========================================================
 
 
-
-    public async void ActionStart() {
-        try {            
-            await enemyAILogic.AIStart();            
-            MessageBus.Instance.Publish("EnemyActionComplete", Id);
-        } catch (Exception e) {
-            Debug.LogError($"Enemy {Id} action failed: {e.Message}");
+    // 行動実行メソッド
+    public void ExecuteAction(EnemyAction action)
+    {
+        switch(action.Type)
+        {
+            case ActionType.Move:
+                enemyMoveLogic.Move(action.TargetPosition, action.Direction);
+                break;
+            case ActionType.Attack:
+                enemyAttackLogic.Attack(action.Target, action.Direction);
+                break;
         }
     }
 
-    // IObjectData
-    public int Id { get; set; }
-    public string Name { get; set; }
-    string IObjectData.Type { get; set; }
-    int IObjectData.RoomNum { get; set; }
+    // public async void ActionStart() {
+    //     try {            
+    //         await enemyAILogic.AIStart();            
+    //         MessageBus.Instance.Publish("EnemyActionComplete", Id);
+    //     } catch (Exception e) {
+    //         Debug.LogError($"Enemy {Id} action failed: {e.Message}");
+    //     }
+    // }
 
+    
     public event System.Action<IObjectData> OnObjectUpdated;
 
     public void InitializeEnemy() {

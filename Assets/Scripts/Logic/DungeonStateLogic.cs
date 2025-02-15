@@ -12,20 +12,21 @@ public class DungeonStateLogic {
     private State playerState;
     private State enemyState;    
     private GameObject enemyParent;
+    private EnemyManager enemyManager;
 
     public List<IPositionAdapter> objectsPositionAdapters = new List<IPositionAdapter>();
     public List<Transform> gameObjectsTransform = new List<Transform>();
     public List<Enemy> enemies = new List<Enemy>();        
 
-    public DungeonStateLogic(GameObject enemyParent) {        
+    public DungeonStateLogic(GameObject enemyParent, EnemyManager enemyManager) {        
         this.enemyParent = enemyParent;        
+        this.enemyManager = enemyManager;
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;
     }
 
     public void PlayerStateStart() {
-        Debug.Log("PlayerStateStart - Beginning");  // デバッグログを追加
         // TODO:UIを有効化してプレイヤーのアクションを待つ     
     }
 
@@ -33,39 +34,34 @@ public class DungeonStateLogic {
     }
 
     public async void EnemyStateStart() {         
-        Debug.Log("EnemyStateStart - Beginning");
         await Task.Delay(10);
+        await enemyManager.ProcessEnemies();
+        EndEnemyTurn();
 
-        enemies = CharacterManager.i.GetAllEnemies();
-        Debug.Log($"Found {enemies.Count} enemies");
+        // enemies = CharacterManager.i.GetAllEnemies();
                 
-        int completedActions = 0;
-        int totalEnemies = enemies.Count;
+        // int completedActions = 0;
+        // int totalEnemies = enemies.Count;
 
-        // 一つのイベントハンドラを作成
-        Action<object> actionCompleteHandler = null;
-        actionCompleteHandler = (object data) => {
-            Debug.Log($"Enemy action complete received: {data}");
-            if (data is int enemyId && enemies.Any(e => e.Id == enemyId)) {
-                completedActions++;
-                Debug.Log($"Completed actions: {completedActions}/{totalEnemies}");
+        // // 一つのイベントハンドラを作成
+        // Action<object> actionCompleteHandler = null;
+        // actionCompleteHandler = (object data) => {
+        //     if (data is int enemyId && enemies.Any(e => e.Id == enemyId)) {
+        //         completedActions++;
                 
-                // すべての敵のアクションが完了したらクリーンアップしてターン終了
-                if (completedActions >= totalEnemies) {
-                    Debug.Log("All enemies completed their actions");
-                    MessageBus.Instance.Unsubscribe("EnemyActionComplete", actionCompleteHandler);
-                    EndEnemyTurn();
-                }
-            }
-        };
+        //         // すべての敵のアクションが完了したらクリーンアップしてターン終了
+        //         if (completedActions >= totalEnemies) {
+        //             MessageBus.Instance.Unsubscribe("EnemyActionComplete", actionCompleteHandler);
+        //             EndEnemyTurn();
+        //         }
+        //     }
+        // };
 
-        MessageBus.Instance.Subscribe("EnemyActionComplete", actionCompleteHandler);
-        Debug.Log("Starting enemy actions");
+        // MessageBus.Instance.Subscribe("EnemyActionComplete", actionCompleteHandler);
 
-        foreach(var enemy in enemies) {
-            Debug.Log($"Starting action for enemy ID: {enemy.Id}");
-            enemy.ActionStart();
-        }
+        // foreach(var enemy in enemies) {
+        //     enemy.ActionStart();
+        // }
     }
 
     public void EnemyStateExit() {        
@@ -75,8 +71,8 @@ public class DungeonStateLogic {
     }
 
     private void EndEnemyTurn(){
-        Debug.Log("EndEnemyTurn");
         MessageBus.Instance.Publish("CreateCharacterUI", null);
+        Debug.Log("EndEnemyTurn");
         stateMachine.SetState(playerState);
     }
 

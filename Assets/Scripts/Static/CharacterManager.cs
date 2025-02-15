@@ -17,7 +17,7 @@ public class CharacterManager : MonoBehaviour {
     }
 
     //ここにすべてのオブジェクトデータが格納される    
-    public List<IObjectData> allObjectData = new List<IObjectData>();
+    public List<IObjectData> allObjectData = new List<IObjectData>();    
 
     //IDの管理
     private static int _idCounter = 0;

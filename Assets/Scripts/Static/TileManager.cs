@@ -103,14 +103,14 @@ public class TileManager{
         if (roomNum == 0) return null;
 
         // TileInfoの辞書を使用してタイルを取得
-        List<TileInfo> roomTiles = field.tileInfo.GetTilesByRoomNum(roomNum);
-        if (roomTiles == null || roomTiles.Count == 0) return null;
+        List<Vector2Int> roomPositions = field.tileInfo.GetTilePositionsByRoomNum(roomNum);
+        if (roomPositions == null || roomPositions.Count == 0) return null;
 
         // room内の全ポジションを取得
-        List<Vector2Int> allRoomPositions = roomTiles.Select(tile => tile.position).ToList();
+        List<Vector2Int> allRoomPositions = roomPositions;
 
         // 接続点（joint）を取得し、接続点から1マス隣の通路を探索
-        List<Vector2Int> joints = ExtractJointPosInRoom(roomTiles.First().position);
+        List<Vector2Int> joints = ExtractJointPosInRoom(allRoomPositions.First());
         if (joints == null || joints.Count == 0) return allRoomPositions; // 接続点がなければそのまま返す
 
         foreach (Vector2Int joint in joints) {
@@ -162,16 +162,20 @@ public class TileManager{
         // Fieldの中からランダムでRoomを選択
         if (field.Rooms.Count == 0) return Vector2Int.zero;
 
-        int roomNum = Random.Range(1, field.Rooms.Count + 1);
+        int roomNum = Random.Range(1, field.Rooms.Count + 1);        
         return GetRandomRoomPositions(roomNum);
     }
 
     //指定されたRoomの中からランダムなポジションを返す
-    private Vector2Int GetRandomRoomPositions(int roomNum){
-        List<TileInfo> roomTiles = field.tileInfo.GetTilesByRoomNum(roomNum);
-        if (roomTiles == null || roomTiles.Count == 0) return Vector2Int.zero;
-
-        Vector2Int randomPosition = roomTiles[Random.Range(0, roomTiles.Count)].position;
+    private Vector2Int GetRandomRoomPositions(int roomNum){        
+        List<Vector2Int> roomPositions = field.tileInfo.GetTilePositionsByRoomNum(roomNum);
+        
+        if (roomPositions == null || roomPositions.Count == 0) {
+            Debug.LogError("roomPositions is null or empty");
+            return Vector2Int.zero;
+        }
+        
+        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];                
         return randomPosition;
     }
     

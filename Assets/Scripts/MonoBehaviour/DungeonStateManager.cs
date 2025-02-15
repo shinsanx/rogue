@@ -10,24 +10,22 @@ public class DungeonStateManager : MonoBehaviour {
     State playerState;
     State enemyState;
     [SerializeField] GameObject enemyParent;
+    [SerializeField] EnemyManager enemyManager;
     DungeonStateLogic dungeonStateLogic;
 
 
     public void Initialize() {
-        Debug.Log("DungeonStateManager Initialize - Beginning");  // デバッグログを追加
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;        
 
-        dungeonStateLogic = new DungeonStateLogic(enemyParent);
+        dungeonStateLogic = new DungeonStateLogic(enemyParent, enemyManager);
 
         playerState.OnEnterEvent += dungeonStateLogic.PlayerStateStart;
         enemyState.OnEnterEvent += dungeonStateLogic.EnemyStateStart;
 
         playerState.OnExitEvent += dungeonStateLogic.PlayerStateExit;
         enemyState.OnExitEvent += dungeonStateLogic.EnemyStateExit;
-        
-        Debug.Log("DungeonStateManager Initialize - Complete");  // デバッグログを追加
     }
 
 }

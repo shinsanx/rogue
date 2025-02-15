@@ -17,11 +17,11 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] StatusUI statusUI;
     [SerializeField] int generateEnemyCount;
     [SerializeField] DungeonStateManager dungeonStateManager;
+    [SerializeField] EnemyManager enemyManager;
 
     private void Start() {
         // StateMachineの初期化を最初に行う
         GameAssets.i.stateMachine.init();
-
         // ミニマップの初期化
         autoMapping.Initialize();
         
@@ -47,6 +47,7 @@ public class DungeonEventManager : MonoBehaviour {
             enemy.GetComponent<Enemy>().InitializeEnemy();
             enemy.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
         }
+        enemyManager.Initialize();
         
         // アイテムの生成
         // ミニマップの生成

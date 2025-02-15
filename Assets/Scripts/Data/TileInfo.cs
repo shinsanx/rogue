@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TMPro;
+using UnityEngine.Tilemaps;
 
 namespace RandomDungeonWithBluePrint {
     public class TileInfo {
@@ -18,13 +19,40 @@ namespace RandomDungeonWithBluePrint {
         // 新たに追加する辞書
         private Dictionary<Vector2Int, int> mapChipTypeByPosition;
         private Dictionary<Vector2Int, int> tileTypeByPosition;
-        private Dictionary<int, List<TileInfo>> tilesByRoomNum;
+        private Dictionary<int, List<Vector2Int>> tilePositionsByRoomNum;
         private Dictionary<Vector2Int, int> roomNumByPosition;
         private Dictionary<int, Room> roomByNum;
+
+        // コンストラクタで辞書を初期化（オプション）
+        public TileInfo() {
+            mapChipTypeByPosition = new Dictionary<Vector2Int, int>();
+            tileTypeByPosition = new Dictionary<Vector2Int, int>();
+            tilePositionsByRoomNum = new Dictionary<int, List<Vector2Int>>();
+            roomNumByPosition = new Dictionary<Vector2Int, int>();
+            roomByNum = new Dictionary<int, Room>();
+        }
 
         public void Build(Vector2Int size, List<Room> rooms, List<Vector2Int> branches) {
             mapSize = size;
             MakeTileList(size.x, size.y);
+            MakePosition(size.x, size.y);            
+
+            // 辞書の初期化（コンストラクタで初期化していない場合）
+            if (mapChipTypeByPosition == null) {
+                mapChipTypeByPosition = new Dictionary<Vector2Int, int>();
+            }
+            if (tileTypeByPosition == null) {
+                tileTypeByPosition = new Dictionary<Vector2Int, int>();
+            }
+            if (tilePositionsByRoomNum == null) {
+                tilePositionsByRoomNum = new Dictionary<int, List<Vector2Int>>();
+            }
+            if (roomNumByPosition == null) {
+                roomNumByPosition = new Dictionary<Vector2Int, int>();
+            }
+            if (roomByNum == null) {
+                roomByNum = new Dictionary<int, Room>();
+            }
 
             for (var i = 0; i < size.y; i++) {
                 for (var j = 0; j < size.x; j++) {
@@ -40,10 +68,11 @@ namespace RandomDungeonWithBluePrint {
                     
                     //キーが重複した場合は上書き
                     if (mapChipTypeByPosition.ContainsKey(pos)) {
-                        mapChipTypeByPosition[pos] = tiles[pos.y][pos.x].mapChipType; //辞書に格納
+                        mapChipTypeByPosition[pos] = tiles[pos.y][pos.x].mapChipType; //辞書に格納                        
                     } else {
                         mapChipTypeByPosition.Add(pos, tiles[pos.y][pos.x].mapChipType); //辞書に格納
                     }
+                    tiles[pos.y][pos.x].roomNum = roomCount; //自作。roomNum生成のために使用する。
                 }
                 room.roomNum = roomCount; //自作。roomNum生成のために使用する。
                 roomByNum[roomCount] = room;
@@ -65,17 +94,16 @@ namespace RandomDungeonWithBluePrint {
                 }
             }
 
-            MakePosition(size.x, size.y);            
-
-            // roomNumごとのタイルListを辞書に格納
-            tilesByRoomNum = new Dictionary<int, List<TileInfo>>();
-            foreach (var tile in tiles.SelectMany(row => row)) {
-                if (!tilesByRoomNum.ContainsKey(tile.roomNum)) {
-                    tilesByRoomNum[tile.roomNum] = new List<TileInfo>();
-                }
-                tilesByRoomNum[tile.roomNum].Add(tile);
+            // roomNumごとのタイルポジションListを辞書に格納
+            foreach (TileInfo tile in tiles.SelectMany(row => row)) {
+                if (!tilePositionsByRoomNum.ContainsKey(tile.roomNum)) {
+                    tilePositionsByRoomNum[tile.roomNum] = new List<Vector2Int>();
+                }                
+                tilePositionsByRoomNum[tile.roomNum].Add(tile.position);
             }
         }
+
+
 
         //自作 Tileの盤面を作成。
         private void MakeTileList(int x, int y) {
@@ -99,12 +127,12 @@ namespace RandomDungeonWithBluePrint {
         //ここから辞書を使用したメソッド
         //TileManagerで使用するメソッド
 
-        // roomNumからタイルを取得するメソッド
-        public List<TileInfo> GetTilesByRoomNum(int roomNum) {
-            if (tilesByRoomNum.TryGetValue(roomNum, out var tileList)) {
-                return tileList;
+        // roomNumから全タイルポジションを取得するメソッド
+        public List<Vector2Int> GetTilePositionsByRoomNum(int roomNum) {
+            if (tilePositionsByRoomNum.TryGetValue(roomNum, out var tilePositions)) {
+                return tilePositions;
             }
-            return new List<TileInfo>();
+            return new List<Vector2Int>();
         }
 
         //positionからroomNumを取得するメソッド

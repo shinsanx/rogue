@@ -4,6 +4,9 @@ using UnityEngine;
 
 public interface IMonsterStatusAdapter
 {    
+    // ========================================================
+    // IMonsterStatusAdapter
+    // ========================================================
     public int HP {get; set;}
     public int AttackPower {get;set;}
     public int Defence {get; set;}

@@ -1616,7 +1616,6 @@ GameObject:
   - component: {fileID: 672341466}
   - component: {fileID: 672341467}
   - component: {fileID: 672341468}
-  - component: {fileID: 672341469}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -1657,9 +1656,8 @@ MonoBehaviour:
   enemyParent: {fileID: 304789717}
   enemyPrefab: {fileID: 1233923294277433561, guid: f7f3d723095c5446fa08126d9df89abb, type: 3}
   statusUI: {fileID: 972607837}
-  generateEnemyCount: 2
+  generateEnemyCount: 12
   dungeonStateManager: {fileID: 672341468}
-  enemyManager: {fileID: 672341469}
 --- !u!114 &672341468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1673,19 +1671,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyParent: {fileID: 304789717}
-  enemyManager: {fileID: 672341469}
---- !u!114 &672341469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 672341465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ece352887525b480e946434ae3226ca8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &679488204
 GameObject:
   m_ObjectHideFlags: 0
@@ -2888,7 +2873,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1327367936
 MonoBehaviour:
   m_ObjectHideFlags: 0
