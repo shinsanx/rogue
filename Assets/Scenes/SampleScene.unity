@@ -679,6 +679,50 @@ MonoBehaviour:
   initialTextsPos: {x: 0, y: 0}
   texts: {fileID: 459345363}
   box: {fileID: 37994342}
+--- !u!1 &233936746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 233936748}
+  - component: {fileID: 233936747}
+  m_Layer: 0
+  m_Name: CharacterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &233936747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233936746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef9e3f0cf9bf406f9ec54fd7e2b2127, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &233936748
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233936746}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304789717
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,8 +1011,10 @@ MonoBehaviour:
   generateButton: {fileID: 1385033606}
   fieldView: {fileID: 407009773}
   bluePrints:
+  - BluePrint: {fileID: 11400000, guid: e6254fb716ade4c18bc9eefea13924a0, type: 2}
+    Weight: 0
   - BluePrint: {fileID: 11400000, guid: 7aa4c71871cfa4785972200301b9becf, type: 2}
-    Weight: 1
+    Weight: 2
 --- !u!114 &407009773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1657,7 +1703,7 @@ MonoBehaviour:
   enemyParent: {fileID: 304789717}
   enemyPrefab: {fileID: 1233923294277433561, guid: f7f3d723095c5446fa08126d9df89abb, type: 3}
   statusUI: {fileID: 972607837}
-  generateEnemyCount: 2
+  generateEnemyCount: 30
   dungeonStateManager: {fileID: 672341468}
   enemyManager: {fileID: 672341469}
 --- !u!114 &672341468
@@ -3904,3 +3950,4 @@ SceneRoots:
   - {fileID: 1874388000}
   - {fileID: 672341466}
   - {fileID: 145286390}
+  - {fileID: 233936748}

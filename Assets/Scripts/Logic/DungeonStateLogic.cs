@@ -34,34 +34,11 @@ public class DungeonStateLogic {
     }
 
     public async void EnemyStateStart() {         
-        await Task.Delay(10);
+        await Task.Delay(300);
         await enemyManager.ProcessEnemies();
         EndEnemyTurn();
 
-        // enemies = CharacterManager.i.GetAllEnemies();
-                
-        // int completedActions = 0;
-        // int totalEnemies = enemies.Count;
 
-        // // 一つのイベントハンドラを作成
-        // Action<object> actionCompleteHandler = null;
-        // actionCompleteHandler = (object data) => {
-        //     if (data is int enemyId && enemies.Any(e => e.Id == enemyId)) {
-        //         completedActions++;
-                
-        //         // すべての敵のアクションが完了したらクリーンアップしてターン終了
-        //         if (completedActions >= totalEnemies) {
-        //             MessageBus.Instance.Unsubscribe("EnemyActionComplete", actionCompleteHandler);
-        //             EndEnemyTurn();
-        //         }
-        //     }
-        // };
-
-        // MessageBus.Instance.Subscribe("EnemyActionComplete", actionCompleteHandler);
-
-        // foreach(var enemy in enemies) {
-        //     enemy.ActionStart();
-        // }
     }
 
     public void EnemyStateExit() {        
@@ -72,7 +49,6 @@ public class DungeonStateLogic {
 
     private void EndEnemyTurn(){
         MessageBus.Instance.Publish("CreateCharacterUI", null);
-        Debug.Log("EndEnemyTurn");
         stateMachine.SetState(playerState);
     }
 

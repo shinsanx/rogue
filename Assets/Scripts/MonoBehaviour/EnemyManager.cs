@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
+using System;
+
 public class EnemyManager : MonoBehaviour {
     private List<Enemy> enemies = new List<Enemy>();
     private StateMachine stateMachine;
@@ -11,6 +13,7 @@ public class EnemyManager : MonoBehaviour {
     private GameObject player;
     private Vector2Int playerPos;
     private Vector2Int enemyCurrentPos;
+    private Vector2Int enemyTargetPos;        
     private EnemyAction enemyAction;    
     private IObjectData objectData;
     private AStarPathfinding pathfinding;
@@ -18,7 +21,10 @@ public class EnemyManager : MonoBehaviour {
     public void Initialize() {
         stateMachine = GameAssets.i.stateMachine;
         enemyState = GameAssets.i.enemyState;
-        player = CharacterManager.i.GetPlayer();        
+        player = CharacterManager.i.GetPlayer();
+        
+        // MainThreadHelperのインスタンスを確実に生成
+        var helper = MainThreadHelper.Instance;
     }
 
 
@@ -33,9 +39,33 @@ public class EnemyManager : MonoBehaviour {
         enemies = CharacterManager.i.GetAllEnemies();
 
         foreach (var enemy in enemies) {
-            EnemyAction action = AIStart(enemy);
-            enemy.ExecuteAction(action);
-            await Task.Yield(); // フレームを分散させるための待機
+            try {
+                var action = await MainThreadHelper.RunOnMainThread<EnemyAction>(() => {
+                    try {                        
+                        var result = AIStart(enemy);                        
+                        return result;
+                    }
+                    catch (Exception ex) {
+                        Debug.LogError($"Error in AIStart: {ex}");
+                        throw;
+                    }
+                });
+                
+                await MainThreadHelper.RunOnMainThread(() => {
+                    try {
+                        enemy.ExecuteAction(action);
+                    }
+                    catch (Exception ex) {
+                        Debug.LogError($"Error in ExecuteAction: {ex}");
+                        throw;
+                    }
+                });
+                await Task.Yield();
+            }
+            catch (Exception ex) {
+                Debug.LogError($"Error in enemy processing loop: {ex}");
+            }            
+            await Task.Yield();
         }
     }
 
@@ -58,6 +88,7 @@ public class EnemyManager : MonoBehaviour {
         enemyCurrentPos = objectData.Position;
         enemyAIState.IsInRoomAtStart = TileManager.i.LookupRoomNum(enemyCurrentPos) != 0;
         enemyAIState.StartPosition = enemyCurrentPos;
+        enemyTargetPos = enemyAIState.TargetPosition;        
         enemyAIState.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
         enemyAIState.MonsterView = GetMonsterView();
         enemyAIState.CanSeePlayer = CanSeePlayer();
@@ -67,9 +98,9 @@ public class EnemyManager : MonoBehaviour {
             enemyAIState.LastKnownPlayerPosition = Vector2Int.zero;
         }
 
-        if (enemyAIState.TargetPosition == enemyCurrentPos) {
+        if (enemyTargetPos == enemyCurrentPos) {
             // 目的地が自分の位置にある場合はリセットする
-            enemyAIState.TargetPosition = Vector2Int.zero;
+            enemyTargetPos = Vector2Int.zero;
         }
 
         if (enemyAIState.CanSeePlayer) {
@@ -107,8 +138,9 @@ public class EnemyManager : MonoBehaviour {
     // 攻撃と移動をする
     private void ExecuteAction() {
         if (TryAttackPlayer()) return;
-        if (TryMove()) return;
-    }    
+        //GetRandomPositionInSurrounding(enemyCurrentPos); //デバッグ用
+         if (TryMove()) return;
+    }
 
     // ターンスタート時にプレイヤーと隣接していた場合はプレイヤーを攻撃。
     private bool TryAttackPlayer() {
@@ -130,14 +162,16 @@ public class EnemyManager : MonoBehaviour {
     // 移動をする
     private bool TryMove() {
         Vector2Int targetPosition = DetermineTargetPosition();
+        //Vector2Int targetPosition = GetRandomPositionInSurrounding(enemyCurrentPos); //デバッグ用
+
         if (targetPosition == enemyCurrentPos) return false;
 
         List<Vector2Int> route = MakeRoute(enemyCurrentPos, targetPosition);
         if (route != null && route.Count > 0) {
-            enemyAction.Type = ActionType.Move;
+            enemyAction.Type = ActionType.Move;            
             enemyAction.TargetPosition = route[0];
-            enemyAction.Direction = targetPosition - enemyCurrentPos;
-            enemyAIState.FacingDirection = targetPosition - enemyCurrentPos;
+            enemyAction.Direction = route[0] - enemyCurrentPos;
+            enemyAIState.FacingDirection = route[0] - enemyCurrentPos;
             enemyAIState.EndPosition = targetPosition;
             return true;
         }
@@ -151,8 +185,8 @@ public class EnemyManager : MonoBehaviour {
     // 目的地を決める
     private Vector2Int DetermineTargetPosition() {
         // 既に目的地が設定されている場合はそれを返す
-        if (enemyAIState.TargetPosition != Vector2Int.zero) {                        
-            return enemyAIState.TargetPosition;
+        if (enemyTargetPos != Vector2Int.zero) {                        
+            return enemyTargetPos;
         }
 
         // プレイヤーの最後の位置情報がある場合はそれを返す
@@ -170,6 +204,7 @@ public class EnemyManager : MonoBehaviour {
         return enemyAIState.IsInRoomAtStart ?
             DetermineRoomTargetPosition() :
             DetermineCorridorTargetPosition();
+        //return GetRandomPositionInSurrounding(enemyCurrentPos); //デバッグ用
     }
 
     // プレイヤーが角越しに隣接している場合の迂回処理
@@ -206,7 +241,7 @@ public class EnemyManager : MonoBehaviour {
     private List<Vector2Int> MakeRoute(Vector2Int selfPos, Vector2Int targetPos) {
         // プレイヤーが視野内の場合、A*アルゴリズムで詳細なパスを計算する        
         if (enemyAIState.CanSeePlayer) {
-            Debug.Log("MakeRoute");
+            Debug.Log("AstarPathfinding");
             //return pathfinding.FindPath(selfPos, targetPos, enemyAIState.MonsterView);
         }
 
@@ -228,13 +263,14 @@ public class EnemyManager : MonoBehaviour {
                 return neighborBranchPositions[0];
             }
         }
-        return DetermineJointTargetPosition();
+        return DetermineJointTargetPosition();        
     }
 
     // JointPositionにいる場合の目的地を決める
     private Vector2Int DetermineJointTargetPosition() {
         var joints = TileManager.i.ExtractJointPosInRoom(enemyCurrentPos);
 
+        //EnterJointPositionが0の場合は、最も近いジョイントポイントを選択
         if (enemyAIState.EnterJointPosition == Vector2Int.zero) {
             if (joints != null && joints.Count > 0) {
                 // 最も近いジョイントポイントを選択
@@ -246,15 +282,24 @@ public class EnemyManager : MonoBehaviour {
                 return enemyCurrentPos;
             }
         }
-        //jointPositionの中からランダムで選択する
-        while (true) {
-            int randomIndex = Random.Range(0, joints.Count);
+        
+        
+        //もしJointPositionが1つの場合はその位置を返す
+        if (joints.Count == 1) {
+            return joints[0];
+        }
+
+        //すでにEneterjointPositionが設定されている場合は他のjointPositionを選択する
+        foreach(var joint in joints){
+            int randomIndex = UnityEngine.Random.Range(0, joints.Count);
             var randomJoint = joints[randomIndex];
             if (randomJoint != enemyAIState.EnterJointPosition) {
-                enemyAIState.TargetPosition = randomJoint;
+                enemyTargetPos = randomJoint;
                 return randomJoint;
             }
-        }        
+        }
+        Debug.Log("JointTargetPositionが見つかりませんでした");
+        return enemyCurrentPos;
     }
 
     // 通路にいる場合の目的地を決める
@@ -333,6 +378,18 @@ public class EnemyManager : MonoBehaviour {
 
     private void ResetEnemyAction() {
         enemyAction = new EnemyAction();
+    }
+
+    // 周囲8マスのランダムな位置を取得する
+    // デバッグ用
+    private Vector2Int GetRandomPositionInSurrounding(Vector2Int selfPos) {
+        var surroundingPositions = TileManager.i.GetSurroundingPositions(selfPos);
+        enemyAction.Type = ActionType.Move;            
+        enemyAction.TargetPosition = surroundingPositions[UnityEngine.Random.Range(0, surroundingPositions.Count)];
+        enemyAction.Direction = surroundingPositions[UnityEngine.Random.Range(0, surroundingPositions.Count)] - selfPos;
+        enemyAIState.FacingDirection = surroundingPositions[UnityEngine.Random.Range(0, surroundingPositions.Count)] - selfPos;
+        enemyAIState.EndPosition = surroundingPositions[UnityEngine.Random.Range(0, surroundingPositions.Count)];
+        return surroundingPositions[UnityEngine.Random.Range(0, surroundingPositions.Count)];
     }
 
 

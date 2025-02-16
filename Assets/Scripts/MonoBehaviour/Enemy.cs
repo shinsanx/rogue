@@ -26,10 +26,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     public Vector2Int Position {
         get { return _enemyPosition; }
         set {
-            // Debug.Log("Enemy.cs: Position: " + value);
-            transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
-            _enemyPosition = value;
-            OnObjectUpdated.Invoke(this);
+            Debug.Log("Enemy.cs: Position: " + value);
+             transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
+             _enemyPosition = value;
+             OnObjectUpdated.Invoke(this);
         }
     }
 
@@ -141,14 +141,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         }
     }
 
-    // public async void ActionStart() {
-    //     try {            
-    //         await enemyAILogic.AIStart();            
-    //         MessageBus.Instance.Publish("EnemyActionComplete", Id);
-    //     } catch (Exception e) {
-    //         Debug.LogError($"Enemy {Id} action failed: {e.Message}");
-    //     }
-    // }
 
     
     public event System.Action<IObjectData> OnObjectUpdated;

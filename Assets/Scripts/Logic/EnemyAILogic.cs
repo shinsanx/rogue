@@ -48,7 +48,7 @@ public class EnemyAILogic {
         this.state = new EnemyAIState();
     }
 
-    public async Task AIStart() {
+    public void AIStart() {
         UpdateEnemyState();
         ExecuteAction();
         UpdateEndState();
