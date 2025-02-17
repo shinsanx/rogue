@@ -52,7 +52,7 @@ public class PlayerAttackLogic
 
         int weaponPw;
         if(playerStatusAdapter.EquipWeapon != null){
-            weaponPw = playerStatusAdapter.EquipWeapon.power;
+            weaponPw = playerStatusAdapter.EquipWeapon.attackPower;
         } else{
             weaponPw = 1;
         }

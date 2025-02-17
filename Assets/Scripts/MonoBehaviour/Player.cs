@@ -6,7 +6,7 @@ using DG.Tweening;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Animator))]
-public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStatusAdapter, IObjectData {
+public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStatusAdapter, IObjectData, IEffectReceiver {
     // === Serialized Fields ===
     [SerializeField] private RandomDungeonWithBluePrint.RandomMapGenerator randomMapGenerator;
     [SerializeField] private DungeonEventManager dungeonEventManager;
@@ -17,6 +17,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private PlayerMoveLogic playerMoveLogic;
     private PlayerAttackLogic playerAttackLogic;
     private PlayerAnimLogic playerAnimLogic;
+    private PlayerInventory playerInventory;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
     private StateMachine stateMachine;
@@ -31,7 +32,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     private bool isMoving = false;
 
-    // === Events ===
+    // ================================================
+    // ==================== Events ====================
+    // ================================================
     // CharacterManagerのAddCharacterで実装。
     public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
 
@@ -39,9 +42,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPを渡すイベント
     public event Action<int> OnLvChanged; // レベルを渡すイベント
 
-    // === Properties ===
-
-    // IObjectData
+    // ================================================
+    // ================== Properties ==================
+    // ================================================
     public int Id { get; set; }
     public string Name { get; set; }
     string IObjectData.Type { get; set; }
@@ -63,7 +66,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     public bool IsMoving() => isMoving;
 
-    // IAnimationAdapter
+    // ================================================
+    // ============= IAnimationAdapter ===============
+    // ================================================
     public bool AttackAnimation {
         set => animator.SetTrigger("AtkTrigger");
     }
@@ -81,7 +86,22 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         set => animator.SetTrigger("TakeDamageTrigger");
     }
 
-    // IStatusAdapter
+    // ================================================
+    // ============= IPlayerStatusAdapter =============
+    // ================================================
+
+    public WeaponSO EquipWeapon { get; set; }
+    public ShieldSO EquipShield { get; set; }
+
+    // Additional properties
+    public int Level { get; set; }
+    public int MaxSatiety { get; set; }
+    public int Satiety { get; set; }
+    public int MaxMuscle { get; set; }
+    public int Muscle { get; set; }
+    public int BasicAttackPower { get; set; }
+    public int DefencePower { get; set; }
+
     public int level {
         get => _currentLv;
         set {
@@ -101,7 +121,6 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
             OnHealthChanged?.Invoke(_currentHp, _maxHp);
         }
     }
-
     public int health {
         get => _currentHp;
         set {
@@ -109,7 +128,6 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
             OnHealthChanged?.Invoke(_currentHp, _maxHp);
         }
     }
-
     public int Experience {
         get => _totalExp;
         set {
@@ -120,20 +138,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         }
     }
 
-    public WeaponSO EquipWeapon { get; set; }
-    public ShieldSO EquipShield { get; set; }
-
-    // Additional properties
-    public int Level { get; set; }
-    public int MaxSatiety { get; set; }
-    public int Satiety { get; set; }
-    public int MaxMuscle { get; set; }
-    public int Muscle { get; set; }
-    public int BasicAttackPower { get; set; }
-    public int DefencePower { get; set; }
-
-
-    // === Methods ===
+    // ================================================
+    // ================ Methods ======================
+    // ================================================
     public void InitializePlayer() {
         Id = CharacterManager.GetUniqueID();
         CharacterManager.i.AddCharacter(this);
@@ -143,7 +150,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this);
         createMessageLogic = new CreateMessageLogic();
-
+        playerInventory = new PlayerInventory();
         // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
@@ -160,5 +167,16 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     public void TakeDamage(int damage, string dealerName) {
         playerStatusDataLogic.TakeDamage(damage, dealerName);
+    }
+
+    // ================================================
+    // ============== IEffectReceiver =================
+    // ================================================ 
+    public void ApplyEffect(EffectSO effect) {
+        effect.ApplyEffect(this);
+    }
+
+    public void Heal(int amount) {
+        health += amount;
     }
 }

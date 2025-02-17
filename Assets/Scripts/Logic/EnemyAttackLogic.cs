@@ -57,7 +57,7 @@ public class EnemyAttackLogic
         if(targetObject.CompareTag("Player")){
             if(playerStatusAdapter == null)playerStatusAdapter = targetObject.GetComponent<IPlayerStatusAdapter>();
             if(playerStatusAdapter.EquipShield != null){
-                targetDefencePw = playerStatusAdapter.EquipShield.power;
+                targetDefencePw = playerStatusAdapter.EquipShield.defensePower;
             } else {
                 targetDefencePw = 1;
             }

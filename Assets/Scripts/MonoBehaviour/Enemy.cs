@@ -5,15 +5,14 @@ using DG.Tweening;
 using System;
 [RequireComponent(typeof(Animator))]
 
-public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData, IEnemyAIState {
+public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData, IEnemyAIState, IEffectReceiver {
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sr;
     [SerializeField] MonsterStatusSO monsterSO;
 
     private EnemyStatusLogic enemyStatusLogic;
     private EnemyAnimLogic enemyAnimLogic;
-    private EnemyAttackLogic enemyAttackLogic;
-    private EnemyAILogic enemyAILogic;
+    private EnemyAttackLogic enemyAttackLogic;    
     private EnemyMoveLogic enemyMoveLogic;
 
     Vector2 moveOffset = new Vector2(.5f, .5f);
@@ -21,12 +20,11 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     private int _hp;
 
     // ========================================================
-    // IPositionAdapter
+    // =================== IPositionAdapter ===================
     // ========================================================
     public Vector2Int Position {
         get { return _enemyPosition; }
-        set {
-            Debug.Log("Enemy.cs: Position: " + value);
+        set {            
              transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
              _enemyPosition = value;
              OnObjectUpdated.Invoke(this);
@@ -34,17 +32,17 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     }
 
     // ========================================================
-    // IObjectData
+    // ===================== IObjectData =====================
     // ========================================================
     public int Id { get; set; }
     public string Name { get; set; }
     string IObjectData.Type { get; set; }
     int IObjectData.RoomNum { get; set; }
-    // ========================================================
+    
 
 
     // ========================================================
-    // IAnimationAdapter
+    // ================== IAnimationAdapter ==================
     // ========================================================
     private Vector2 enemyFaceDirection;
     public Vector2 MoveAnimationDirection {
@@ -68,14 +66,13 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     }
     private void TriggerAnimator(string triggerName) {
         animator.SetTrigger(triggerName);
-    }
-    // ========================================================
+    }    
 
 
     // ========================================================
-    // IMonsterStatusAdapter
+    // ================= IMonsterStatusAdapter ================
     // ========================================================
-    int IMonsterStatusAdapter.HP {
+    public int HP {
         get { return _hp; }
         set {
             if (_hp <= value) {
@@ -105,11 +102,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         get { return animator.runtimeAnimatorController; }
         set { animator.runtimeAnimatorController = value; }
     }
-    // ========================================================    
     
 
     // ========================================================
-    // IEnemyAIState
+    // ==================== IEnemyAIState =================
     // ========================================================
     public bool IsInRoomAtStart { get; set; }
     public bool IsInRoomAtEnd { get; set; }
@@ -123,11 +119,12 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     public Vector2Int StartPosition { get; set; }
     public Vector2Int EndPosition { get; set; }
     public List<Vector2Int> MonsterView { get; set; }
-    public List<Vector2Int> RouteCache { get; set; }
+    public List<Vector2Int> RouteCache { get; set; }    
+
+
     // ========================================================
-
-
-    // 行動実行メソッド
+    // ===================== Methods =====================
+    // ========================================================
     public void ExecuteAction(EnemyAction action)
     {
         switch(action.Type)
@@ -141,8 +138,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         }
     }
 
-
-    
+    // オブジェクトが更新された時に呼び出されるイベント
     public event System.Action<IObjectData> OnObjectUpdated;
 
     public void InitializeEnemy() {
@@ -150,8 +146,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAnimLogic = new EnemyAnimLogic(this, sr);
         enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
-        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);
-        enemyAILogic = new EnemyAILogic(this, enemyAttackLogic, enemyMoveLogic, new AStarPathfinding());
+        enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);        
 
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
         Id = CharacterManager.GetUniqueID(); // Assign a unique ID
@@ -175,5 +170,16 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     }
 
     private void OnEnable() {
+    }
+
+    // ========================================================
+    // ==================== IEffectReceiver ===================
+    // ========================================================
+    public void ApplyEffect(EffectSO effect) {
+        effect.ApplyEffect(this);
+    }
+
+    public void Heal(int amount) {
+        HP += amount;
     }
 }

@@ -266,7 +266,7 @@ public class EnemyManager : MonoBehaviour {
         return DetermineJointTargetPosition();        
     }
 
-    // JointPositionにいる場合の目的地を決める
+    // JointPositionの目的地を決める
     private Vector2Int DetermineJointTargetPosition() {
         var joints = TileManager.i.ExtractJointPosInRoom(enemyCurrentPos);
 
@@ -283,18 +283,30 @@ public class EnemyManager : MonoBehaviour {
             }
         }
         
+        //EnterJointPositionがJointPositionに含まれている場合は削除
+        if(joints.Contains(enemyAIState.EnterJointPosition)) {
+            joints.Remove(enemyAIState.EnterJointPosition);
+        }
         
         //もしJointPositionが1つの場合はその位置を返す
         if (joints.Count == 1) {
             return joints[0];
         }
 
-        //すでにEneterjointPositionが設定されている場合は他のjointPositionを選択する
+        //もしJointPositionが0の場合は、とりあえず一歩進む
+        if (joints.Count == 0) {
+            enemyAIState.EnterJointPosition = Vector2Int.zero;
+            return DetermineCorridorTargetPosition();
+        }
+        
+        //ランダムなJointPositionを選択する
         foreach(var joint in joints){
             int randomIndex = UnityEngine.Random.Range(0, joints.Count);
+            Debug.Log("randomIndex: " + randomIndex);
             var randomJoint = joints[randomIndex];
             if (randomJoint != enemyAIState.EnterJointPosition) {
                 enemyTargetPos = randomJoint;
+                Debug.Log("DetermineJointTargetPosition: " + randomJoint);
                 return randomJoint;
             }
         }
