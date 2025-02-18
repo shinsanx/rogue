@@ -50,8 +50,8 @@ public class CharacterManager : MonoBehaviour {
     public void AddCharacter(IObjectData character) {
         allObjectData.Add(character);
         character.OnObjectUpdated += UpdateObjectInfo;
-         Debug.Log($"registered: {character.Name}");
-         Debug.Log($"ID: {character.Id}");
+        //  Debug.Log($"registered: {character.Name}");
+        //  Debug.Log($"ID: {character.Id}");
     }
 
     // キャラクターを削除するメソッド

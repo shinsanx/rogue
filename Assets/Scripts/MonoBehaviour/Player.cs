@@ -17,7 +17,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private PlayerMoveLogic playerMoveLogic;
     private PlayerAttackLogic playerAttackLogic;
     private PlayerAnimLogic playerAnimLogic;
-    private PlayerInventory playerInventory;
+    public PlayerInventory playerInventory;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
     private StateMachine stateMachine;

@@ -19,6 +19,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] int generateEnemyCount;
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
+    [SerializeField] InventoryUI inventoryUI;
 
     private async void Start() {
         try {
@@ -46,10 +47,13 @@ public class DungeonEventManager : MonoBehaviour {
             // 8. モンスターの生成
             await GenerateEnemies();
 
-            // 9. アイテムの生成（必要に応じて実装）
+            // 9. インベントリUIの初期化
+            inventoryUI.Initialize();
+
+            // 10. アイテムの生成（必要に応じて実装）
             // await GenerateItems();
 
-            // 10. ミニマップの生成
+            // 11. ミニマップの生成
             await CreateMiniMap();
 
             Debug.Log("Initialize completed");

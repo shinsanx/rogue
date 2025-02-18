@@ -7,18 +7,21 @@ public class MainThreadHelper : MonoBehaviour {
     private static SynchronizationContext unitySynchronizationContext;
     private static MainThreadHelper _instance;
 
-    // 静的コンストラクタでインスタンスを生成
-    static MainThreadHelper()
-    {
-        var obj = new GameObject("MainThreadHelper");
-        _instance = obj.AddComponent<MainThreadHelper>();
-        DontDestroyOnLoad(obj);
-    }
-
     private void Awake()
     {
         // UnityのメインスレッドのSynchronizationContextを取得
         unitySynchronizationContext = SynchronizationContext.Current;
+
+        // インスタンスが存在しない場合にGameObjectを作成
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (_instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public static MainThreadHelper Instance {

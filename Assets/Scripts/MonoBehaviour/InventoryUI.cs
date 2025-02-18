@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 public class InventoryUI : MonoBehaviour
 {
-    public PlayerInventory playerInventory; // プレイヤーのインベントリへの参照
+    public Player player; // プレイヤーのインベントリへの参照
     public GameObject itemSlotPrefab;       // アイテムスロットのPrefab
     public Transform itemsParent;           // アイテムスロットを配置する親Transform
 
     private Dictionary<ItemSO, GameObject> itemSlots = new Dictionary<ItemSO, GameObject>();
+    private Dictionary<ItemSO, int> items = new Dictionary<ItemSO, int>();
 
-    private void Start()
+    public void Initialize()
     {
         UpdateUI();
         // インベントリの更新を監視する場合はイベントリスナーを追加
@@ -27,7 +28,7 @@ public class InventoryUI : MonoBehaviour
         itemSlots.Clear();
 
         // インベントリ内の全アイテムを取得
-        Dictionary<ItemSO, int> items = playerInventory.GetAllItems();
+        items = player.playerInventory.GetAllItems();
 
         foreach (var pair in items)
         {
@@ -60,7 +61,7 @@ public class InventoryUI : MonoBehaviour
             Button useButton = slot.transform.Find("UseButton").GetComponent<Button>();
             useButton.onClick.AddListener(() => {
                 // 使用操作（例：プレイヤーやターゲットを指定）
-                playerInventory.UseItem(item, this.GetComponent<Player>());
+                player.GetComponent<PlayerInventory>().UseItem(item, this.GetComponent<Player>());
                 UpdateUI();
             });
 
