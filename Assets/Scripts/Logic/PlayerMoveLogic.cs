@@ -67,7 +67,7 @@ public class PlayerMoveLogic {
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
         
             if (stateMachine.CurrentState != GameAssets.i.playerState) {
-                Debug.Log("enemyStateで動けません");
+                // Debug.Log("enemyStateで動けません");
                 return;
             }
 

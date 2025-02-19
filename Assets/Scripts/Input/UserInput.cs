@@ -5,15 +5,14 @@ using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using System.Threading.Tasks;
 
-public class UserInput : MonoBehaviour
-{
+public class UserInput : MonoBehaviour {
     // インスペクターで設定
     public UnityEvent<Vector2> onMoveInput;
     public UnityEvent onAttack;
     public UnityEvent onMenuOpen;
     public UnityEvent onMenuClose;
     public UnityEvent<Vector2> onNavigate;
-
+    public UnityEvent onSubmit;
     Vector2 inputVector;
     public bool isMoveButtonLongPrresed = false;
     private bool isInputLocked = true;  // 入力ロックのフラグ
@@ -24,8 +23,7 @@ public class UserInput : MonoBehaviour
     private InputActionMap playerActionMap;
     private InputActionMap uiActionMap;
 
-    private async void Start()
-    {
+    private async void Start() {
         // ActionMapの取得
         playerActionMap = inputActionAsset.FindActionMap("Player", true);
         uiActionMap = inputActionAsset.FindActionMap("UI", true);
@@ -41,14 +39,14 @@ public class UserInput : MonoBehaviour
     }
 
     //移動
-    public void OnMove(InputAction.CallbackContext context){
+    public void OnMove(InputAction.CallbackContext context) {
         if (isInputLocked) return;  // ロック中は入力を無視
 
-        if(context.started){        
+        if (context.started) {
             isMoveButtonLongPrresed = true;
             return;
         }
-        if(context.canceled){
+        if (context.canceled) {
             isMoveButtonLongPrresed = false;
             return;
         }
@@ -57,37 +55,36 @@ public class UserInput : MonoBehaviour
     }
 
     //長押し移動
-    public void OnLongPress(InputAction.CallbackContext context){
+    public void OnLongPress(InputAction.CallbackContext context) {
         if (isInputLocked) return;  // ロック中は入力を無視
 
-        if(context.performed){
+        if (context.performed) {
             MoveContinuously();
         }
     }
 
-    private async void MoveContinuously(){
-        if(!isMoveButtonLongPrresed) return;
-        while(isMoveButtonLongPrresed){
+    private async void MoveContinuously() {
+        if (!isMoveButtonLongPrresed) return;
+        while (isMoveButtonLongPrresed) {
             onMoveInput.Invoke(inputVector);
             await Task.Delay(300);
         }
     }
 
-    public void OnAttack(InputAction.CallbackContext context){
+    public void OnAttack(InputAction.CallbackContext context) {
         if (isInputLocked) return;  // ロック中は入力を無視
 
-        if(context.started) return;
-        if(context.canceled) return;
+        if (context.started) return;
+        if (context.canceled) return;
         onAttack?.Invoke();
     }
 
     /// <summary>
     /// メニューを開く際に呼び出す
     /// </summary>
-    public void OnMenuOpen(InputAction.CallbackContext context)
-    {
-        if(context.started) return;
-        if(context.canceled) return;
+    public void OnMenuOpen(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
         playerActionMap.Disable();
         uiActionMap.Enable();
         Cursor.lockState = CursorLockMode.None;
@@ -98,10 +95,9 @@ public class UserInput : MonoBehaviour
     /// <summary>
     /// メニューを閉じる際に呼び出す
     /// </summary>
-    public void OnMenuClose(InputAction.CallbackContext context)
-    {
-        if(context.started) return;
-        if(context.canceled) return;        
+    public void OnMenuClose(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
         uiActionMap.Disable();
         playerActionMap.Enable();
         Cursor.lockState = CursorLockMode.Locked;
@@ -109,11 +105,17 @@ public class UserInput : MonoBehaviour
         onMenuClose?.Invoke();
     }
 
-    public void OnNavigate(InputAction.CallbackContext context){
-        if(context.started) return;
-        if(context.canceled) return;
+    public void OnNavigate(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
         Vector2 navigateVector = context.ReadValue<Vector2>();
-        if(navigateVector.magnitude == 0) return;
+        if (navigateVector.magnitude == 0) return;
         onNavigate?.Invoke(navigateVector);
+    }
+
+    public void OnSubmit(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
+        onSubmit?.Invoke();
     }
 }

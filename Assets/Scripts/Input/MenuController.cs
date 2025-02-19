@@ -18,6 +18,7 @@ public class MenuController : MonoBehaviour {
     /// メニューを表示する
     /// </summary>
     public void OpenMenu() {
+        Debug.Log("OpenMenu");
         if (menuUI != null) {
             menuUI.SetActive(true);
             isMenuOpen = true;
@@ -60,6 +61,12 @@ public class MenuController : MonoBehaviour {
 
         if (inventoryUI != null) {            
             inventoryUI.MoveCursor(navigateVectorInt);
+        }
+    }
+
+    public void Submit() {
+        if (inventoryUI != null) {
+            inventoryUI.Submit();
         }
     }
 }

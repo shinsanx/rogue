@@ -562,7 +562,19 @@ MonoBehaviour:
     m_ActionId: b27308bf-442e-4209-8363-70ee3ae001bd
     m_ActionName: UI/Navigate[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 190771914}
+        m_TargetAssemblyTypeName: UserInput, Assembly-CSharp
+        m_MethodName: OnSubmit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 995d70c4-10d3-493b-b5c7-cf67491a9d4c
     m_ActionName: UI/Submit[/Keyboard/enter]
   - m_PersistentCalls:
@@ -705,6 +717,21 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
         m_MethodName: Navigate
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onSubmit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 190771915}
+        m_TargetAssemblyTypeName: MenuController, Assembly-CSharp
+        m_MethodName: Submit
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2101,6 +2128,7 @@ MonoBehaviour:
   itemSlotPrefab: {fileID: 7938978799774588981, guid: b982754d714b9431eaf0304a5f7eec1b, type: 3}
   itemsParent: {fileID: 1340392347}
   cursorPrefab: {fileID: 3909111321675568408, guid: 3b9bbac3af5db4498985a05a23486c26, type: 3}
+  itemActionMenuPrefab: {fileID: 214613725396762291, guid: 2a2139e50509049888ac46a5f9c9e142, type: 3}
 --- !u!1 &679488204
 GameObject:
   m_ObjectHideFlags: 0
