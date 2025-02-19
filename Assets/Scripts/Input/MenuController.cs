@@ -2,26 +2,15 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour {
 
-    [SerializeField] private GameObject menuUI; // メニューUIのオブジェクト
-    [SerializeField] private GameObject cursor; // カーソルのプレハブ
-    [SerializeField] private GameObject inventoryUI; // インベントリUIのオブジェクト
+    [SerializeField] private GameObject menuUI; // メニューUIのオブジェクト    
+    [SerializeField] private InventoryUI inventoryUI; // インベントリUIのオブジェクト
     private bool isMenuOpen = false;
     private Vector2 navigateVector;
     
     private float roundX;
     private float roundY;
     
-    private InventoryUI inventoryUIComponent;
-
-    private void Start()
-    {
-        if (inventoryUI != null)
-        {
-            inventoryUIComponent = inventoryUI.GetComponent<InventoryUI>();
-            inventoryUIComponent.Initialize();
-        }
-    }
-
+    
     // ========================================================
     // メニューの開閉
     // ========================================================
@@ -61,34 +50,16 @@ public class MenuController : MonoBehaviour {
     // ========================================================
     // カーソル移動
     // ========================================================
-    public void Navigate(Vector2 navigateVector) {
+    public void Navigate(Vector2 navigateVector) {        
         this.navigateVector = navigateVector;
 
         roundX = Mathf.Round(navigateVector.x);
         roundY = Mathf.Round(navigateVector.y);
 
-        Vector2Int navigateVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理        
-        Debug.Log("navigateVector: " + navigateVectorInt);
+        Vector2Int navigateVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理                
 
-        if (inventoryUIComponent != null && isMenuOpen) {
-            inventoryUIComponent.MoveCursor(navigateVectorInt);
-        }
-    }
-
-    private void Update()
-    {
-        if (isMenuOpen && Input.GetKeyDown(KeyCode.I))
-        {
-            ToggleMenu();
-        }
-
-        if (isMenuOpen)
-        {
-            Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-            if (input != Vector2.zero)
-            {
-                Navigate(input);
-            }
+        if (inventoryUI != null) {            
+            inventoryUI.MoveCursor(navigateVectorInt);
         }
     }
 }

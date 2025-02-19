@@ -6,44 +6,32 @@ using TMPro;
 public class InventoryUI : MonoBehaviour
 {
     public Player player; // プレイヤーのインベントリへの参照
+    private PlayerInventory playerInventory;
     public GameObject itemSlotPrefab;       // アイテムスロットのPrefab
     public Transform itemsParent;           // アイテムスロットを配置する親Transform
-    public GameObject cursor;               // カーソルのオブジェクト
+    public GameObject cursorPrefab;               // カーソルのプレハブ
+    private GameObject cursorInstance; // カーソルのインスタンス
 
-    private Dictionary<ItemSO, GameObject> itemSlots = new Dictionary<ItemSO, GameObject>();
+    private List<ItemSO> itemSlots = new List<ItemSO>();
     private List<GameObject> slotList = new List<GameObject>();
     private int selectedIndex = 0;
 
+    private Vector2 offset = new Vector3(-200, 0);
+
     public void Initialize()
     {
-        PlayerInventory playerInventory = player.playerInventory;
+        playerInventory = player.playerInventory;
         if (playerInventory != null)
         {
             playerInventory.OnInventoryUpdated += UpdateUI; // イベントを購読
         }
         UpdateUI();
-        UpdateCursorPosition();
     }
-
-    private void OnDestroy()
-    {
-        PlayerInventory playerInventory = player.playerInventory;
-        if (playerInventory != null)
-        {
-            playerInventory.OnInventoryUpdated -= UpdateUI; // イベントの購読を解除
-        }
-    }
+    
 
     // インベントリUIを更新するメソッド
     public void UpdateUI()
-    {
-        PlayerInventory playerInventory = player.playerInventory;
-        if (playerInventory == null)
-        {
-            Debug.LogError("PlayerInventory コンポーネントが見つかりません。");
-            return;
-        }
-
+    {                
         // 既存のスロットをクリア
         foreach (Transform child in itemsParent)
         {
@@ -53,13 +41,10 @@ public class InventoryUI : MonoBehaviour
         slotList.Clear();
 
         // インベントリ内の全アイテムを取得
-        Dictionary<ItemSO, int> items = playerInventory.GetAllItems();
+        List<ItemSO> items = playerInventory.GetAllItems();
 
-        foreach (var pair in items)
+        foreach (ItemSO item in items)
         {
-            ItemSO item = pair.Key;
-            int quantity = pair.Value;
-
             // アイテムスロットのインスタンスを生成
             GameObject slot = Instantiate(itemSlotPrefab, itemsParent);
             // アイテムアイコンの設定
@@ -86,9 +71,15 @@ public class InventoryUI : MonoBehaviour
                 UpdateUI();
             });
 
-            // スロットを辞書およびリストに追加
-            itemSlots.Add(item, slot);
+            // スロットをリストに追加
+            itemSlots.Add(item);
             slotList.Add(slot);
+        }
+
+        // カーソルの初期化または更新
+        if (cursorInstance == null)
+        {
+            cursorInstance = Instantiate(cursorPrefab, itemsParent);
         }
 
         // 選択インデックスをリセット
@@ -98,35 +89,46 @@ public class InventoryUI : MonoBehaviour
 
     // カーソルの位置を更新するメソッド
     public void MoveCursor(Vector2Int direction)
-    {
+    {           
         if (slotList.Count == 0) return;
 
         int columns = GetColumns();
-        int rows = Mathf.CeilToInt((float)slotList.Count / columns);
+        Debug.Log("totalColumns: " + columns);
 
-        int currentRow = selectedIndex / columns;
+        // 行数を計算
+        int rows = slotList.Count;
+        Debug.Log("rows: " + rows);
+
+        // 現在の行と列を計算
+        int currentRow = selectedIndex;
         int currentCol = selectedIndex % columns;
+        Debug.Log("currentRow: " + currentRow);
+        Debug.Log("currentCol: " + currentCol);
 
-        int newCol = currentCol + direction.x;
-        int newRow = currentRow + direction.y;
+        // 新しい行と列を計算
+        //int newCol = currentCol + direction.x;
+        int newRow = currentRow + direction.y * -1;
 
-        newCol = Mathf.Clamp(newCol, 0, columns - 1);
+        // 新しい行と列をクランプ
+        //newCol = Mathf.Clamp(newCol, 0, columns - 1);
         newRow = Mathf.Clamp(newRow, 0, rows - 1);
 
-        int newIndex = newRow * columns + newCol;
+        //int newIndex = newRow * columns + newCol;
+        int newIndex = newRow;
         newIndex = Mathf.Clamp(newIndex, 0, slotList.Count - 1);
 
         selectedIndex = newIndex;
         UpdateCursorPosition();
     }
 
+    // カーソルの位置を更新するメソッド
     private void UpdateCursorPosition()
     {
-        if (slotList.Count == 0 || cursor == null) return;
+        if (slotList.Count == 0 || cursorInstance == null) return;
 
         GameObject selectedSlot = slotList[selectedIndex];
-        cursor.transform.SetParent(selectedSlot.transform, false);
-        cursor.transform.localPosition = Vector3.zero;
+        cursorInstance.transform.SetParent(selectedSlot.transform, false);
+        cursorInstance.transform.localPosition = new Vector3(-selectedSlot.GetComponent<RectTransform>().rect.width/2, 0, 0);
     }
 
     private int GetColumns()
@@ -141,5 +143,14 @@ public class InventoryUI : MonoBehaviour
             return Mathf.Max(columns, 1);
         }
         return 1;
+    }
+
+    private void OnDestroy()
+    {
+        PlayerInventory playerInventory = player.playerInventory;
+        if (playerInventory != null)
+        {
+            playerInventory.OnInventoryUpdated -= UpdateUI; // イベントの購読を解除
+        }
     }
 }

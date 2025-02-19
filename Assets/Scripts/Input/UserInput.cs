@@ -88,7 +88,6 @@ public class UserInput : MonoBehaviour
     {
         if(context.started) return;
         if(context.canceled) return;
-        Debug.Log("メニューを開く");
         playerActionMap.Disable();
         uiActionMap.Enable();
         Cursor.lockState = CursorLockMode.None;
@@ -102,8 +101,7 @@ public class UserInput : MonoBehaviour
     public void OnMenuClose(InputAction.CallbackContext context)
     {
         if(context.started) return;
-        if(context.canceled) return;
-        Debug.Log("メニューを閉じる");
+        if(context.canceled) return;        
         uiActionMap.Disable();
         playerActionMap.Enable();
         Cursor.lockState = CursorLockMode.Locked;
@@ -115,7 +113,7 @@ public class UserInput : MonoBehaviour
         if(context.started) return;
         if(context.canceled) return;
         Vector2 navigateVector = context.ReadValue<Vector2>();
-        Debug.Log("navigateVector: " + navigateVector);
+        if(navigateVector.magnitude == 0) return;
         onNavigate?.Invoke(navigateVector);
     }
 }
