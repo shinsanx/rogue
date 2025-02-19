@@ -11,7 +11,7 @@ public class AutoMapping : MonoBehaviour {
     public GameObject roadImagePrefab;
     public GameObject enemyImagePrefab;
     public GameObject playerImagePrefab;
-    // public GameObject itemImagePrefab;
+    public GameObject itemImagePrefab;
     private Field currentField;
 
     float scale;
@@ -76,12 +76,18 @@ public class AutoMapping : MonoBehaviour {
                 case "Player":
                     CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position + offset, scale, startPosition);
                     break;
+                case "Item":
+                    CreateUIElement(itemImagePrefab, items.transform, objectData.Position + offset, scale, startPosition);
+                    break;
             }
         }
     }
 
     private void ClearCharacterUI() {
         foreach (Transform child in enemies.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in items.transform) {
             Destroy(child.gameObject);
         }
     }
@@ -113,6 +119,9 @@ public class AutoMapping : MonoBehaviour {
             Destroy(child.gameObject);
         }
         foreach (Transform child in enemies.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in items.transform) {
             Destroy(child.gameObject);
         }
     }

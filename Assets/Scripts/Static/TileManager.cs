@@ -39,8 +39,8 @@ public class TileManager{
 
     //床が移動可能かどうか判別する
     public bool CheckMovableTile(Vector2Int currentPos, Vector2Int targetPos) {
-        bool existCharacter = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
-        return IsBasicallyWalkable(currentPos, targetPos) && !existCharacter;
+        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        return IsBasicallyWalkable(currentPos, targetPos) && !existEnemy;
     }
 
     // 攻撃可能なタイルかどうか判別する
@@ -56,8 +56,15 @@ public class TileManager{
     //そのポジションに他オブジェクトがないかチェックする
     public bool CheckTileStandable(Vector2Int targetPos) {
         bool canMove = field.tileInfo.GetMapChipTypeByPosition(targetPos) == 0;
-        bool existCharacter = CharacterManager.i.GetObjectTypeByPosition(targetPos) != null;
-        return canMove && !existCharacter;
+        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        return canMove && !existEnemy;
+    }
+
+    public Item CheckExistItem(Vector2Int targetPos) {
+         if(CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Item"){
+            return CharacterManager.i.GetObjectByPosition(targetPos).GetComponent<Item>();
+         }
+         return null;
     }
 
     //aisleとnothingのみ。MapChipTypeとは別

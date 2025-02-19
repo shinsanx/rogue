@@ -10,20 +10,18 @@ public class DungeonStateLogic {
 
     private StateMachine stateMachine;
     private State playerState;
-    private State enemyState;    
-    private GameObject enemyParent;
+    
+    
     private EnemyManager enemyManager;
 
     public List<IPositionAdapter> objectsPositionAdapters = new List<IPositionAdapter>();
     public List<Transform> gameObjectsTransform = new List<Transform>();
     public List<Enemy> enemies = new List<Enemy>();        
 
-    public DungeonStateLogic(GameObject enemyParent, EnemyManager enemyManager) {        
-        this.enemyParent = enemyParent;        
+    public DungeonStateLogic(EnemyManager enemyManager) {        
         this.enemyManager = enemyManager;
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
-        enemyState = GameAssets.i.enemyState;
     }
 
     public void PlayerStateStart() {
@@ -34,10 +32,9 @@ public class DungeonStateLogic {
     }
 
     public async void EnemyStateStart() {         
-        await Task.Delay(300);
+        await Task.Delay(200);
         await enemyManager.ProcessEnemies();
         EndEnemyTurn();
-
 
     }
 

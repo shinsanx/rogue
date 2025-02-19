@@ -302,11 +302,9 @@ public class EnemyManager : MonoBehaviour {
         //ランダムなJointPositionを選択する
         foreach(var joint in joints){
             int randomIndex = UnityEngine.Random.Range(0, joints.Count);
-            Debug.Log("randomIndex: " + randomIndex);
             var randomJoint = joints[randomIndex];
             if (randomJoint != enemyAIState.EnterJointPosition) {
                 enemyTargetPos = randomJoint;
-                Debug.Log("DetermineJointTargetPosition: " + randomJoint);
                 return randomJoint;
             }
         }
@@ -382,7 +380,6 @@ public class EnemyManager : MonoBehaviour {
                 return;
             }
             if (jointPositions.Any(j => j == enemyAIState.EndPosition)) {
-                Debug.Log("RecordEnterJointPosition: " + enemyAIState.EndPosition);
                 enemyAIState.EnterJointPosition = enemyAIState.EndPosition;                
             }
         }

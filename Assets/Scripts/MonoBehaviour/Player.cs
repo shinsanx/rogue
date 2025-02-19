@@ -31,30 +31,28 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private int _totalExp;
 
     private bool isMoving = false;
+    public bool IsMoving() => isMoving;
 
     // ================================================
     // ==================== Events ====================
     // ================================================
-    // CharacterManagerのAddCharacterで実装。
-    public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
-
     // StatusUIで実装。
     public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPを渡すイベント
     public event Action<int> OnLvChanged; // レベルを渡すイベント
 
     // ================================================
-    // ================== Properties ==================
+    // ================== ObjectData ==================
     // ================================================
     public int Id { get; set; }
     public string Name { get; set; }
-    string IObjectData.Type { get; set; }
-    int IObjectData.RoomNum { get; set; }
+    public string Type { get; set; }
+    public int RoomNum { get; set; }
 
     public Vector2Int Position {
         get => playerPosition;
         set {
             playerPosition = value;
-            isMoving = true;
+            isMoving = false; //本当はtrueにする。デバッグのためにfalseにしている。
             transform.DOMove(value.ToVector2() + moveOffset, 0.3f)
                 .SetEase(Ease.Linear)
                 .OnComplete(() => {
@@ -63,8 +61,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
                 });
         }
     }
-
-    public bool IsMoving() => isMoving;
+    
+    // CharacterManagerのAddCharacterで実装。
+    public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
 
     // ================================================
     // ============= IAnimationAdapter ===============

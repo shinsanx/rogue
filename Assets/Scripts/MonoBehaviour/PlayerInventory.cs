@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInventory {
     // アイテムとその数量を管理する辞書
     private Dictionary<ItemSO, int> items = new Dictionary<ItemSO, int>();
+
+    // インベントリが更新された時に発行されるイベント
+    public event Action OnInventoryUpdated;
 
     // アイテムを追加するメソッド
     public void AddItem(ItemSO item, int quantity = 1) {
@@ -15,6 +19,7 @@ public class PlayerInventory {
         Debug.Log($"{item.itemName} を {quantity} つ追加しました。現在の数量: {items[item]}");
 
         // インベントリの更新通知（必要に応じてイベントを発行）
+        OnInventoryUpdated?.Invoke();
     }
 
     // アイテムを削除するメソッド

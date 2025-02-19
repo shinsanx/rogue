@@ -39,7 +39,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     string IObjectData.Type { get; set; }
     int IObjectData.RoomNum { get; set; }
     
-
+    // オブジェクトが更新された時に呼び出されるイベント
+    // subscribeしているのは
+    public event System.Action<IObjectData> OnObjectUpdated;
 
     // ========================================================
     // ================== IAnimationAdapter ==================
@@ -137,9 +139,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
                 break;
         }
     }
-
-    // オブジェクトが更新された時に呼び出されるイベント
-    public event System.Action<IObjectData> OnObjectUpdated;
 
     public void InitializeEnemy() {
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);

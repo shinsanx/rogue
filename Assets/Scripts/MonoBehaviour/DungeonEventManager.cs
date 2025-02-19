@@ -15,8 +15,11 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] Player player;
     [SerializeField] GameObject enemyParent;
     [SerializeField] GameObject enemyPrefab;
+    [SerializeField] GameObject itemParent;
+    [SerializeField] GameObject itemPrefab;
     [SerializeField] StatusUI statusUI;
     [SerializeField] int generateEnemyCount;
+    [SerializeField] int generateItemCount;
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
     [SerializeField] InventoryUI inventoryUI;
@@ -48,10 +51,10 @@ public class DungeonEventManager : MonoBehaviour {
             await GenerateEnemies();
 
             // 9. インベントリUIの初期化
-            inventoryUI.Initialize();
+            await InitializeInventoryUI();
 
             // 10. アイテムの生成（必要に応じて実装）
-            // await GenerateItems();
+            await GenerateItems();
 
             // 11. ミニマップの生成
             await CreateMiniMap();
@@ -100,6 +103,11 @@ public class DungeonEventManager : MonoBehaviour {
         return Task.CompletedTask;
     }
 
+    private Task InitializeInventoryUI() {
+        inventoryUI.Initialize();
+        return Task.CompletedTask;
+    }
+
     private async Task GenerateEnemies() {
         for (int i = 0; i < generateEnemyCount; i++) {
             // Instantiateはメインスレッドで実行
@@ -109,6 +117,15 @@ public class DungeonEventManager : MonoBehaviour {
             await Task.Yield(); // フレームを分散させるための待機
         }
         enemyManager.Initialize();
+    }
+
+    private async Task GenerateItems() {
+        for (int i = 0; i < generateItemCount; i++) {
+            GameObject item = Instantiate(itemPrefab, itemParent.transform);
+            item.GetComponent<Item>().Initialize();
+            item.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
+            await Task.Yield(); // フレームを分散させるための待機
+        }
     }
 
     private Task CreateMiniMap() {
