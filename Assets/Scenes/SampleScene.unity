@@ -2129,6 +2129,7 @@ MonoBehaviour:
   itemsParent: {fileID: 1340392347}
   cursorPrefab: {fileID: 3909111321675568408, guid: 3b9bbac3af5db4498985a05a23486c26, type: 3}
   itemActionMenuPrefab: {fileID: 214613725396762291, guid: 2a2139e50509049888ac46a5f9c9e142, type: 3}
+  subMenuCursorPrefab: {fileID: 3909111321675568408, guid: 3b9bbac3af5db4498985a05a23486c26, type: 3}
 --- !u!1 &679488204
 GameObject:
   m_ObjectHideFlags: 0
