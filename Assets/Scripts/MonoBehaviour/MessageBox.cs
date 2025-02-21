@@ -16,7 +16,6 @@ public class MessageBox : MonoBehaviour {
     [SerializeField] private GameObject texts;
     [SerializeField] private GameObject box;
     
-
     private readonly Queue<List<string>> messageQueue = new Queue<List<string>>();
     private bool isProcessing = false;
     private CancellationTokenSource cancellationTokenSource;
@@ -46,6 +45,7 @@ public class MessageBox : MonoBehaviour {
 
         // 既存の処理がある場合はキャンセル
         if (isProcessing && cancellationTokenSource != null) {
+            await Task.Delay(1000);
             cancellationTokenSource.Cancel();
             messageQueue.Clear();
         }

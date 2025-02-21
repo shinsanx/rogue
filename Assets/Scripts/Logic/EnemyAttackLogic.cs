@@ -35,17 +35,7 @@ public class EnemyAttackLogic
         DealDamage(go, direction);        
     }
 
-    private GameObject GetTarget(){
-        int selfXpos = Mathf.FloorToInt(objectData.Position.x);
-        int selfYpos = Mathf.FloorToInt(objectData.Position.y);
-        int targetXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
-        int targetYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
-
-        Vector2Int targetVector = new Vector2Int(selfXpos + targetXpos, selfYpos + targetYpos);
-        GameObject targetObject = CharacterManager.i.GetObjectByPosition(targetVector);
-
-        return targetObject;        
-    }
+    
 
     private void DealDamage(GameObject targetObject, Vector2Int direction){
         if(targetObject == null)return;

@@ -79,6 +79,8 @@ public class PlayerMoveLogic {
             //アニメーションを再生する
             playerAnimLogic.SetMoveAnimation(new Vector2(inputVector.x, inputVector.y));
             if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
+
+            //アイテムを拾う
             if(TileManager.i.CheckExistItem(targetPos) is Item item) {                
                 item.GetComponent<Item>().OnPicked(player.playerInventory);
             }

@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CreateMessageLogic {
-    string upperDamageText = null;
-    public CreateMessageLogic() {
+    string upperDamageText = null; 
+    string playerName = "トルネコ";   
+    
 
-    }
-
-    //ダメージを受けたときのメッセージ
+    //Enemyがダメージを受けたときのメッセージ
     public List<string> CreateAttackMessage(List<string> strings, int damage, string dealerName, string takerName){
         string firstText = dealerName + "は、" + takerName + "に";
         string secondText = upperDamageText.ConvertNumToUpperString(damage) + "ポイントのダメージを与えた。";
@@ -45,6 +45,56 @@ public class CreateMessageLogic {
 
         strings.Add(firstText);
         strings.Add(secondText);
+        return strings;
+    }
+
+    //アイテムを使用したとき
+    public List<string> CreateUseItemMessage(string itemName){
+        string firstText = playerName + "は" +   itemName + "を使用した。";
+
+        List<string>strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
+
+    //アイテムを拾ったとき
+    public List<string> CreateGetItemMessage(string itemName){
+        string firstText = itemName + "を拾った。";
+
+        List<string>strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
+
+    //アイテムに乗った時
+    public List<string> CreateRideItemMessage(string itemName){
+        string firstText = itemName + "に乗った。";
+
+        List<string>strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
+
+    //回復したとき
+    public List<string> CreateHealMessage(int heal, string takerName){
+        string firstText = takerName + "のHPが、" + upperDamageText.ConvertNumToUpperString(heal) + "ポイント回復した。";
+
+        List<string>strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
+
+    //最大HPが上がったとき
+    public List<string> CreateMaxHpUpMessage(int amount){
+        string firstText =  "最大HPが" + upperDamageText.ConvertNumToUpperString(amount) + "ポイント上がった。";
+
+        List<string>strings = new List<string>{
+            firstText,
+        };
         return strings;
     }
 

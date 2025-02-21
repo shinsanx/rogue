@@ -1,12 +1,11 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class MenuController : MonoBehaviour {
-
-    [SerializeField] private GameObject menuUI; // メニューUIのオブジェクト    
+    
     [SerializeField] private InventoryUI inventoryUI; // インベントリUIのオブジェクト
     private bool isMenuOpen = false;
-    private Vector2 navigateVector;
-    
+
     private float roundX;
     private float roundY;
     
@@ -19,8 +18,8 @@ public class MenuController : MonoBehaviour {
     /// </summary>
     public void OpenMenu() {
         Debug.Log("OpenMenu");
-        if (menuUI != null) {
-            menuUI.SetActive(true);
+        if (inventoryUI != null) {
+            inventoryUI.OpenMenu();
             isMenuOpen = true;
         } else {
             Debug.LogError("menuUIがアサインされていません。");
@@ -30,8 +29,8 @@ public class MenuController : MonoBehaviour {
     /// メニューを非表示にする
     /// </summary>
     public void CloseMenu() {
-        if (menuUI != null) {
-            menuUI.SetActive(false);
+        if (inventoryUI != null) {
+            inventoryUI.CloseMenu();
             isMenuOpen = false;
         } else {
             Debug.LogError("menuUIがアサインされていません。");
@@ -51,8 +50,7 @@ public class MenuController : MonoBehaviour {
     // ========================================================
     // カーソル移動
     // ========================================================
-    public void Navigate(Vector2 navigateVector) {        
-        this.navigateVector = navigateVector;
+    public void Navigate(Vector2 navigateVector) {                
 
         roundX = Mathf.Round(navigateVector.x);
         roundY = Mathf.Round(navigateVector.y);

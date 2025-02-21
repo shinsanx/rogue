@@ -36,9 +36,9 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     // ================================================
     // ==================== Events ====================
     // ================================================
-    // StatusUIで実装。
-    public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPを渡すイベント
-    public event Action<int> OnLvChanged; // レベルを渡すイベント
+    // StatusUI.csで実装。
+    public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPをUI表示するイベント UpdateHPText
+    public event Action<int> OnLvChanged; // レベルをUI表示するイベント UpdateLvText
 
     // ================================================
     // ================== ObjectData ==================
@@ -105,10 +105,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => _currentLv;
         set {
             _currentLv = value;
-            playerStatusDataLogic.LevelUp();
-            if (_currentLv >= 2) {
-                MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.LvUppedMessage(Name, _currentLv));
-            }
+            playerStatusDataLogic.LevelUp();                                        
             OnLvChanged?.Invoke(_currentLv);
         }
     }
@@ -176,6 +173,15 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     }
 
     public void Heal(int amount) {
-        health += amount;
+        //体力MAXの場合
+        if(MaxHealth == health){
+            MaxHealth += 1;
+            health = MaxHealth;
+            MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateMaxHpUpMessage(1));
+            return;
+        }
+        int healAmount = Mathf.Clamp(amount, 0, MaxHealth - health);
+        health += amount;        
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateHealMessage(healAmount, Name));
     }
 }

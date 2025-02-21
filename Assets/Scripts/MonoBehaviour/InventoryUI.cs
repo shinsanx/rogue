@@ -9,11 +9,12 @@ public class InventoryUI : MonoBehaviour {
     public GameObject itemSlotPrefab;       // アイテムスロットのPrefab
     public Transform itemsParent;           // アイテムスロットを配置する親Transform
     public GameObject cursorPrefab;               // カーソルのプレハブ
-    public GameObject itemActionMenuPrefab; // アイテムアクションメニューのPrefab
-    public GameObject subMenuCursorPrefab;  // サブメニューカーソルのプレハブ
+    public GameObject itemActionMenuPrefab; // アイテムアクションメニューのPrefab    
     private GameObject cursorInstance; // カーソルのインスタンス
     private GameObject itemActionMenuInstance; // サブメニューのインスタンス
-    private GameObject subMenuCursorInstance;    // サブメニューカーソルのインスタンス
+    private GameObject menuUI; // メニューUIのオブジェクト
+
+    
 
     private List<ItemSO> itemSlots = new List<ItemSO>();
     private List<GameObject> slotList = new List<GameObject>();
@@ -23,14 +24,29 @@ public class InventoryUI : MonoBehaviour {
     private int subMenuSelectedIndex = 0;
     private List<Button> subMenuButtons = new List<Button>();
 
-    private void Start() {
-        Initialize();
-    }
+    private const int ItemsPerPage = 12; // 1ページに表示するアイテム数
+    private int currentPage = 0; // 現在のページ
+
+    // ボタンの情報を管理する構造体
+    private struct SubMenuButtonInfo
+    {
+        public string buttonName;      // ボタンの名前（GameObject検索用）
+        public string displayName;     // 表示名
+        public System.Action<ItemSO> action;  // ボタンが押されたときの処理
+
+        public SubMenuButtonInfo(string buttonName, string displayName, System.Action<ItemSO> action)
+        {
+            this.buttonName = buttonName;
+            this.displayName = displayName;
+            this.action = action;
+        }
+    }    
 
     public void Initialize() {
         playerInventory = player.playerInventory;
         if (playerInventory != null) {
             playerInventory.OnInventoryUpdated += UpdateUI; // イベントを購読
+            playerInventory.onItemUsed += CloseMenu;
         }
         UpdateUI();
     }
@@ -47,7 +63,12 @@ public class InventoryUI : MonoBehaviour {
         // インベントリ内の全アイテムを取得
         List<ItemSO> items = playerInventory.GetAllItems();
 
-        foreach (ItemSO item in items) {
+        // 現在のページに基づいてアイテムを表示
+        int startIndex = currentPage * ItemsPerPage;
+        int endIndex = Mathf.Min(startIndex + ItemsPerPage, items.Count);
+
+        for (int i = startIndex; i < endIndex; i++) {
+            ItemSO item = items[i];
             // アイテムスロットのインスタンスを生成
             GameObject slot = Instantiate(itemSlotPrefab, itemsParent);
             // アイテムアイコンの設定
@@ -87,27 +108,32 @@ public class InventoryUI : MonoBehaviour {
             return;
         }
 
-        int columns = GetColumns();
+        // ページ切り替えの処理
+        int previousPage = currentPage;
+        if (direction.x > 0) {
+            currentPage++;
+        } else if (direction.x < 0) {
+            currentPage--;
+        }
 
-        // 行数を計算
-        int rows = slotList.Count;        
+        int totalPages = Mathf.CeilToInt((float)playerInventory.GetAllItems().Count / ItemsPerPage);
+        currentPage = Mathf.Clamp(currentPage, 0, totalPages - 1);
 
-        // 現在の行と列を計算
-        int currentRow = selectedIndex;
-        int currentCol = selectedIndex % columns;
-        // 新しい行と列を計算
-        //int newCol = currentCol + direction.x;
-        int newRow = currentRow + direction.y * -1;
+        // ページが変わったらUIを更新し、selectedIndexをリセット
+        if (currentPage != previousPage) {
+            UpdateUI();
+            selectedIndex = 0; // ページが変わったときのみ初期化
+        }
 
-        // 新しい行と列をクランプ
-        //newCol = Mathf.Clamp(newCol, 0, columns - 1);
-        newRow = Mathf.Clamp(newRow, 0, rows - 1);
+        // 垂直移動のみ対応（左右移動不要な場合）
+        if (direction.y > 0) {
+            selectedIndex--;
+        } else if (direction.y < 0) {
+            selectedIndex++;
+        }
 
-        //int newIndex = newRow * columns + newCol;
-        int newIndex = newRow;
-        newIndex = Mathf.Clamp(newIndex, 0, slotList.Count - 1);
+        selectedIndex = Mathf.Clamp(selectedIndex, 0, slotList.Count - 1);
 
-        selectedIndex = newIndex;
         UpdateCursorPosition();
     }
 
@@ -122,18 +148,6 @@ public class InventoryUI : MonoBehaviour {
         cursorInstance.transform.SetParent(selectedSlot.transform, false);
         //カーソルを要素の左端に配置
         cursorInstance.transform.localPosition = new Vector3(-selectedSlot.GetComponent<RectTransform>().rect.width / 2, 0, 0);
-    }
-
-    private int GetColumns() {
-        // レイアウトに応じてカラム数を設定
-        // 例えば、GridLayoutGroupを使用している場合
-        GridLayoutGroup grid = itemsParent.GetComponent<GridLayoutGroup>();
-        if (grid != null) {
-            // 親のRectTransformから横幅を取得し、セル幅で割る
-            int columns = Mathf.FloorToInt(itemsParent.GetComponent<RectTransform>().rect.width / (grid.cellSize.x + grid.spacing.x));
-            return Mathf.Max(columns, 1);
-        }
-        return 1;
     }
 
     private void OnDestroy() {
@@ -156,56 +170,82 @@ public class InventoryUI : MonoBehaviour {
         }
     }
 
-    private void OpenSubMenu() {
+    // メニューを閉じるメソッド
+    public void CloseMenu(){
+        if(menuUI != null){
+            menuUI.SetActive(false);
+        }                
+    }
+
+    public void OpenMenu(){
+        if(menuUI != null){
+            menuUI.SetActive(true);
+        }
+    }
+
+    // ================================================
+    // ================== SubMenu ==================
+    // ================================================
+
+    private void OpenSubMenu()
+    {
         if (slotList.Count == 0) return;
 
-        // 選択中のアイテムを取得
         ItemSO selectedItem = itemSlots[selectedIndex];
-        if (selectedItem == null) {
+        if (selectedItem == null)
+        {
             Debug.LogError("選択されたアイテムが存在しません。");
             return;
         }
 
-        // サブメニューが既に表示されている場合は無視
-        if (itemActionMenuInstance != null) {
-            return;
-        }
+        if (itemActionMenuInstance != null) return;
 
         // サブメニューのインスタンスを生成
-        itemActionMenuInstance = Instantiate(itemActionMenuPrefab, itemsParent.parent); // UIの構造に応じて親を調整
-        itemActionMenuInstance.transform.SetAsLastSibling(); // 最前面に表示
+        itemActionMenuInstance = Instantiate(itemActionMenuPrefab, itemsParent.parent);
+        itemActionMenuInstance.transform.SetAsLastSibling();
 
-        // ボタンの取得
-        Button useButton = itemActionMenuInstance.transform.Find("UseButton").GetComponent<Button>();
-        Button placeButton = itemActionMenuInstance.transform.Find("PlaceButton").GetComponent<Button>();
-        Button throwButton = itemActionMenuInstance.transform.Find("ThrowButton").GetComponent<Button>();
+        // ボタン情報のリストを作成
+        var buttonInfos = new List<SubMenuButtonInfo>
+        {
+            new SubMenuButtonInfo("UseButton", "使う", UseItem),
+            new SubMenuButtonInfo("PlaceButton", "置く", item => {
+                Debug.Log("置く機能は未実装です。");
+                CloseSubMenu();
+            }),
+            new SubMenuButtonInfo("ThrowButton", "投げる", item => {
+                Debug.Log("投げる機能は未実装です。");
+                CloseSubMenu();
+            })
+        };
 
         subMenuButtons.Clear();
-        subMenuButtons.Add(useButton);
-        subMenuButtons.Add(placeButton);
-        subMenuButtons.Add(throwButton);
 
-        // 最初のボタンを選択する
+        // 各ボタンを設定
+        foreach (var buttonInfo in buttonInfos)
+        {
+            Button button = itemActionMenuInstance.transform
+                .Find(buttonInfo.buttonName)
+                .GetComponent<Button>();
+
+            // ボタンのテキストを設定（必要な場合）
+            var buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.text = buttonInfo.displayName;
+            }
+
+            // ボタンのクリックイベントを設定
+            button.onClick.AddListener(() => {
+                buttonInfo.action.Invoke(selectedItem);
+                CloseSubMenu();
+            });
+
+            subMenuButtons.Add(button);
+        }
+
+        // 最初のボタンを選択
         subMenuSelectedIndex = 0;
         UpdateSubMenuCursor();
-
-        // ボタンの設定
-        useButton.onClick.AddListener(() => {
-            UseItem(selectedItem);
-            CloseSubMenu();
-        });
-
-        // 「置く」と「投げる」は後で実装
-        placeButton.onClick.AddListener(() => {
-            Debug.Log("置く機能は未実装です。");
-            CloseSubMenu();
-        });
-
-        throwButton.onClick.AddListener(() => {
-            Debug.Log("投げる機能は未実装です。");
-            CloseSubMenu();
-        });
-
         isSubMenuOpen = true;
     }
 
@@ -216,9 +256,9 @@ public class InventoryUI : MonoBehaviour {
             itemActionMenuInstance = null;
         }
 
-        if (subMenuCursorInstance != null) {
-            Destroy(subMenuCursorInstance);
-            subMenuCursorInstance = null;
+        if (cursorInstance != null) {
+            Destroy(cursorInstance);
+            cursorInstance = null;
         }
 
         isSubMenuOpen = false;
@@ -227,19 +267,18 @@ public class InventoryUI : MonoBehaviour {
 
     // サブメニューカーソルの位置を更新するメソッド
     private void UpdateSubMenuCursor() {
-        if (subMenuCursorInstance == null) {
-            subMenuCursorInstance = Instantiate(subMenuCursorPrefab, itemActionMenuInstance.transform);
-            subMenuCursorInstance.transform.localPosition = new Vector3(-subMenuCursorInstance.GetComponent<RectTransform>().rect.width / 2, 0, 0);
-            //subMenuCursorInstance.transform.SetAsFirstSibling(); // ボタンの下に表示
+        if (cursorInstance == null) {
+            cursorInstance = Instantiate(cursorPrefab, itemActionMenuInstance.transform);
+            cursorInstance.transform.localPosition = new Vector3(-cursorInstance.GetComponent<RectTransform>().rect.width / 2, 0, 0);            
         }
 
-        if (subMenuButtons.Count == 0 || subMenuCursorInstance == null) return;
+        if (subMenuButtons.Count == 0 || cursorInstance == null) return;
 
         Button selectedButton = subMenuButtons[subMenuSelectedIndex];
-        subMenuCursorInstance.transform.SetParent(selectedButton.transform, false);
-        RectTransform cursorRect = subMenuCursorInstance.GetComponent<RectTransform>();
+        cursorInstance.transform.SetParent(selectedButton.transform, false);
+        RectTransform cursorRect = cursorInstance.GetComponent<RectTransform>();
         if (cursorRect != null) {
-            cursorRect.anchoredPosition = new Vector3(-selectedButton.GetComponent<RectTransform>().rect.width / 2, 0, 0); // ボタンの中心に配置
+            cursorRect.anchoredPosition = new Vector3(-selectedButton.GetComponent<RectTransform>().rect.width / 2, 0, 0);            
         }
     }
 

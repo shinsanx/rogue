@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class PlayerStatusDataLogic
 {
-    private IPlayerStatusAdapter playerStatusAdapter;
-    private IObjectData objectData;
+    private IPlayerStatusAdapter playerStatusAdapter;    
     private IAnimationAdapter animationAdapter;
     private List<string> messages = new List<string>();
     CreateMessageLogic createMessageLogic;
 
     public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData){
         this.playerStatusAdapter = playerStatusAdapter;
-        this.animationAdapter = animationAdapter;
-        this.objectData = objectData;
+        this.animationAdapter = animationAdapter;        
         createMessageLogic = new CreateMessageLogic();
     }    
 

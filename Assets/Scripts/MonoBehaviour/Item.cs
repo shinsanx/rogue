@@ -41,9 +41,16 @@ public class Item : MonoBehaviour, IObjectData
     }    
 
     public void OnPicked(PlayerInventory playerInventory){        
-        playerInventory.AddItem(itemSO);
-        CharacterManager.i.RemoveCharacter(this);
-        Destroy(gameObject);
+        // インベントリへの追加が成功した場合のみ、アイテムを削除
+        if (playerInventory.AddItem(itemSO))
+        {
+            CharacterManager.i.RemoveCharacter(this);
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log($"{itemSO.itemName}を拾えませんでした。インベントリが一杯です。");
+        }
     }
     
 
