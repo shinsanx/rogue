@@ -7,12 +7,10 @@ public class PlayerStatusDataLogic
     private IPlayerStatusAdapter playerStatusAdapter;    
     private IAnimationAdapter animationAdapter;
     private List<string> messages = new List<string>();
-    CreateMessageLogic createMessageLogic;
 
     public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData){
         this.playerStatusAdapter = playerStatusAdapter;
         this.animationAdapter = animationAdapter;        
-        createMessageLogic = new CreateMessageLogic();
     }    
 
     public async void GetExp(object exp){
@@ -56,7 +54,7 @@ public class PlayerStatusDataLogic
 
         //Todo: dealerのタグによってメッセージを変える。Enemyかその他か
         messages.Clear();
-        messages = createMessageLogic.CreateTakeDamageMessage(messages, damage, dealerName);
+        messages = GameAssets.i.createMessageLogic.CreateTakeDamageMessage(messages, damage, dealerName);
 
         MessageBus.Instance.Publish("sendMessage", messages);
     }

@@ -88,13 +88,12 @@ public class PlayerMoveLogic {
             Vector2 newPosition = targetPos + moveOffset;
             objectData.Position = newPosition.ToVector2Int();
             ActionEventManager.NotifyActionComplete();
-        
     }
 
-    async void LockInputWhileMoving() {
-        isMoving = true;
-        await Task.Delay(15);
-        isMoving = false;
-    }
+    // async void LockInputWhileMoving() {
+    //     isMoving = true;
+    //     await Task.Delay(15);
+    //     isMoving = false;
+    // }
 
 }

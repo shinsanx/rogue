@@ -22,7 +22,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] int generateItemCount;
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
-    [SerializeField] InventoryUI inventoryUI;
+    [SerializeField] InventoryController inventoryUI;
 
     private async void Start() {
         try {
@@ -51,7 +51,7 @@ public class DungeonEventManager : MonoBehaviour {
             await GenerateEnemies();
 
             // 9. インベントリUIの初期化
-            await InitializeInventoryUI();
+            // await InitializeInventoryUI();
 
             // 10. アイテムの生成（必要に応じて実装）
             await GenerateItems();
@@ -103,10 +103,10 @@ public class DungeonEventManager : MonoBehaviour {
         return Task.CompletedTask;
     }
 
-    private Task InitializeInventoryUI() {
-        inventoryUI.Initialize();
-        return Task.CompletedTask;
-    }
+    // private Task InitializeInventoryUI() {
+    //     inventoryUI.InitializeMenu();
+    //     return Task.CompletedTask;
+    // }
 
     private async Task GenerateEnemies() {
         for (int i = 0; i < generateEnemyCount; i++) {

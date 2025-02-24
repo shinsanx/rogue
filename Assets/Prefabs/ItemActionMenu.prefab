@@ -383,7 +383,7 @@ GameObject:
   - component: {fileID: 5127366678884264088}
   - component: {fileID: 9123736539682149227}
   m_Layer: 0
-  m_Name: ThrowButton
+  m_Name: ThrowMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -607,7 +607,7 @@ GameObject:
   - component: {fileID: 8585317282747110288}
   - component: {fileID: 955318972870243008}
   m_Layer: 0
-  m_Name: PlaceButton
+  m_Name: PlaceMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -697,7 +697,7 @@ GameObject:
   - component: {fileID: 3451152866835149465}
   - component: {fileID: 8962882359596160943}
   m_Layer: 0
-  m_Name: UseButton
+  m_Name: UseMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

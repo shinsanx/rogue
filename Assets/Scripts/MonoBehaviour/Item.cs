@@ -44,12 +44,13 @@ public class Item : MonoBehaviour, IObjectData
         // インベントリへの追加が成功した場合のみ、アイテムを削除
         if (playerInventory.AddItem(itemSO))
         {
+            MessageBus.Instance.Publish("sendMessage", GameAssets.i.createMessageLogic.CreatePickUpMessage(itemSO.itemName));
             CharacterManager.i.RemoveCharacter(this);
             Destroy(gameObject);
         }
         else
         {
-            Debug.Log($"{itemSO.itemName}を拾えませんでした。インベントリが一杯です。");
+            MessageBus.Instance.Publish("sendMessage", GameAssets.i.createMessageLogic.CreateCantPickUpMessage(itemSO.itemName));
         }
     }
     

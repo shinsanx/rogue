@@ -11,7 +11,6 @@ public class StatusUI : MonoBehaviour {
     [SerializeField] TextMeshProUGUI currentLvTxt;
     [SerializeField] TextMeshProUGUI currentGoldTxt;
     [SerializeField] Image healthBarGage;
-    CreateMessageLogic createMessageLogic;
     private Player player;
 
     private void OnDestroy() {
@@ -35,7 +34,7 @@ public class StatusUI : MonoBehaviour {
         currentLvTxt.text = updateTxt.ConvertNumToUpperString(level);
         if (level == 1) return;
 
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.LvUppedMessage(player.Name, level));
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.LvUppedMessage(player.Name, level));
     }
 
     public void Initialize() {

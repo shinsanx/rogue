@@ -10,7 +10,7 @@ public class UserInput : MonoBehaviour {
     public UnityEvent<Vector2> onMoveInput;
     public UnityEvent onAttack;
     public UnityEvent onMenuOpen;
-    public UnityEvent onMenuClose;
+    public UnityEvent onMenuClose;    
     public UnityEvent<Vector2> onNavigate;
     public UnityEvent onSubmit;
     Vector2 inputVector;
@@ -85,8 +85,8 @@ public class UserInput : MonoBehaviour {
     public void OnMenuOpen(InputAction.CallbackContext context) {
         if (context.started) return;
         if (context.canceled) return;
-        playerActionMap.Disable();
-        uiActionMap.Enable();
+        //playerActionMap.Disable();
+        //uiActionMap.Enable();
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         onMenuOpen?.Invoke();
@@ -95,14 +95,26 @@ public class UserInput : MonoBehaviour {
     /// <summary>
     /// メニューを閉じる際に呼び出す
     /// </summary>
-    public void OnMenuClose(InputAction.CallbackContext context) {
+    public void OnMenuClose(InputAction.CallbackContext context) {        
         if (context.started) return;
         if (context.canceled) return;
-        uiActionMap.Disable();
-        playerActionMap.Enable();
+        //uiActionMap.Disable();
+        //playerActionMap.Enable();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         onMenuClose?.Invoke();
+    }
+
+    public void OnToggleActionMap(){
+        if (playerActionMap.enabled) {
+            playerActionMap.Disable();
+            uiActionMap.Enable();
+            Debug.Log("playerActionMap.Disable");
+        } else {
+            playerActionMap.Enable();
+            uiActionMap.Disable();
+            Debug.Log("playerActionMap.Enable");
+        }
     }
 
     public void OnNavigate(InputAction.CallbackContext context) {
