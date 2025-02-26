@@ -128,7 +128,7 @@ public class CreateMessageLogic {
             firstText,
         };
         return strings;
-    }   
+    }
 
     public List<string> CreateUnequipMessage(string itemName) {
         string firstText = itemName + "を外した。";
@@ -149,4 +149,13 @@ public class CreateMessageLogic {
         };
         return strings;
     }
+
+    public List<string> CreatePlaceItemMessage(string itemName) {
+        string firstText = itemName + " をおいた";
+
+        List<string> strings = new List<string>{
+            firstText,
+        };
+        return strings;
     }
+}

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5e5ec5acb347460e85ecb85f7b1f226, type: 3}
   m_Name: yakuso
   m_EditorClassIdentifier: 
+  id: 42
   itemName: "\u3084\u304F\u305D\u3046"
   description: "\u56DE\u5FA9\u7684\u306A"
   purchasePrice: 30

@@ -13,19 +13,13 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] RandomMapGenerator randomMapGenerator;
     [SerializeField] AutoMapping autoMapping;
     [SerializeField] Player player;
-    [SerializeField] GameObject enemyParent;
-    [SerializeField] GameObject enemyPrefab;
-    [SerializeField] GameObject itemParent;
-    [SerializeField] GameObject itemPrefab;
     [SerializeField] StatusUI statusUI;
-    [SerializeField] int generateEnemyCount;
-    [SerializeField] int generateItemCount;
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
     [SerializeField] InventoryController inventoryUI;
 
     private async void Start() {
-        try {
+        //try {
             // 1. StateMachineの初期化を最初に行う
             await InitializeStateMachine();
 
@@ -60,10 +54,10 @@ public class DungeonEventManager : MonoBehaviour {
             await CreateMiniMap();
 
             Debug.Log("Initialize completed");
-        }
-        catch (System.Exception ex) {
-            Debug.LogError($"DungeonEventManager Initialization Failed: {ex.Message}");
-        }
+        // }
+        // catch (System.Exception ex) {
+        //     Debug.LogError($"DungeonEventManager Initialization Failed: {ex.Message}");
+        // }
     }
 
     private Task InitializeStateMachine() {
@@ -109,23 +103,12 @@ public class DungeonEventManager : MonoBehaviour {
     // }
 
     private async Task GenerateEnemies() {
-        for (int i = 0; i < generateEnemyCount; i++) {
-            // Instantiateはメインスレッドで実行
-            GameObject enemy = Instantiate(enemyPrefab, enemyParent.transform);
-            enemy.GetComponent<Enemy>().InitializeEnemy();
-            enemy.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
-            await Task.Yield(); // フレームを分散させるための待機
-        }
+        await ArrangeManager.i.ArrangeEnemyToRandomPosition();
         enemyManager.Initialize();
     }
 
     private async Task GenerateItems() {
-        for (int i = 0; i < generateItemCount; i++) {
-            GameObject item = Instantiate(itemPrefab, itemParent.transform);
-            item.GetComponent<Item>().Initialize();
-            item.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
-            await Task.Yield(); // フレームを分散させるための待機
-        }
+        await ArrangeManager.i.ArrangeItemToRandomPosition();        
     }
 
     private Task CreateMiniMap() {

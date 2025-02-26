@@ -56,11 +56,9 @@ public class MainMenuController : BaseMenuController {
     public override void Submit() {
         Debug.Log("MainMenuController Submit");
         switch (currentIndex) {
-            case 0:
-                Debug.Log("持ち物が選択されました。");
+            case 0:                
                 // InventoryUI を呼び出す
-                MenuManager.Instance.SetActiveMenu<InventoryController>();
-                MenuManager.Instance.ToggleMenu();                
+                MenuManager.Instance.SetActiveMenu<InventoryController>();                                
                 break;
             case 1:
                 Debug.Log("足元が選択されました。");
@@ -76,15 +74,14 @@ public class MainMenuController : BaseMenuController {
         }
     }
 
-    public override void OpenMenu() {
-        MenuManager.Instance.RegisterMenu(this);
+    public override void OpenMenu() {        
         isActive = true;
         mainMenuObject.SetActive(true);
     }
 
-    public override void CloseMenu() {
+    public override void CloseMenu() {        
         isActive = false;
-        mainMenuObject.SetActive(false);
+        mainMenuObject.SetActive(false);        
     }
     
     

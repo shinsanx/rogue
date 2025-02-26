@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Item_SO", menuName ="Item/ItemSO", order =0)]
 public abstract class ItemSO : ScriptableObject
 {
+    public int id;
     public string itemName;
     [TextArea] public string description;
     public int purchasePrice;

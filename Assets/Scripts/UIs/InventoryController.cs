@@ -91,13 +91,13 @@ public class InventoryController : BaseMenuController {
     }
 
     // アイテムを選択してサブメニューを表示するメソッド
-    public override void Submit() {        
+    public override void Submit() {
+        if(itemSlots.Count == 0) return;
         // サブメニューをアクティブにする
         SubMenuController subMenuController = MenuManager.Instance.SetActiveMenu<SubMenuController>();
 
         // 選択されているアイテムをサブメニューに渡す
         subMenuController.SetSubMenu(itemSlots[currentIndex]);
-        MenuManager.Instance.ToggleMenu();                
     }
 
     // ページ切り替えを行うメソッド
@@ -118,12 +118,13 @@ public class InventoryController : BaseMenuController {
 
     public override void OpenMenu() {
         itemWindow.SetActive(true);
-        MenuManager.Instance.RegisterMenu(this);
+        // MainMenuを閉じる
+        MenuManager.Instance.CloseSpecificMenu<MainMenuController>();
         isActive = true;
     }
 
     public override void CloseMenu() {
-        itemWindow.SetActive(false);
-        isActive = false;
+        itemWindow.SetActive(false);        
+        isActive = false;        
     }
 }

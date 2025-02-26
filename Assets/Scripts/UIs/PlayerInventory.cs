@@ -58,10 +58,7 @@ public class PlayerInventory {
             if (item is ConsumableSO consumable) {
                 MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateUseItemMessage(consumable.itemName));
                 consumable.effect.ApplyEffect(receiver);
-                Debug.Log($"{consumable.itemName} を使用しました。");
-
-                //インベントリを閉じる
-                onItemUsed?.Invoke();
+                Debug.Log($"{consumable.itemName} を使用しました。");                                
             } else {
                 Debug.Log("このアイテムは使用できません。");
             }

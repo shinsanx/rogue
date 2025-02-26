@@ -21,19 +21,18 @@ public class SubMenuController : BaseMenuController {
         currentIndex = 0;
     }
 
-    public override void OpenMenu() {
-        MenuManager.Instance.RegisterMenu(this);
+    public override void OpenMenu() {        
         subMenuWindow.SetActive(true);
         isActive = true;
     }
 
     public override void CloseMenu() {
         isActive = false;
-        subMenuWindow.SetActive(false);
+        subMenuWindow.SetActive(false);        
         if(cursorInstance != null) {
             Destroy(cursorInstance);
             cursorInstance = null;
-        }
+        }        
     }
 
     public void SetSubMenu(ItemSO selectedItem) {        
@@ -50,7 +49,7 @@ public class SubMenuController : BaseMenuController {
                 UseItem();
                 break;
             case 1:
-                Debug.Log("placeMenu");
+                PlaceItem();
                 break;
             case 2:
                 Debug.Log("throwMenu");
@@ -71,6 +70,14 @@ public class SubMenuController : BaseMenuController {
 
     private void UseItem() {
         player.playerInventory.UseItem(selectedItem, player);
-        MenuManager.Instance.ToggleMenu();
+        MenuManager.Instance.CloseAllMenus();
+    }
+
+    private void PlaceItem() {
+        GameObject itemPrefab = CharacterManager.i.GetItemPrefab(selectedItem.id);
+        ArrangeManager.i.PlaceItem(itemPrefab, player.GetComponent<IObjectData>().Position);
+        player.playerInventory.RemoveItem(selectedItem);
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreatePlaceItemMessage(selectedItem.itemName));
+        MenuManager.Instance.CloseAllMenus();
     }
 }

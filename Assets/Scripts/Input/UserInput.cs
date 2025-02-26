@@ -84,9 +84,7 @@ public class UserInput : MonoBehaviour {
     /// </summary>
     public void OnMenuOpen(InputAction.CallbackContext context) {
         if (context.started) return;
-        if (context.canceled) return;
-        //playerActionMap.Disable();
-        //uiActionMap.Enable();
+        if (context.canceled) return;                
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         onMenuOpen?.Invoke();
@@ -97,9 +95,7 @@ public class UserInput : MonoBehaviour {
     /// </summary>
     public void OnMenuClose(InputAction.CallbackContext context) {        
         if (context.started) return;
-        if (context.canceled) return;
-        //uiActionMap.Disable();
-        //playerActionMap.Enable();
+        if (context.canceled) return;                
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         onMenuClose?.Invoke();
@@ -110,11 +106,11 @@ public class UserInput : MonoBehaviour {
             playerActionMap.Disable();
             uiActionMap.Enable();
             Debug.Log("playerActionMap.Disable");
-        } else {
+        } else if (MenuManager.Instance.activeMenus.Count == 0) {
             playerActionMap.Enable();
             uiActionMap.Disable();
             Debug.Log("playerActionMap.Enable");
-        }
+        }        
     }
 
     public void OnNavigate(InputAction.CallbackContext context) {

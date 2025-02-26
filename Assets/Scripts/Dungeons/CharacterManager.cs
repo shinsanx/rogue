@@ -17,7 +17,7 @@ public class CharacterManager : MonoBehaviour {
     }
 
     //ここにすべてのオブジェクトデータが格納される    
-    public List<IObjectData> allObjectData = new List<IObjectData>();    
+    public List<IObjectData> allObjectData = new List<IObjectData>();      
 
     //IDの管理
     private static int _idCounter = 0;
@@ -128,6 +128,12 @@ public class CharacterManager : MonoBehaviour {
         
         return validEnemies.ToList();
     }
+
+    public GameObject GetItemPrefab(int id) {
+        return GameAssets.i.allItemListSO.itemDataList.Find(item => item.id == id).itemPrefab;        
+    }
+
+
 
     public void Initialize() {
         allObjectData = new List<IObjectData>();

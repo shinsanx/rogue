@@ -16,6 +16,9 @@ public class GameAssets: MonoBehaviour {
     public StateMachine stateMachine;
     public State playerState;
     public State enemyState;        
-    public CreateMessageLogic createMessageLogic = new CreateMessageLogic();
+    public CreateMessageLogic createMessageLogic = new CreateMessageLogic();  
+
+    public AllItemListSO allItemListSO;
+    
 
 }
