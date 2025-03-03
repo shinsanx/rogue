@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     Vector2 moveOffset = new Vector2(.5f, .5f);
     private Vector2Int _enemyPosition;
     private int _hp;
+    public int MaxHealth { get; set; }
 
     // ========================================================
     // =================== IPositionAdapter ===================
@@ -81,6 +82,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
                 //TODO: 回復アニメーションを再生する＆ダメージアニメーションを再生しない
             }
             _hp = value;
+            
             enemyAnimLogic.SetDamageAnimation();
             if (_hp <= 0) {
                 enemyAnimLogic.SetDamageAnimation();

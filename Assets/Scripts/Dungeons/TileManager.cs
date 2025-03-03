@@ -185,5 +185,27 @@ public class TileManager{
         Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];                
         return randomPosition;
     }
+
+    //前方nマスまでのキャラクターを取得する
+    public Vector2Int GetCharactersInFront(Vector2Int selfPos, Vector2Int direction, int distance) {
+        Vector2Int objectPos2 = Vector2Int.zero;
+        for (int i = 1; i <= distance; i++) {
+            Vector2Int objectPos = selfPos + direction * i;            
+            //壁だった場合は一つ前のポジションを返す            
+            if(GetMapChipType(objectPos) == (int)Constants.MapChipType.Wall) {
+                Debug.Log(objectPos + "に壁があります");
+                return objectPos;
+            }
+            //キャラクターがいた場合はそのポジションを返す
+            if(CharacterManager.i.GetObjectTypeByPosition(objectPos) != null) {
+                string objectType = CharacterManager.i.GetObjectTypeByPosition(objectPos);
+                Debug.Log(objectPos + "に" + objectType + "がいます");                
+                return objectPos;
+            }
+            objectPos2 = selfPos + direction * i;
+        }
+        Debug.Log("前方にキャラクターがいません");
+        return objectPos2;
+    }
     
 }

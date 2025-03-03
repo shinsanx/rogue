@@ -158,4 +158,13 @@ public class CreateMessageLogic {
         };
         return strings;
     }
+
+    public List<string> CreateThrowItemMessage(string itemName) {
+        string firstText = itemName + " を投げた";
+
+        List<string> strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
 }

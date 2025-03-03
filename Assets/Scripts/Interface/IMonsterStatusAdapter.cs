@@ -8,6 +8,7 @@ public interface IMonsterStatusAdapter
     // IMonsterStatusAdapter
     // ========================================================
     public int HP {get; set;}
+    public int MaxHealth {get; set;}
     public int AttackPower {get;set;}
     public int Defence {get; set;}
     public int Exp {get; set;}

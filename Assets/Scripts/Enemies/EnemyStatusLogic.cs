@@ -24,6 +24,7 @@ public class EnemyStatusLogic
 
     public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, IObjectData objectData){        
         monsterStatusAdapter.HP = monsterStatusSO.HP;
+        monsterStatusAdapter.MaxHealth = monsterStatusSO.HP;
         monsterStatusAdapter.AttackPower = monsterStatusSO.AttackPower;
         monsterStatusAdapter.Defence = monsterStatusSO.Deffence;
         monsterStatusAdapter.Exp = monsterStatusSO.Exp;

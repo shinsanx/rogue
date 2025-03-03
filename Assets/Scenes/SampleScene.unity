@@ -2289,6 +2289,8 @@ GameObject:
   - component: {fileID: 672341471}
   - component: {fileID: 672341473}
   - component: {fileID: 672341474}
+  - component: {fileID: 672341475}
+  - component: {fileID: 672341476}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -2447,6 +2449,30 @@ MonoBehaviour:
   itemPrefab: {fileID: 1734026874544617083, guid: ca68d3306ee3242a3afa0179cbf1385d, type: 3}
   itemCount: 50
   enemyCount: 3
+--- !u!114 &672341475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672341465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee35db5571f754f93af5b4ca81b17a73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &672341476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672341465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7732e25a5c65c46ef8f4caf293d53af7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &679488204
 GameObject:
   m_ObjectHideFlags: 0

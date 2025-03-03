@@ -47,4 +47,9 @@ public static class ScriptExtention {
         Vector2 vector = new Vector2(self.x, self.y);
         return vector;
     }
+
+    public static Vector3 ToVector3(this Vector2Int self){
+        Vector3 vector = new Vector3(self.x, self.y, 0);
+        return vector;
+    }
 }

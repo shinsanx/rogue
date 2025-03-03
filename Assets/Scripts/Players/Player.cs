@@ -74,10 +74,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     public Vector2 MoveAnimationDirection {
         get => playerFaceDirection;
-        set {
+                set {
             playerFaceDirection = new Vector2(value.x, value.y);
             animator.SetFloat("x", value.x);
-            animator.SetFloat("y", value.y);
+            animator.SetFloat("y", value.y);            
         }
     }
 

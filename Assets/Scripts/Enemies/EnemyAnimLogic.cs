@@ -22,9 +22,9 @@ public class EnemyAnimLogic
         tween = spriteRenderer.DOFade(0, 2f).SetEase(Ease.Flash, 6);        
     }
 
-    public void SetAttackAnimation(Vector2Int direction){
-        animationAdapter.AttackAnimation = true;
+    public void SetAttackAnimation(Vector2Int direction){        
         animationAdapter.MoveAnimationDirection = direction;
+        animationAdapter.AttackAnimation = true;
     }
 
     public void SetMoveAnimation(Vector2 vector){

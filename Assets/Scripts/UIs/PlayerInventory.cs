@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-
+using System.Threading.Tasks;
 public class PlayerInventory {
 
     public PlayerInventory(){
@@ -43,6 +43,7 @@ public class PlayerInventory {
     public bool RemoveItem(ItemSO item) {
         if (items.Contains(item)) {
             items.Remove(item);
+            OnInventoryUpdated?.Invoke();
             Debug.Log($"{item.itemName} を削除しました。現在の数量: {items.Count}");
             return true;
         } else {
@@ -65,6 +66,35 @@ public class PlayerInventory {
         } else {
             Debug.Log("アイテムの使用に失敗しました。");
         }
+    }
+
+    //アイテムを置く
+    public void PlaceItem(ItemSO item, Vector2Int position) {
+        GameObject itemPrefab = CharacterManager.i.GetItemPrefab(item.id);
+        ArrangeManager.i.PlaceItem(itemPrefab, position);
+        RemoveItem(item);
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreatePlaceItemMessage(item.itemName));
+    }
+
+    //アイテムを投げる
+    public async Task ThrowItem(ItemSO item, Vector2Int position, Vector2Int direction) {
+        Vector2Int throwPosition = TileManager.i.GetCharactersInFront(position, direction, 10);
+        //throwPositionのタイプが壁だった場合は一つ前のポジションを取得する
+        if(TileManager.i.GetMapChipType(throwPosition) == (int)RandomDungeonWithBluePrint.Constants.MapChipType.Wall) {
+            throwPosition = throwPosition - direction;
+        }
+        //throwPositionのタイプがEnemyだった場合はアイテムの効果を適用する
+        if(CharacterManager.i.GetObjectTypeByPosition(throwPosition) == "Enemy") {            
+            ItemEffectManager.i.ApplyItemEffect(item, CharacterManager.i.GetObjectByPosition(throwPosition));
+            await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
+            RemoveItem(item);
+            return;
+        }
+        GameObject itemPrefab = CharacterManager.i.GetItemPrefab(item.id);
+        await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
+        ArrangeManager.i.PlaceItem(itemPrefab, throwPosition);
+        RemoveItem(item);
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateThrowItemMessage(item.itemName));
     }
 
     // インベントリ内の全アイテムを取得

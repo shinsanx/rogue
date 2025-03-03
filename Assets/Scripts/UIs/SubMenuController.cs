@@ -52,7 +52,7 @@ public class SubMenuController : BaseMenuController {
                 PlaceItem();
                 break;
             case 2:
-                Debug.Log("throwMenu");
+                ThrowItem();
                 break;
             default:
                 Debug.LogError("無効な選択インデックスです。");
@@ -68,16 +68,21 @@ public class SubMenuController : BaseMenuController {
         cursorInstance.transform.SetParent(menuItems[currentIndex].transform, false);
     }
 
+    //アイテムを使用する
     private void UseItem() {
         player.playerInventory.UseItem(selectedItem, player);
         MenuManager.Instance.CloseAllMenus();
     }
 
+    //アイテムを置く
     private void PlaceItem() {
-        GameObject itemPrefab = CharacterManager.i.GetItemPrefab(selectedItem.id);
-        ArrangeManager.i.PlaceItem(itemPrefab, player.GetComponent<IObjectData>().Position);
-        player.playerInventory.RemoveItem(selectedItem);
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreatePlaceItemMessage(selectedItem.itemName));
+        player.playerInventory.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position);
+        MenuManager.Instance.CloseAllMenus();
+    }
+
+    //アイテムを投げる
+    private void ThrowItem() {
+        player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position, player.MoveAnimationDirection.ToVector2Int());
         MenuManager.Instance.CloseAllMenus();
     }
 }

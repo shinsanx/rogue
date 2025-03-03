@@ -152,6 +152,7 @@ public class EnemyManager : MonoBehaviour {
         );
 
         if (TileManager.i.CheckAttackableTile(enemyCurrentPos, enemyCurrentPos + direction)) {            
+            enemyAction.Direction = direction;
             enemyAction.Type = ActionType.Attack;
             enemyAction.Target = player;
             return true;
@@ -329,7 +330,7 @@ public class EnemyManager : MonoBehaviour {
     }
 
     // 自身の向いている方向を取得する
-    private DungeonConstants.Direction GetFacingDirection() {
+    private DungeonConstants.Direction GetFacingDirection() {                
         return DungeonConstants.ToDirection[enemyAIState.FacingDirection];
     }
 

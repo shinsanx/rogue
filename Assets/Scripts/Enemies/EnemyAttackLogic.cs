@@ -37,7 +37,7 @@ public class EnemyAttackLogic
 
     
 
-    private void DealDamage(GameObject targetObject, Vector2Int direction){
+    private void DealDamage(GameObject targetObject, Vector2Int direction){        
         if(targetObject == null)return;
         if(damageCalculate == null){
             damageCalculate = new DamageCalculate();

@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Item : MonoBehaviour, IObjectData
 {
+    private SpriteRenderer spriteRenderer;
+    void Start(){
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = itemSO.icon;
+    }
     // ========================================================
     // オブジェクトデータ
     // ========================================================
