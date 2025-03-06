@@ -56,38 +56,38 @@ public class EnemyAILogic {
 
     private void UpdateEnemyState() {        
         state.Player = CharacterManager.i.GetPlayer();
-        state.IsInRoomAtStart = TileManager.i.LookupRoomNum(objectData.Position) != 0;
+        state.IsInRoomAtStart = TileManager.i.LookupRoomNum(objectData.Position.Value) != 0;
         state.IsAdjacentToPlayerAtStart = IsAdjacentToPlayer();
         state.MonsterView = GetMonsterView();
         state.CanSeePlayer = CanSeePlayer();
 
-        if (state.LastKnownPlayerPosition == objectData.Position) {
+        if (state.LastKnownPlayerPosition == objectData.Position.Value) {
             // LastKnownPlayerPositionに辿り着いた場合はリセットする
             state.LastKnownPlayerPosition = Vector2Int.zero;
         }
 
-        if (state.TargetPosition == objectData.Position) {
+        if (state.TargetPosition == objectData.Position.Value) {
             // 目的地が自分の位置にある場合はリセットする
             state.TargetPosition = Vector2Int.zero;
         }
 
         if (state.CanSeePlayer) {
-            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position;
+            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position.Value;
         }
     }
 
     private bool IsAdjacentToPlayer() {
         if (state.Player == null) return false;
 
-        Vector2 playerPos = state.Player.GetComponent<IObjectData>().Position;
-        Vector2 enemyPos = new Vector2(objectData.Position.x, objectData.Position.y);
+        Vector2 playerPos = state.Player.GetComponent<IObjectData>().Position.Value;
+        Vector2 enemyPos = new Vector2(objectData.Position.Value.x, objectData.Position.Value.y);
         return Vector2.Distance(enemyPos, playerPos) <= 1.5f;
     }
 
     private List<Vector2Int> GetMonsterView() {
         // 既存のGetMonsterViewロジックを実装
-        List<Vector2Int> views = TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position));
-        List<Vector2Int> surroundingPositions = TileManager.i.GetSurroundingPositions(objectData.Position);
+        List<Vector2Int> views = TileManager.i.ExtractAllRoomPositions(TileManager.i.LookupRoomNum(objectData.Position.Value));
+        List<Vector2Int> surroundingPositions = TileManager.i.GetSurroundingPositions(objectData.Position.Value);
         if (views == null || views.Count == 0) {
             return surroundingPositions;
         }
@@ -97,7 +97,7 @@ public class EnemyAILogic {
 
     //プレイヤーが視野内にいるかどうかを判定する
     private bool CanSeePlayer() {
-        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position;
+        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position.Value;
         return state.MonsterView.Contains(playerPos);
     }
 
@@ -112,8 +112,8 @@ public class EnemyAILogic {
     private bool TryAttackPlayer() {
         if (!state.IsAdjacentToPlayerAtStart) return false;
 
-        Vector2Int enemyPos = objectData.Position;
-        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position;
+        Vector2Int enemyPos = objectData.Position.Value;
+        Vector2Int playerPos = state.Player.GetComponent<IObjectData>().Position.Value;
         Vector2Int direction = new Vector2Int(
             playerPos.x - enemyPos.x,
             playerPos.y - enemyPos.y
@@ -128,11 +128,11 @@ public class EnemyAILogic {
 
     private bool TryMove() {
         Vector2Int targetPosition = DetermineTargetPosition();
-        if (targetPosition == objectData.Position) return false;
+        if (targetPosition == objectData.Position.Value) return false;
 
-        List<Vector2Int> route = MakeRoute(objectData.Position, targetPosition);
+        List<Vector2Int> route = MakeRoute(objectData.Position.Value, targetPosition);
         if (route != null && route.Count > 0) {
-            Move(objectData.Position, route[0]);
+            Move(objectData.Position.Value, route[0]);
             return true;
         }
         return false;
@@ -149,9 +149,9 @@ public class EnemyAILogic {
         if (state.LastKnownPlayerPosition != Vector2Int.zero) {
             // Debug.Log($"LastKnownPlayerPositionを使用: {state.LastKnownPlayerPosition}");
             // プレイヤーが角越しに隣接している場合の迂回処理
-            if (TileManager.i.IsAdjacentTo(objectData.Position, state.LastKnownPlayerPosition)) {
-                if (!TileManager.i.CheckMovableTile(objectData.Position, state.LastKnownPlayerPosition)) {
-                    return MoveAlternativeTarget(objectData.Position, state.LastKnownPlayerPosition);
+            if (TileManager.i.IsAdjacentTo(objectData.Position.Value, state.LastKnownPlayerPosition)) {
+                if (!TileManager.i.CheckMovableTile(objectData.Position.Value, state.LastKnownPlayerPosition)) {
+                    return MoveAlternativeTarget(objectData.Position.Value, state.LastKnownPlayerPosition);
                 }
             }
             return state.LastKnownPlayerPosition;
@@ -245,9 +245,9 @@ public class EnemyAILogic {
 
     private Vector2Int DetermineRoomTargetPosition() {
         // 自身がJointPositionにいる場合は、通路に入る
-        var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position);
-        if (jointPositions.Any(j => j == objectData.Position) && state.EnterJointPosition != objectData.Position) {
-            var neighborBranchPositions = TileManager.i.GetNeighborBranchPositions(objectData.Position);
+        var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position.Value);
+        if (jointPositions.Any(j => j == objectData.Position.Value) && state.EnterJointPosition != objectData.Position.Value) {
+            var neighborBranchPositions = TileManager.i.GetNeighborBranchPositions(objectData.Position.Value);
             if (neighborBranchPositions.Count > 0) {
                 // Debug.Log("通路に入ります");
                 return neighborBranchPositions[0];
@@ -258,17 +258,17 @@ public class EnemyAILogic {
 
     // JointPositionにいる場合の目的地を決める
     private Vector2Int DetermineJointTargetPosition() {
-        var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position);
+        var joints = TileManager.i.ExtractJointPosInRoom(objectData.Position.Value);
 
         if (state.EnterJointPosition == Vector2Int.zero) {
             if (joints != null && joints.Count > 0) {
                 // 最も近いジョイントポイントを選択
                 state.EnterJointPosition = joints
-                    .OrderBy(j => Vector2Int.Distance(objectData.Position, j))
+                    .OrderBy(j => Vector2Int.Distance(objectData.Position.Value, j))
                     .First();
             } else {
                 Debug.Log("joints is null or empty");
-                return objectData.Position;
+                return objectData.Position.Value;
             }
         }
         // Debug.Log("ここで別のジョイントポジションをターゲットにする");
@@ -290,13 +290,13 @@ public class EnemyAILogic {
         var facingDirection = GetFacingDirection();
 
         // 前方5方向で移動可能な方向に移動する
-        var directions = DirectionUtils.GetSurroundingFacingTiles(objectData.Position, facingDirection);
+        var directions = DirectionUtils.GetSurroundingFacingTiles(objectData.Position.Value, facingDirection);
         foreach (var direction in directions) {
             if (TileManager.i.CheckTileStandable(direction)) {
                 return direction;
             }
         }
-        return objectData.Position;
+        return objectData.Position.Value;
     }
 
     // ルートのそれぞれのマスに他オブジェクトが存在していないかチェックする
@@ -305,11 +305,11 @@ public class EnemyAILogic {
     }
 
     private void UpdateEndState() {        
-        state.IsInRoomAtEnd = TileManager.i.LookupRoomNum(objectData.Position) != 0;
+        state.IsInRoomAtEnd = TileManager.i.LookupRoomNum(objectData.Position.Value) != 0;
         RecordEnterJointPosition();
         state.IsAdjacentToPlayerAtEnd = IsAdjacentToPlayer();
         if (state.IsAdjacentToPlayerAtEnd) {
-            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position;
+            state.LastKnownPlayerPosition = state.Player.GetComponent<IObjectData>().Position.Value;
         }
     }
 
@@ -321,9 +321,9 @@ public class EnemyAILogic {
     // 自身が入ったJointPositionを記録する
     private void RecordEnterJointPosition() {
         if (!state.IsInRoomAtStart && state.IsInRoomAtEnd) {
-            var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position);
-            if (jointPositions.Any(j => j == objectData.Position)) {
-                state.EnterJointPosition = objectData.Position;
+            var jointPositions = TileManager.i.ExtractJointPosInRoom(objectData.Position.Value);
+            if (jointPositions.Any(j => j == objectData.Position.Value)) {
+                state.EnterJointPosition = objectData.Position.Value;
                 Debug.Log($"state.EnterJointPosition: {state.EnterJointPosition}");
             }
         }

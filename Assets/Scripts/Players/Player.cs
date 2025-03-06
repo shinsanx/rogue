@@ -21,10 +21,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     public PlayerInventory playerInventory;
     private PlayerStatusDataLogic playerStatusDataLogic;
     private CreateMessageLogic createMessageLogic;
-    private StateMachine stateMachine;
-    private Vector2Int playerPosition;
+
     private Vector2 playerFaceDirection;
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
+    [SerializeField] bool resetStatus = true;
 
     private int _currentHp;
     private int _maxHp;
@@ -37,30 +37,42 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     // ================================================
     // ==================== Events ====================
-    // ================================================    
-    
-    [SerializeField] VoidEventChannelSO CompletePlayerStateChannel;
-    
+    // ================================================            
+
     // StatusUI.csで実装。
     [SerializeField] GameEvent OnPlayerLevelChanged;
 
     // StatusUI.csで実装。
     [SerializeField] GameEvent OnPlayerHPChanged;
 
+    // AttackLogic, MoveLogic, Inventoryで実装。
+    [SerializeField] GameEvent OnPlayerStateComplete;
+
+    // CharacterManagerのAddCharacterで実装。
+    public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
+
     // ================================================
     // ================== ObjectData ==================
     // ================================================
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
-    public int RoomNum { get; set; }
 
-    public Vector2Int Position {
-        get => playerPosition;
+
+    [SerializeField] private IntVariable _id;
+    [SerializeField] private StringVariable _name;
+    [SerializeField] private StringVariable _type;
+    [SerializeField] private IntVariable _roomNum;
+
+    // オブジェクトデータ
+    public IntVariable Id { get => _id; set => _id.SetValue(value); }
+    public StringVariable Name { get => _name; set => _name.SetValue(value); }
+    public StringVariable Type { get => _type; set => _type.SetValue(value); }
+    public IntVariable RoomNum { get => _roomNum; set => _roomNum.SetValue(value); }    
+
+    public Vector2IntVariable Position {
+        get => Position;
         set {
-            playerPosition = value;
+            Position.SetValue(value);
             isMoving = false; //本当はtrueにする。デバッグのためにfalseにしている。
-            transform.DOMove(value.ToVector2() + moveOffset, 0.3f)
+            transform.DOMove(Position.Value.ToVector2() + moveOffset, 0.3f)
                 .SetEase(Ease.Linear)
                 .OnComplete(() => {
                     isMoving = false;
@@ -68,9 +80,8 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
                 });
         }
     }
-    
-    // CharacterManagerのAddCharacterで実装。
-    public event Action<IObjectData> OnObjectUpdated; // オブジェクトの更新を渡すイベント
+
+
 
     // ================================================
     // ============= IAnimationAdapter ===============
@@ -81,10 +92,10 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
     public Vector2 MoveAnimationDirection {
         get => playerFaceDirection;
-                set {
+        set {
             playerFaceDirection = new Vector2(value.x, value.y);
             animator.SetFloat("x", value.x);
-            animator.SetFloat("y", value.y);            
+            animator.SetFloat("y", value.y);
         }
     }
 
@@ -93,14 +104,14 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     }
 
     public bool EatAnimation {
-        set => animator.SetTrigger("EatTrigger");        
+        set => animator.SetTrigger("EatTrigger");
     }
 
     // ================================================
     // ============= IPlayerStatusAdapter =============
     // ================================================
 
-    public IntVariable playerId;
+
     public IntVariable playerLevel;
     public IntVariable playerMaxHealth;
     public IntVariable playerCurrentHealth;
@@ -115,54 +126,56 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
 
 
     // プレイヤーのHPを変更するメソッド
-    public void ChangePlayerCurrentHealth(int value){
-        if(value < 0){
+    public void ChangePlayerCurrentHealth(int value) {
+        if (value < 0) {
             Debug.Log("PlayerのHPが0以下になりました。");
             playerCurrentHealth.Value = 0;
             OnPlayerHPChanged.Raise();
-        } else if(value > playerMaxHealth.Value){
+            return;
+        } else if (value > playerMaxHealth.Value) {
             Debug.Log("PlayerのHPが最大値を超えました。");
             playerCurrentHealth.Value = playerMaxHealth.Value;
             OnPlayerHPChanged.Raise();
-        } else{            
+            return;
+        } else {
             playerCurrentHealth.Value = value;
             OnPlayerHPChanged.Raise();
         }
     }
 
     // プレイヤーの最大HPを変更するメソッド
-    public void ChangePlayerMaxHealth(int value){        
+    public void ChangePlayerMaxHealth(int value) {
         playerMaxHealth.Value = value;
         playerCurrentHealth.Value = value;
         OnPlayerHPChanged.Raise();
     }
 
     // プレイヤーのレベルを変更するメソッド
-    public void ChangePlayerLevel(int value){
-        if(playerLevel.Value <= 1) return;        
-        playerLevel.Value += value;
+    public void ChangePlayerLevel(int value) {
+        if (playerLevel.Value <= 1) return;
+        playerLevel.Value = value;
         OnPlayerLevelChanged.Raise();
     }
 
     // プレイヤーの経験値を変更するメソッド
-    public void ChangePlayerExperience(int value){
-        playerExperience.Value += value;        
+    public void ChangePlayerExperience(int value) {
+        playerExperience.Value = value;
 
         // レベルアップ判定
-        if(playerExperience.Value >= DungeonConstants.necessarryExp[playerLevel.Value + 1]){
-            playerLevel.Value++;                        
+        if (playerExperience.Value >= DungeonConstants.necessarryExp[playerLevel.Value + 1]) {
+            playerLevel.Value++;
         }
     }
 
-    public void ChangePlayerMaxMuscle(int value){
+    public void ChangePlayerMaxMuscle(int value) {
         playerMaxMuscle.Value += value;
         playerCurrentMuscle.Value += value;
     }
 
-    public void ChangePlayerCurrentMuscle(int value){
+    public void ChangePlayerCurrentMuscle(int value) {
         playerCurrentMuscle.Value += value;
     }
-    
+
 
     // Additional properties
     public int Level { get; set; }
@@ -211,33 +224,31 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     // ================================================
     public void InitializePlayer() {
         SetPlayerStatusDefault();
-        Id = CharacterManager.GetUniqueID();
+        //Id = CharacterManager.GetUniqueID();
         CharacterManager.i.AddCharacter(this);
-        playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
+        Position.SetValue(new Vector2Int((int)transform.position.x, (int)transform.position.y));
         playerAnimLogic = new PlayerAnimLogic(this);
-        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this, CompletePlayerStateChannel);
-        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this, CompletePlayerStateChannel, this);
+        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this, OnPlayerStateComplete);
+        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this, OnPlayerStateComplete, this);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this, this);
         createMessageLogic = new CreateMessageLogic();
-        playerInventory = new PlayerInventory(CompletePlayerStateChannel);
+        playerInventory = new PlayerInventory(OnPlayerStateComplete);
         // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
-        playerStatusDataLogic.SetStatusDefault(this);
-        playerStatusDataLogic.SetObjectDataDefault(this);
         MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
-        stateMachine = GameAssets.i.stateMachine;
-
     }
 
-    private void SetPlayerStatusDefault(){
-        ChangePlayerMaxHealth(15);        
-        ChangePlayerMaxMuscle(8);
-        ChangePlayerLevel(1);
-        ChangePlayerCurrentHealth(playerMaxHealth.Value);
-        ChangePlayerCurrentMuscle(playerMaxMuscle.Value);
-        playerBasicAttackPower.Value = 0;
-        playerDefencePower.Value = 0;
+    private void SetPlayerStatusDefault() {
+        if (resetStatus) {
+            ChangePlayerMaxHealth(15);
+            ChangePlayerMaxMuscle(8);
+            ChangePlayerLevel(1);
+            ChangePlayerCurrentHealth(playerMaxHealth.Value);
+            ChangePlayerCurrentMuscle(playerMaxMuscle.Value);
+            playerBasicAttackPower.Value = 0;
+            playerDefencePower.Value = 0;
+        }
     }
 
     public void TakeDamage(int damage, string dealerName) {
@@ -255,14 +266,14 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         playerAnimLogic.SetEatAnimation();
 
         //体力MAXの場合
-        if(playerMaxHealth.Value == playerCurrentHealth.Value){
+        if (playerMaxHealth.Value == playerCurrentHealth.Value) {
             ChangePlayerMaxHealth(playerMaxHealth.Value + 1);
             MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateMaxHpUpMessage(1));
             return;
         }
         int healAmount = Mathf.Clamp(amount, 0, playerMaxHealth.Value - playerCurrentHealth.Value);
         ChangePlayerCurrentHealth(healAmount);
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateHealMessage(healAmount, Name));
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateHealMessage(healAmount, Name.Value));
     }
 
     public IPlayerStatusAdapter InformPlayerStatusAdapter() {

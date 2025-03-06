@@ -12,19 +12,20 @@ public class Item : MonoBehaviour, IObjectData
     // ========================================================
     // オブジェクトデータ
     // ========================================================
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Type { get; set; }
-    public Vector2Int Position {
-        get => _position;
+    public IntVariable Id{get;set;}
+    public StringVariable Name{get;set;}
+    public StringVariable Type{get;set;}
+    public IntVariable RoomNum{get;set;}
+
+    public Vector2IntVariable Position {
+        get => Position;
         set{
-            _position = value;
-            transform.position = value.ToVector2() + moveOffset;
-            RoomNum = TileManager.i.LookupRoomNum(value);
+            Position.SetValue(value);
+            transform.position = Position.Value.ToVector2() + moveOffset;
+            RoomNum.SetValue(TileManager.i.LookupRoomNum(Position.Value));
             OnObjectUpdated?.Invoke(this);
         }
     }
-    public int RoomNum { get; set; }
 
     // キャラクターマネージャーによって更新される
     public event System.Action<IObjectData> OnObjectUpdated;
@@ -36,11 +37,11 @@ public class Item : MonoBehaviour, IObjectData
 
     public void Initialize()
     {
-        Id = CharacterManager.GetUniqueID();
-        Name = itemSO.name;
-        Type = "Item";
-        Position = new Vector2Int(0, 0);
-        RoomNum = 0;
+        Id.SetValue(CharacterManager.GetUniqueID());
+        Name.Value=itemSO.name;
+        Type.Value="Item";
+        Position.SetValue(new Vector2Int(0, 0));
+        RoomNum.SetValue(0);
         gameObject.GetComponent<SpriteRenderer>().sprite = itemSO.icon;
         CharacterManager.i.AddCharacter(this);
     }    

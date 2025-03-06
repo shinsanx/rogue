@@ -11,7 +11,7 @@ public class PlayerAttackLogic
     private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
     private bool isAttacking = false;
-    private VoidEventChannelSO CompletePlayerStateChannel;    
+    private GameEvent OnPlayerStateComplete;    
     private Player player;
     
 
@@ -21,14 +21,14 @@ public class PlayerAttackLogic
         IAnimationAdapter animationAdapter,
         IObjectData objectData,
         IPlayerStatusAdapter playerStatusAdapter,        
-        VoidEventChannelSO CompletePlayerStateChannel,
+        GameEvent OnPlayerStateComplete,
         Player player
     ){
         this.playerAnimLogic = playerAnimLogic;
         this.animationAdapter = animationAdapter;
         this.objectData = objectData;
         this.playerStatusAdapter = playerStatusAdapter;                
-        this.CompletePlayerStateChannel = CompletePlayerStateChannel;        
+        this.OnPlayerStateComplete = OnPlayerStateComplete;        
         this.player = player;
     }
 
@@ -37,12 +37,12 @@ public class PlayerAttackLogic
         playerAnimLogic.SetAttackAnimation();
         DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition())); 
         LockInputWhileAttacking();
-        CompletePlayerStateChannel.RaiseEvent();
+        OnPlayerStateComplete.Raise();
     }
 
     private Vector2Int GetTargetPosition(){
-        int selfXpos = Mathf.FloorToInt(player.Position.x);
-        int selfYpos = Mathf.FloorToInt(player.Position.y);
+        int selfXpos = Mathf.FloorToInt(player.Position.Value.x);
+        int selfYpos = Mathf.FloorToInt(player.Position.Value.y);
         int faceXpos = (int)Mathf.Round(player.MoveAnimationDirection.x);
         int faceYpos = (int)Mathf.Round(player.MoveAnimationDirection.y);
         Vector2Int targetVector = new Vector2Int(selfXpos + faceXpos, selfYpos + faceYpos);
@@ -66,7 +66,7 @@ public class PlayerAttackLogic
         IMonsterStatusAdapter monsterStatusAdapter = targetObject.GetComponent<IMonsterStatusAdapter>();
         int damage = damageCalculate.CalculateAttackDamage(player.playerLevel.Value, player.playerMaxMuscle.Value, weaponPw, monsterStatusAdapter.Defence);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
-        damageable.TakeDamage(damage, player.Name);
+        damageable.TakeDamage(damage, player.Name.Value);
     }
 
     async void LockInputWhileAttacking(){

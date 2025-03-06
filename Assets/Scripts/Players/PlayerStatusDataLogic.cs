@@ -24,25 +24,7 @@ public class PlayerStatusDataLogic
         player.ChangePlayerMaxHealth(player.playerMaxHealth.Value + randUpHP);        
     }
 
-    public void SetStatusDefault(IPlayerStatusAdapter playerStatusAdapter){        
-        playerStatusAdapter.Level = 1;
-        playerStatusAdapter.MaxHealth = 15;
-        playerStatusAdapter.health = 15;
-        playerStatusAdapter.MaxSatiety = 100;
-        playerStatusAdapter.Satiety = 100;
-        playerStatusAdapter.MaxMuscle = 8;
-        playerStatusAdapter.Muscle = 8;
-        playerStatusAdapter.BasicAttackPower = 0;
-        playerStatusAdapter.DefencePower = 0;
-        playerStatusAdapter.Experience = 0;
-        playerStatusAdapter.EquipWeapon = null;
-        playerStatusAdapter.EquipShield = null;
-    }
-
-    public void SetObjectDataDefault(IObjectData objectData){
-        objectData.Name = "トルネコ";   
-        objectData.Type = "Player";
-    }
+    
 
     public void TakeDamage(int damage, string dealerName){
         Debug.Log("ダメージを受けました" + damage);

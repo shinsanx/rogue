@@ -38,7 +38,7 @@ public class ArrangeManager : MonoBehaviour {
         GameObject itemObject = Instantiate(itemPrefab, position.ToVector2(), Quaternion.identity);
         itemObject.transform.SetParent(itemParent.transform);
         itemObject.GetComponent<Item>().Initialize();
-        itemObject.GetComponent<IObjectData>().Position = position;
+        itemObject.GetComponent<IObjectData>().Position.SetValue(position);
     }
 
     public async Task ArrangeEnemyToRandomPosition() {
@@ -54,6 +54,6 @@ public class ArrangeManager : MonoBehaviour {
         GameObject enemyObject = Instantiate(enemyPrefab, position.ToVector2(), Quaternion.identity);
         enemyObject.transform.SetParent(enemyParent.transform);
         enemyObject.GetComponent<Enemy>().InitializeEnemy();
-        enemyObject.GetComponent<IObjectData>().Position = position;
+        enemyObject.GetComponent<IObjectData>().Position.SetValue(position);
     }
 }

@@ -11,7 +11,6 @@ public class DungeonStateManager : MonoBehaviour {
     State enemyState;
     [SerializeField] GameObject enemyParent;
     [SerializeField] EnemyManager enemyManager;
-    [SerializeField] VoidEventChannelSO CompletePlayerStateChannel;
     DungeonStateLogic dungeonStateLogic;
 
 
@@ -27,8 +26,7 @@ public class DungeonStateManager : MonoBehaviour {
 
         playerState.OnExitEvent += dungeonStateLogic.PlayerStateExit;
         enemyState.OnExitEvent += dungeonStateLogic.EnemyStateExit;
-
-        CompletePlayerStateChannel.OnEventRaised += PlayerActionComplete;
+        
     }
 
     // Playerのターンを終わらせる

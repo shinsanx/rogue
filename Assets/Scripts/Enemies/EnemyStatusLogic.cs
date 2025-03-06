@@ -34,8 +34,8 @@ public class EnemyStatusLogic
         monsterStatusAdapter.AnimatorController = monsterStatusSO.AnimatorController;
         monsterStatusAdapter.Sprite = monsterStatusSO.Sprite;
 
-        objectData.Name = monsterStatusSO.Name;
-        objectData.Type = "Enemy";        
+        objectData.Name.Value = monsterStatusSO.Name;
+        objectData.Type.Value = "Enemy";        
     }
 
     

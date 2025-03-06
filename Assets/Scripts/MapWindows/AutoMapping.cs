@@ -69,15 +69,15 @@ public class AutoMapping : MonoBehaviour {
         ClearCharacterUI();
         
         foreach (var objectData in CharacterManager.i.allObjectData) {
-            switch (objectData.Type) {
+            switch (objectData.Type.Value) {
                 case "Enemy":
-                    CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position + offset, scale, startPosition);
+                    CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position.Value + offset, scale, startPosition);
                     break;
                 case "Player":
-                    CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position + offset, scale, startPosition);
+                    CreateUIElement(playerImagePrefab, enemies.transform, objectData.Position.Value + offset, scale, startPosition);
                     break;
                 case "Item":
-                    CreateUIElement(itemImagePrefab, items.transform, objectData.Position + offset, scale, startPosition);
+                    CreateUIElement(itemImagePrefab, items.transform, objectData.Position.Value + offset, scale, startPosition);
                     break;
             }
         }

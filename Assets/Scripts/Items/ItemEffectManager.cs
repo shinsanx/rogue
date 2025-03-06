@@ -36,7 +36,7 @@ public class ItemEffectManager : MonoBehaviour {
         }
         int healAmount = Mathf.Clamp(amount, 0, player.MaxHealth - player.health);
         player.health += amount;
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, player.Name));
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, player.Name.Value));
     }
 
     public void HealEnemy(Enemy enemy, int amount) {

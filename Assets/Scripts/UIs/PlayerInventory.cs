@@ -5,18 +5,18 @@ using UnityEngine.Events;
 using System.Threading.Tasks;
 public class PlayerInventory {
 
-    public PlayerInventory(VoidEventChannelSO CompletePlayerStateChannel){
+    public PlayerInventory(GameEvent OnPlayerStateComplete){
         if(createMessageLogic == null){
             createMessageLogic = new CreateMessageLogic();
         }
-        this.CompletePlayerStateChannel = CompletePlayerStateChannel;
+        this.OnPlayerStateComplete = OnPlayerStateComplete;
     }
     private const int MAX_ITEMS = 24; 
 
     // アイテムとその数量を管理する辞書
     private List<ItemSO> items = new List<ItemSO>();
     private CreateMessageLogic createMessageLogic;
-    private VoidEventChannelSO CompletePlayerStateChannel;
+    private GameEvent OnPlayerStateComplete;
     // インベントリが更新された時に発行されるイベント
     public event Action OnInventoryUpdated;
     
@@ -56,7 +56,7 @@ public class PlayerInventory {
             if (item is ConsumableSO consumable) {
                 MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateUseItemMessage(consumable.itemName));
                 consumable.effect.ApplyEffect(receiver);
-                CompletePlayerStateChannel.RaiseEvent();
+                OnPlayerStateComplete.Raise();
                 //Debug.Log($"{consumable.itemName} を使用しました。");                                
             } else {
                 Debug.Log("このアイテムは使用できません。");
@@ -71,7 +71,7 @@ public class PlayerInventory {
         GameObject itemPrefab = CharacterManager.i.GetItemPrefab(item.id);
         ArrangeManager.i.PlaceItem(itemPrefab, position);
         RemoveItem(item);
-        CompletePlayerStateChannel.RaiseEvent();
+        OnPlayerStateComplete.Raise();
         MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreatePlaceItemMessage(item.itemName));
     }
 
@@ -88,14 +88,14 @@ public class PlayerInventory {
             ItemEffectManager.i.ApplyItemEffect(item, CharacterManager.i.GetObjectByPosition(throwPosition));
             await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
             RemoveItem(item);
-            CompletePlayerStateChannel.RaiseEvent();
+            OnPlayerStateComplete.Raise();
             return;
         }
         GameObject itemPrefab = CharacterManager.i.GetItemPrefab(item.id);
         await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
         ArrangeManager.i.PlaceItem(itemPrefab, throwPosition);
         RemoveItem(item);
-        CompletePlayerStateChannel.RaiseEvent();
+        OnPlayerStateComplete.Raise();
         MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateThrowItemMessage(item.itemName));
     }
 

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public interface IObjectData
 {
-    int Id {get;set;}
-    string Name {get;set;}
-    string Type{get;set;}
-    Vector2Int Position{get;set;}
-    int RoomNum{get;set;}
+    IntVariable Id {get;set;}
+    StringVariable Name {get;set;}
+    StringVariable Type{get;set;}
+    Vector2IntVariable Position{get;set;}
+    IntVariable RoomNum{get;set;}
 
     // オブジェクト更新時のイベント
     event System.Action<IObjectData> OnObjectUpdated;

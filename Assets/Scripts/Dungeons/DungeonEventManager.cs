@@ -39,13 +39,13 @@ public class DungeonEventManager : MonoBehaviour {
             await InitializePlayer();
 
             // 8. モンスターの生成
-            await GenerateEnemies();
+            //await GenerateEnemies();
 
             // 9. インベントリUIの初期化
             // await InitializeInventoryUI();
 
             // 10. アイテムの生成（必要に応じて実装）
-            await GenerateItems();
+            //await GenerateItems();
 
             // 11. ミニマップの生成
             await CreateMiniMap();
@@ -85,7 +85,7 @@ public class DungeonEventManager : MonoBehaviour {
 
     private Task InitializePlayer() {
         player.InitializePlayer();
-        player.GetComponent<IObjectData>().Position = TileManager.i.GetRandomPosition();
+        player.GetComponent<IObjectData>().Position.SetValue(TileManager.i.GetRandomPosition());
         return Task.CompletedTask;
     }
 

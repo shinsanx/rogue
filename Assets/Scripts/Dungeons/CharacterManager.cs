@@ -64,7 +64,7 @@ public class CharacterManager : MonoBehaviour {
     // 指定された位置にあるオブジェクトを取得する    
     public GameObject GetObjectByPosition(Vector2Int position) {
         // allObjectData から一致する IObjectData を検索
-        var matchingObject = allObjectData.FirstOrDefault(obj => obj.Position == position);
+        var matchingObject = allObjectData.FirstOrDefault(obj => obj.Position.Value == position);
 
         if (matchingObject != null) {
             // IObjectData から GameObject を取得 (キャストが必要)
@@ -81,17 +81,17 @@ public class CharacterManager : MonoBehaviour {
 
     //positionから存在するオブジェクトのタイプを返す
     public string GetObjectTypeByPosition(Vector2Int position) {
-        var obj = allObjectData.FirstOrDefault(obj => obj.Position == position);
+        var obj = allObjectData.FirstOrDefault(obj => obj.Position.Value == position);
         if (obj == null) {
             // Debug.Log($"{position}にはタイプが見つかりません");
             return null;
         }
-        return obj.Type;
+        return obj.Type.Value;
     }
 
     //指定された部屋番号のオブジェクトを取得する
     public List<GameObject> GetObjectsInSameRoom(int roomNum) {        
-        IEnumerable<IObjectData> objectsInRoom = allObjectData.Where(obj => obj.RoomNum == roomNum);
+        IEnumerable<IObjectData> objectsInRoom = allObjectData.Where(obj => obj.RoomNum.Value == roomNum);
 
         // MonoBehaviourにキャストしてGameObjectを取得
         IEnumerable<GameObject> gameObjects = objectsInRoom.Select(data => {
@@ -105,7 +105,7 @@ public class CharacterManager : MonoBehaviour {
 
     //プレイヤーを取得する
     public GameObject GetPlayer() {
-        var obj = allObjectData.FirstOrDefault(obj => obj.Type == "Player");
+        var obj = allObjectData.FirstOrDefault(obj => obj.Type.Value == "Player");
         if(obj != null) {
             MonoBehaviour monoBehaviour = obj as MonoBehaviour;            
             return monoBehaviour?.gameObject;
@@ -117,7 +117,7 @@ public class CharacterManager : MonoBehaviour {
     //すべてのEnemyを取得する
     public List<Enemy> GetAllEnemies() {
         // Enemyタイプのオブジェクトのみを抽出
-        var enemyObjects = allObjectData.Where(obj => obj.Type == "Enemy");
+        var enemyObjects = allObjectData.Where(obj => obj.Type.Value == "Enemy");
         
         // Enemyクラスにキャスト
         var enemies = enemyObjects.Select(obj => obj as Enemy);

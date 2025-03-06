@@ -23,6 +23,6 @@ public class EnemyMoveLogic
         enemyAnimLogic.SetMoveAnimation(new Vector2(direction.x, direction.y));
 
         Vector2 newPosition = targetPos + moveOffset;
-        objectData.Position = newPosition.ToVector2Int(); 
+        objectData.Position.SetValue(newPosition.ToVector2Int()); 
     }
 }

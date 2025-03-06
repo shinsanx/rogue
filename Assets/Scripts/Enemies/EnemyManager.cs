@@ -33,7 +33,7 @@ public class EnemyManager : MonoBehaviour {
     public async Task ProcessEnemies() {
 
         //最初にプレイヤーの位置を取得
-        playerPos = player.GetComponent<IObjectData>().Position;
+        playerPos = player.GetComponent<IObjectData>().Position.Value;
 
         if (stateMachine.CurrentState != enemyState) return;
         enemies = CharacterManager.i.GetAllEnemies();
@@ -85,7 +85,7 @@ public class EnemyManager : MonoBehaviour {
     // ========================================================
 
     private void UpdateEnemyState() {
-        enemyCurrentPos = objectData.Position;
+        enemyCurrentPos = objectData.Position.Value;
         enemyAIState.IsInRoomAtStart = TileManager.i.LookupRoomNum(enemyCurrentPos) != 0;
         enemyAIState.StartPosition = enemyCurrentPos;
         enemyTargetPos = enemyAIState.TargetPosition;        

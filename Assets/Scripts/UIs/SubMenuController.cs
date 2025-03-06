@@ -75,7 +75,7 @@ public class SubMenuController : BaseMenuController {
 
     //アイテムを置く
     private void PlaceItem() {
-        player.playerInventory.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position);
+        player.playerInventory.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
         MenuManager.Instance.CloseAllMenus();
     }
 
@@ -83,6 +83,6 @@ public class SubMenuController : BaseMenuController {
     private async Task ThrowItem() {
         MenuManager.Instance.CloseAllMenus();        
         Vector2Int direction = player.MoveAnimationDirection.RoundVector2().ToVector2Int();
-        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position, direction);
+        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value, direction);
     }
 }

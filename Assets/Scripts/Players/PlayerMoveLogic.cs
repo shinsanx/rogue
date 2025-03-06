@@ -13,15 +13,15 @@ public class PlayerMoveLogic {
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
-    private VoidEventChannelSO CompletePlayerStateChannel;
+    private GameEvent OnPlayerStateComplete;
 
     //コンストラクタ
-    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic, Player player, VoidEventChannelSO CompletePlayerStateChannel) {
+    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic, Player player, GameEvent OnPlayerStateComplete) {
         this.objectData = objectData;
         this.playerAnimLogic = playerAnimLogic;
         this.stateMachine = GameAssets.i.stateMachine;
         this.player = player;
-        this.CompletePlayerStateChannel = CompletePlayerStateChannel;
+        this.OnPlayerStateComplete = OnPlayerStateComplete;
     }
 
     Vector2 inputVector;
@@ -39,7 +39,7 @@ public class PlayerMoveLogic {
             roundY = Mathf.Round(inputVector.y);
 
             Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
-            Vector2Int currentPos = objectData.Position;
+            Vector2Int currentPos = objectData.Position.Value;
             Vector2Int targetPos = inputVectorInt + currentPos;
 
             if (isMoving) return;
@@ -92,8 +92,8 @@ public class PlayerMoveLogic {
             }
 
             Vector2 newPosition = targetPos + moveOffset;
-            objectData.Position = newPosition.ToVector2Int();
-            CompletePlayerStateChannel.RaiseEvent();
+            objectData.Position.SetValue(newPosition.ToVector2Int());
+            OnPlayerStateComplete.Raise();
     }
 
     // async void LockInputWhileMoving() {

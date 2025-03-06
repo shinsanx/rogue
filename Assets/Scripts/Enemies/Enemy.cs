@@ -23,11 +23,11 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     // ========================================================
     // =================== IPositionAdapter ===================
     // ========================================================
-    public Vector2Int Position {
-        get { return _enemyPosition; }
+    public Vector2IntVariable Position {
+        get { return Position; }
         set {            
-             transform.DOMove(value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
-             _enemyPosition = value;
+             transform.DOMove(Position.Value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
+             Position.SetValue(value);
              OnObjectUpdated.Invoke(this);
         }
     }
@@ -35,10 +35,15 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     // ========================================================
     // ===================== IObjectData =====================
     // ========================================================
-    public int Id { get; set; }
-    public string Name { get; set; }
-    string IObjectData.Type { get; set; }
-    int IObjectData.RoomNum { get; set; }
+    //public int Id { get; set; }
+    //public string Name { get; set; }
+    //string IObjectData.Type { get; set; }
+    //int IObjectData.RoomNum { get; set; }
+
+    public IntVariable Id{get;set;}
+    public StringVariable Name{get;set;}
+    public StringVariable Type{get;set;}
+    public IntVariable RoomNum{get;set;}    
     
     // オブジェクトが更新された時に呼び出されるイベント
     // subscribeしているのは
@@ -153,7 +158,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);        
 
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
-        Id = CharacterManager.GetUniqueID(); // Assign a unique ID
+        Id.SetValue(CharacterManager.GetUniqueID()); // Assign a unique ID
         CharacterManager.i.AddCharacter(this);
 
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように

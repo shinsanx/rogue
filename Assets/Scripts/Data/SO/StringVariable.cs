@@ -11,4 +11,12 @@ public class StringVariable : ScriptableObject
         get => value;
         set => this.value = value;
     }
+
+    public void SetValue(string value) {
+        this.value = value;
+    }
+
+    public void SetValue(StringVariable value) {
+        this.value = value.Value;
+    }
 }

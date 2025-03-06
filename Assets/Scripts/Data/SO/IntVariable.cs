@@ -23,6 +23,7 @@ public class IntVariable : ScriptableObject
         Value = value.Value;
     }
 
+
     
     
     
