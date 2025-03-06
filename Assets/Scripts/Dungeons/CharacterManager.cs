@@ -58,7 +58,6 @@ public class CharacterManager : MonoBehaviour {
     public void RemoveCharacter(IObjectData character) {
         character.OnObjectUpdated -= UpdateObjectInfo;
         allObjectData.Remove(character);
-        Debug.Log($"unregistered: {character.Name}");
     }
 
 

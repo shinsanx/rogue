@@ -54,7 +54,6 @@ public class MainMenuController : BaseMenuController {
     /// 決定時の処理。選択中の項目に応じて、必要な処理（たとえば InventoryUI を開いたり）を実行
     /// </summary>
     public override void Submit() {
-        Debug.Log("MainMenuController Submit");
         switch (currentIndex) {
             case 0:                
                 // InventoryUI を呼び出す

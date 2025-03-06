@@ -15,7 +15,7 @@ public class MessageBox : MonoBehaviour {
 
     [SerializeField] private GameObject texts;
     [SerializeField] private GameObject box;
-    
+
     private readonly Queue<List<string>> messageQueue = new Queue<List<string>>();
     private bool isProcessing = false;
     private CancellationTokenSource cancellationTokenSource;
@@ -40,18 +40,23 @@ public class MessageBox : MonoBehaviour {
     /// </summary>
     /// <param name="messages">表示するメッセージのリスト</param>
     /// <returns>非同期タスク</returns>
-    public async Task EnqueueMessageAsync(List<string> messages) {        
-        if (messages == null || messages.Count == 0) return;
+    public async Task EnqueueMessageAsync(List<string> messages) {
+        if (messages == null || messages.Count == 0) {
+            Debug.LogError("messages is null or empty");
+            return;
+        }
 
         // 既存の処理がある場合はキャンセル
         if (isProcessing && cancellationTokenSource != null) {
             await Task.Delay(1000);
-            cancellationTokenSource.Cancel();
-            messageQueue.Clear();
+            if (cancellationTokenSource != null) {
+                cancellationTokenSource.Cancel();
+                messageQueue.Clear();
+            }
         }
 
         messageQueue.Enqueue(messages);
-        if (!isProcessing) {
+        if (!isProcessing) {            
             await ProcessMessagesAsync();
         }
     }
@@ -73,14 +78,11 @@ public class MessageBox : MonoBehaviour {
                 }
                 await DisplayMessagesAsync(messages, token);
             }
-        }
-        catch (OperationCanceledException) {
+        } catch (OperationCanceledException) {
             // Debug.Log("メッセージ処理がキャンセルされました。");
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Debug.LogError($"予期せぬエラーが発生しました: {ex.Message}");
-        }
-        finally {
+        } finally {
             isProcessing = false;
             cancellationTokenSource.Dispose();
             cancellationTokenSource = null;
@@ -101,10 +103,10 @@ public class MessageBox : MonoBehaviour {
         texts.transform.DOLocalMove(initialTextsPos, 0.0f).SetUpdate(true);
 
         TextMeshProUGUI[] textFields = { firstText, secondText, thirdText, fourthText };
-        for (int i = 0; i < messages.Count && i < textFields.Length; i++) {            
+        for (int i = 0; i < messages.Count && i < textFields.Length; i++) {
             token.ThrowIfCancellationRequested();
 
-            textFields[i].text = messages[i];            
+            textFields[i].text = messages[i];
             if (i >= 0) {
                 await Task.Delay(300, token);
             }

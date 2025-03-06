@@ -30,10 +30,7 @@ public class DungeonEventManager : MonoBehaviour {
             await InitializeRandomMapGenerator();
 
             // 4. キャラクターマネージャーの初期化
-            await InitializeCharacterManager();
-
-            // 5. ステータスUIの初期化
-            await InitializeStatusUI();
+            await InitializeCharacterManager();                        
 
             // 6. ダンジョンステートマネージャーの初期化
             await InitializeDungeonStateManager();
@@ -79,12 +76,7 @@ public class DungeonEventManager : MonoBehaviour {
     private Task InitializeCharacterManager() {
         CharacterManager.i.Initialize();
         return Task.CompletedTask;
-    }
-
-    private Task InitializeStatusUI() {
-        statusUI.Initialize();
-        return Task.CompletedTask;
-    }
+    }    
 
     private Task InitializeDungeonStateManager() {
         dungeonStateManager.Initialize();

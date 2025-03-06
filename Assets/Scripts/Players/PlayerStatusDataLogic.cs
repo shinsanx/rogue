@@ -7,24 +7,21 @@ public class PlayerStatusDataLogic
     private IPlayerStatusAdapter playerStatusAdapter;    
     private IAnimationAdapter animationAdapter;
     private List<string> messages = new List<string>();
-
-    public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData){
+    private Player player;
+    public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData, Player player){
         this.playerStatusAdapter = playerStatusAdapter;
         this.animationAdapter = animationAdapter;        
+        this.player = player;
     }    
 
     public async void GetExp(object exp){
         await System.Threading.Tasks.Task.Delay(1500); //最悪！メッセージシステム自体直す
-        playerStatusAdapter.Experience += (int)exp;
+        player.ChangePlayerExperience((int)exp);
     }
 
-    public void LevelUp(){
-        if(playerStatusAdapter.Level == 1){
-            return;
-        }
+    public void LevelUp(){        
         int randUpHP = Random.Range(3,7);
-        playerStatusAdapter.MaxHealth += randUpHP;
-        playerStatusAdapter.health += randUpHP;
+        player.ChangePlayerMaxHealth(player.playerMaxHealth.Value + randUpHP);        
     }
 
     public void SetStatusDefault(IPlayerStatusAdapter playerStatusAdapter){        
@@ -45,11 +42,11 @@ public class PlayerStatusDataLogic
     public void SetObjectDataDefault(IObjectData objectData){
         objectData.Name = "トルネコ";   
         objectData.Type = "Player";
-
     }
 
     public void TakeDamage(int damage, string dealerName){
-        playerStatusAdapter.health -= damage;
+        Debug.Log("ダメージを受けました" + damage);
+        player.ChangePlayerCurrentHealth(player.playerCurrentHealth.Value - damage);
         animationAdapter.TakeDamageAnimation = true;
 
         //Todo: dealerのタグによってメッセージを変える。Enemyかその他か

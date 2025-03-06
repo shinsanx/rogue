@@ -17,4 +17,8 @@ public class PlayerAnimLogic
     public void SetAttackAnimation(){        
         animationAdapter.AttackAnimation = true;
     }
+
+    public void SetEatAnimation(){
+        animationAdapter.EatAnimation = true;
+    }
 }

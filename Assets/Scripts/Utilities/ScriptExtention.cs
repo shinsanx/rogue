@@ -52,4 +52,8 @@ public static class ScriptExtention {
         Vector3 vector = new Vector3(self.x, self.y, 0);
         return vector;
     }
+
+    public static Vector2 RoundVector2(this Vector2 self){
+        return new Vector2(Mathf.RoundToInt(self.x), Mathf.RoundToInt(self.y));
+    }
 }

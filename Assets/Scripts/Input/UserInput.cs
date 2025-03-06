@@ -105,11 +105,11 @@ public class UserInput : MonoBehaviour {
         if (playerActionMap.enabled) {
             playerActionMap.Disable();
             uiActionMap.Enable();
-            Debug.Log("playerActionMap.Disable");
+            // Debug.Log("playerActionMap.Disable");
         } else if (MenuManager.Instance.activeMenus.Count == 0) {
             playerActionMap.Enable();
             uiActionMap.Disable();
-            Debug.Log("playerActionMap.Enable");
+            // Debug.Log("playerActionMap.Enable");
         }        
     }
 

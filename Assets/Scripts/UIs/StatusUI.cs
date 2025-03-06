@@ -11,37 +11,29 @@ public class StatusUI : MonoBehaviour {
     [SerializeField] TextMeshProUGUI currentLvTxt;
     [SerializeField] TextMeshProUGUI currentGoldTxt;
     [SerializeField] Image healthBarGage;
-    private Player player;
-
-    private void OnDestroy() {
-        if (player != null) {
-            player.OnHealthChanged -= UpdateHPText;
-            player.OnLvChanged -= UpdateLvText;
-        }
-    }
+    
+    [SerializeField] IntVariable playerCurrentHealth;
+    [SerializeField] IntVariable playerMaxHealth;
+    [SerializeField] IntVariable playerLevel;
+    [SerializeField] IntVariable playerExperience;    
+    [SerializeField] StringVariable playerName;
+    
 
     //本当はロジックに移行したい。StatusUILogicとか作って
-    public void UpdateHPText(int currentHp, int maxHp) {
+    public void UpdateHPText() {
         string updateTxt = null;
-        maxHPTxt.text = updateTxt.ConvertNumToUpperString(maxHp);
-        currentHPTxt.text = updateTxt.ConvertNumToUpperString(currentHp);
+        maxHPTxt.text = updateTxt.ConvertNumToUpperString(playerMaxHealth.Value);
+        currentHPTxt.text = updateTxt.ConvertNumToUpperString(playerCurrentHealth.Value);
 
-        healthBarGage.fillAmount = (float)currentHp / (float)maxHp;
+        healthBarGage.fillAmount = (float)playerCurrentHealth.Value / (float)playerMaxHealth.Value;
     }
 
-    public void UpdateLvText(int level) {
+    public void UpdateLvText() {
         string updateTxt = null;
-        currentLvTxt.text = updateTxt.ConvertNumToUpperString(level);
-        if (level == 1) return;
+        currentLvTxt.text = updateTxt.ConvertNumToUpperString(playerLevel.Value);
+        if (playerLevel.Value == 1) return;
 
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.LvUppedMessage(player.Name, level));
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.LvUppedMessage(playerName.Value, playerLevel.Value));
     }
-
-    public void Initialize() {
-        player = FindObjectOfType<Player>();
-        if (player != null) {
-            player.OnHealthChanged += UpdateHPText;
-            player.OnLvChanged += UpdateLvText;
-        }
-    }
+    
 }

@@ -11,6 +11,8 @@ public class PlayerAttackLogic
     private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
     private bool isAttacking = false;
+    private VoidEventChannelSO CompletePlayerStateChannel;    
+    private Player player;
     
 
     //コンストラクタ
@@ -18,12 +20,16 @@ public class PlayerAttackLogic
         PlayerAnimLogic playerAnimLogic,
         IAnimationAdapter animationAdapter,
         IObjectData objectData,
-        IPlayerStatusAdapter playerStatusAdapter
+        IPlayerStatusAdapter playerStatusAdapter,        
+        VoidEventChannelSO CompletePlayerStateChannel,
+        Player player
     ){
         this.playerAnimLogic = playerAnimLogic;
         this.animationAdapter = animationAdapter;
         this.objectData = objectData;
         this.playerStatusAdapter = playerStatusAdapter;                
+        this.CompletePlayerStateChannel = CompletePlayerStateChannel;        
+        this.player = player;
     }
 
     public void Attack(){
@@ -31,14 +37,14 @@ public class PlayerAttackLogic
         playerAnimLogic.SetAttackAnimation();
         DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition())); 
         LockInputWhileAttacking();
-        ActionEventManager.NotifyActionComplete();
+        CompletePlayerStateChannel.RaiseEvent();
     }
 
     private Vector2Int GetTargetPosition(){
-        int selfXpos = Mathf.FloorToInt(objectData.Position.x);
-        int selfYpos = Mathf.FloorToInt(objectData.Position.y);
-        int faceXpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.x);
-        int faceYpos = (int)Mathf.Round(animationAdapter.MoveAnimationDirection.y);
+        int selfXpos = Mathf.FloorToInt(player.Position.x);
+        int selfYpos = Mathf.FloorToInt(player.Position.y);
+        int faceXpos = (int)Mathf.Round(player.MoveAnimationDirection.x);
+        int faceYpos = (int)Mathf.Round(player.MoveAnimationDirection.y);
         Vector2Int targetVector = new Vector2Int(selfXpos + faceXpos, selfYpos + faceYpos);
         return targetVector;
     }
@@ -51,21 +57,21 @@ public class PlayerAttackLogic
         }
 
         int weaponPw;
-        if(playerStatusAdapter.EquipWeapon != null){
-            weaponPw = playerStatusAdapter.EquipWeapon.attackPower;
+        if(player.EquipWeapon != null){
+            weaponPw = player.EquipWeapon.attackPower;
         } else{
             weaponPw = 1;
         }
 
         IMonsterStatusAdapter monsterStatusAdapter = targetObject.GetComponent<IMonsterStatusAdapter>();
-        int damage = damageCalculate.CalculateAttackDamage(playerStatusAdapter.Level, playerStatusAdapter.Muscle, weaponPw, monsterStatusAdapter.Defence);
+        int damage = damageCalculate.CalculateAttackDamage(player.playerLevel.Value, player.playerMaxMuscle.Value, weaponPw, monsterStatusAdapter.Defence);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
-        damageable.TakeDamage(damage, objectData.Name);
+        damageable.TakeDamage(damage, player.Name);
     }
 
     async void LockInputWhileAttacking(){
         isAttacking = true;
-        await Task.Delay(500);        
+        await Task.Delay(500);
         isAttacking = false;
     }
     

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using System.Threading.Tasks;
 
 public class SubMenuController : BaseMenuController {
     [SerializeField] private GameObject subMenuWindow; // サブメニュー        
@@ -81,8 +80,9 @@ public class SubMenuController : BaseMenuController {
     }
 
     //アイテムを投げる
-    private void ThrowItem() {
-        player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position, player.MoveAnimationDirection.ToVector2Int());
-        MenuManager.Instance.CloseAllMenus();
+    private async Task ThrowItem() {
+        MenuManager.Instance.CloseAllMenus();        
+        Vector2Int direction = player.MoveAnimationDirection.RoundVector2().ToVector2Int();
+        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position, direction);
     }
 }

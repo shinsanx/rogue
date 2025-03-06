@@ -70,6 +70,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     private void TriggerAnimator(string triggerName) {
         animator.SetTrigger(triggerName);
     }    
+    public bool EatAnimation {
+        get;set;        
+    }
 
 
     // ========================================================

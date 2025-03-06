@@ -199,6 +199,10 @@ public class TileManager{
             //キャラクターがいた場合はそのポジションを返す
             if(CharacterManager.i.GetObjectTypeByPosition(objectPos) != null) {
                 string objectType = CharacterManager.i.GetObjectTypeByPosition(objectPos);
+                //アイテムの場合は処理しない
+                if(objectType == "Item") {
+                    continue;
+                }
                 Debug.Log(objectPos + "に" + objectType + "がいます");                
                 return objectPos;
             }

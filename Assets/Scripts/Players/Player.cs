@@ -13,6 +13,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     [SerializeField] private Animator animator;
     [SerializeField] private UserInput userInput;
 
+
     // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
     private PlayerAttackLogic playerAttackLogic;
@@ -33,12 +34,18 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     private bool isMoving = false;
     public bool IsMoving() => isMoving;
 
+
     // ================================================
     // ==================== Events ====================
-    // ================================================
+    // ================================================    
+    
+    [SerializeField] VoidEventChannelSO CompletePlayerStateChannel;
+    
     // StatusUI.csで実装。
-    public event Action<int, int> OnHealthChanged; // 現在のHPと最大HPをUI表示するイベント UpdateHPText
-    public event Action<int> OnLvChanged; // レベルをUI表示するイベント UpdateLvText
+    [SerializeField] GameEvent OnPlayerLevelChanged;
+
+    // StatusUI.csで実装。
+    [SerializeField] GameEvent OnPlayerHPChanged;
 
     // ================================================
     // ================== ObjectData ==================
@@ -85,12 +92,77 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         set => animator.SetTrigger("TakeDamageTrigger");
     }
 
+    public bool EatAnimation {
+        set => animator.SetTrigger("EatTrigger");        
+    }
+
     // ================================================
     // ============= IPlayerStatusAdapter =============
     // ================================================
 
+    public IntVariable playerId;
+    public IntVariable playerLevel;
+    public IntVariable playerMaxHealth;
+    public IntVariable playerCurrentHealth;
+    public IntVariable playerMaxMuscle;
+    public IntVariable playerCurrentMuscle;
+    public IntVariable playerBasicAttackPower;
+    public IntVariable playerDefencePower;
+    public IntVariable playerExperience;
+
     public WeaponSO EquipWeapon { get; set; }
     public ShieldSO EquipShield { get; set; }
+
+
+    // プレイヤーのHPを変更するメソッド
+    public void ChangePlayerCurrentHealth(int value){
+        if(value < 0){
+            Debug.Log("PlayerのHPが0以下になりました。");
+            playerCurrentHealth.Value = 0;
+            OnPlayerHPChanged.Raise();
+        } else if(value > playerMaxHealth.Value){
+            Debug.Log("PlayerのHPが最大値を超えました。");
+            playerCurrentHealth.Value = playerMaxHealth.Value;
+            OnPlayerHPChanged.Raise();
+        } else{            
+            playerCurrentHealth.Value = value;
+            OnPlayerHPChanged.Raise();
+        }
+    }
+
+    // プレイヤーの最大HPを変更するメソッド
+    public void ChangePlayerMaxHealth(int value){        
+        playerMaxHealth.Value = value;
+        playerCurrentHealth.Value = value;
+        OnPlayerHPChanged.Raise();
+    }
+
+    // プレイヤーのレベルを変更するメソッド
+    public void ChangePlayerLevel(int value){
+        if(playerLevel.Value <= 1) return;        
+        playerLevel.Value += value;
+        OnPlayerLevelChanged.Raise();
+    }
+
+    // プレイヤーの経験値を変更するメソッド
+    public void ChangePlayerExperience(int value){
+        playerExperience.Value += value;        
+
+        // レベルアップ判定
+        if(playerExperience.Value >= DungeonConstants.necessarryExp[playerLevel.Value + 1]){
+            playerLevel.Value++;                        
+        }
+    }
+
+    public void ChangePlayerMaxMuscle(int value){
+        playerMaxMuscle.Value += value;
+        playerCurrentMuscle.Value += value;
+    }
+
+    public void ChangePlayerCurrentMuscle(int value){
+        playerCurrentMuscle.Value += value;
+    }
+    
 
     // Additional properties
     public int Level { get; set; }
@@ -105,8 +177,8 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => _currentLv;
         set {
             _currentLv = value;
-            playerStatusDataLogic.LevelUp();                                        
-            OnLvChanged?.Invoke(_currentLv);
+            // playerStatusDataLogic.LevelUp();                                        
+            // OnLvChanged?.Invoke();
         }
     }
 
@@ -114,14 +186,14 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         get => _maxHp;
         set {
             _maxHp = value;
-            OnHealthChanged?.Invoke(_currentHp, _maxHp);
+            //OnHealthChanged?.Invoke();
         }
     }
     public int health {
         get => _currentHp;
         set {
             _currentHp = value > MaxHealth ? MaxHealth : value;
-            OnHealthChanged?.Invoke(_currentHp, _maxHp);
+            //OnHealthChanged?.Invoke();
         }
     }
     public int Experience {
@@ -138,15 +210,16 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     // ================ Methods ======================
     // ================================================
     public void InitializePlayer() {
+        SetPlayerStatusDefault();
         Id = CharacterManager.GetUniqueID();
         CharacterManager.i.AddCharacter(this);
         playerPosition = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         playerAnimLogic = new PlayerAnimLogic(this);
-        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this);
-        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this);
-        playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this);
+        playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this, CompletePlayerStateChannel);
+        playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this, CompletePlayerStateChannel, this);
+        playerStatusDataLogic = new PlayerStatusDataLogic(this, this, this, this);
         createMessageLogic = new CreateMessageLogic();
-        playerInventory = new PlayerInventory();
+        playerInventory = new PlayerInventory(CompletePlayerStateChannel);
         // Event subscriptions
         userInput.onAttack.AddListener(playerAttackLogic.Attack);
         userInput.onMoveInput.AddListener(playerMoveLogic.MoveByInput);
@@ -155,10 +228,16 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
         stateMachine = GameAssets.i.stateMachine;
 
-        // ActionEventManagerで使用するためにセット
-        ActionEventManager.OnPlayerActionComplete += () => {
-            stateMachine.SetState(GameAssets.i.enemyState);
-        };
+    }
+
+    private void SetPlayerStatusDefault(){
+        ChangePlayerMaxHealth(15);        
+        ChangePlayerMaxMuscle(8);
+        ChangePlayerLevel(1);
+        ChangePlayerCurrentHealth(playerMaxHealth.Value);
+        ChangePlayerCurrentMuscle(playerMaxMuscle.Value);
+        playerBasicAttackPower.Value = 0;
+        playerDefencePower.Value = 0;
     }
 
     public void TakeDamage(int damage, string dealerName) {
@@ -173,15 +252,20 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     }
 
     public void Heal(int amount) {
+        playerAnimLogic.SetEatAnimation();
+
         //体力MAXの場合
-        if(MaxHealth == health){
-            MaxHealth += 1;
-            health = MaxHealth;
+        if(playerMaxHealth.Value == playerCurrentHealth.Value){
+            ChangePlayerMaxHealth(playerMaxHealth.Value + 1);
             MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateMaxHpUpMessage(1));
             return;
         }
-        int healAmount = Mathf.Clamp(amount, 0, MaxHealth - health);
-        health += amount;        
+        int healAmount = Mathf.Clamp(amount, 0, playerMaxHealth.Value - playerCurrentHealth.Value);
+        ChangePlayerCurrentHealth(healAmount);
         MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateHealMessage(healAmount, Name));
+    }
+
+    public IPlayerStatusAdapter InformPlayerStatusAdapter() {
+        return this;
     }
 }
