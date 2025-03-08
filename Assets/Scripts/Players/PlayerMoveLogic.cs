@@ -33,7 +33,7 @@ public class PlayerMoveLogic {
 
     public void MoveByInput(Vector2 inputVector) {
         try {
-            this.inputVector = inputVector;
+            this.inputVector = inputVector;            
 
             roundX = Mathf.Round(inputVector.x);
             roundY = Mathf.Round(inputVector.y);
@@ -42,7 +42,7 @@ public class PlayerMoveLogic {
             Vector2Int currentPos = objectData.Position.Value;
             Vector2Int targetPos = inputVectorInt + currentPos;
 
-            if (isMoving) return;
+            if (isMoving) return;            
             inputs.Add(inputVectorInt);
             DevideInput(currentPos, targetPos);
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class PlayerMoveLogic {
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
         
             if (stateMachine.CurrentState != GameAssets.i.playerState) {
-                // Debug.Log("enemyStateで動けません");
+                Debug.Log("enemyStateで動けません");
                 return;
             }
 
@@ -92,7 +92,8 @@ public class PlayerMoveLogic {
             }
 
             Vector2 newPosition = targetPos + moveOffset;
-            objectData.Position.SetValue(newPosition.ToVector2Int());
+            player.SetPosition(newPosition.ToVector2Int());
+            //objectData.Position.SetValue(newPosition.ToVector2Int());
             OnPlayerStateComplete.Raise();
     }
 

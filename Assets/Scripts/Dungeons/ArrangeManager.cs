@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
-
+using System.Linq;
 public class ArrangeManager : MonoBehaviour {
     private static ArrangeManager _instance;
     public static ArrangeManager i {
@@ -41,19 +41,25 @@ public class ArrangeManager : MonoBehaviour {
         itemObject.GetComponent<IObjectData>().Position.SetValue(position);
     }
 
-    public async Task ArrangeEnemyToRandomPosition() {
+    //敵をランダムなポジションに配置
+    public async Task ArrangeEnemyToRandomPosition(List<MonsterStatusSO> enemies, int enemyCount) {
+        //enemiesの中から敵をランダムに選択
+        MonsterStatusSO selectedEnemy = enemies.OrderBy(enemy => Random.Range(0, int.MaxValue)).First();
+        
         // 敵を配置
         for (int i = 0; i < enemyCount; i++) {
-            PlaceEnemy(enemyPrefab, TileManager.i.GetRandomPosition());
+            PlaceEnemy(enemyPrefab, TileManager.i.GetRandomPosition(), selectedEnemy);
             await Task.Yield();
         }
     }
 
-    public void PlaceEnemy(GameObject enemyPrefab, Vector2Int position) {
+    public void PlaceEnemy(GameObject enemyPrefab, Vector2Int position, MonsterStatusSO monsterSO) {
         // 敵を配置
         GameObject enemyObject = Instantiate(enemyPrefab, position.ToVector2(), Quaternion.identity);
-        enemyObject.transform.SetParent(enemyParent.transform);
-        enemyObject.GetComponent<Enemy>().InitializeEnemy();
+        Enemy enemy = enemyObject.GetComponent<Enemy>();
+        enemy.monsterSO = monsterSO;
+        enemy.InitializeEnemy();
+        enemyObject.transform.SetParent(enemyParent.transform);        
         enemyObject.GetComponent<IObjectData>().Position.SetValue(position);
     }
 }

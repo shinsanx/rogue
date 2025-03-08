@@ -12,4 +12,6 @@ public interface IObjectData
 
     // オブジェクト更新時のイベント
     event System.Action<IObjectData> OnObjectUpdated;
+
+    void SetPosition(Vector2Int position);
 }

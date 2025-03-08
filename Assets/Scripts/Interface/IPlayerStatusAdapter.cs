@@ -4,16 +4,15 @@ using UnityEngine;
 
 public interface IPlayerStatusAdapter
 {    
-    public int Level {get;set;}
-    public int MaxHealth{get;set;}
-    public int health {get;set;}
-    public int MaxSatiety {get;set;}//最大満腹度
-    public int Satiety {get;set;}//満腹度
-    public int MaxMuscle {get;set;}//最大ちから
-    public int Muscle{get;set;}//ちから
-    public int BasicAttackPower {get;set;}//基礎攻撃力　レベルで変動
-    public int DefencePower {get;set;}//防御力
-    public int Experience {get;set;}//経験値
-    public WeaponSO EquipWeapon{get;set;}//装備中の武器
-    public ShieldSO EquipShield{get;set;}//装備中の盾
+
+    public IntVariable playerLevel{get;}
+    public IntVariable playerMaxHealth{get;}
+    public IntVariable playerCurrentHealth{get;}
+    public IntVariable playerMaxMuscle{get;}
+    public IntVariable playerCurrentMuscle{get;}
+    public IntVariable playerBasicAttackPower{get;}
+    public IntVariable playerDefencePower{get;}
+    public IntVariable playerExperience{get;}
+    public WeaponSO EquipWeapon{get;}//装備中の武器
+    public ShieldSO EquipShield{get;}//装備中の盾
 }

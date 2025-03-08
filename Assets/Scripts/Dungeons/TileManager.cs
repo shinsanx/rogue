@@ -167,10 +167,11 @@ public class TileManager{
     //ランダムでRoomを選択して、そのRoom内のランダムなポジションを返す
     public Vector2Int GetRandomPosition(){
         // Fieldの中からランダムでRoomを選択
-        if (field.Rooms.Count == 0) return Vector2Int.zero;
+        if (field.Rooms.Count == 0) return Vector2Int.zero;        
 
-        int roomNum = Random.Range(1, field.Rooms.Count + 1);        
+        int roomNum = Random.Range(1, field.Rooms.Count + 1);         
         return GetRandomRoomPositions(roomNum);
+        
     }
 
     //指定されたRoomの中からランダムなポジションを返す
@@ -182,7 +183,7 @@ public class TileManager{
             return Vector2Int.zero;
         }
         
-        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];                
+        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];                        
         return randomPosition;
     }
 

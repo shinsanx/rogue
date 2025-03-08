@@ -1035,50 +1035,6 @@ RectTransform:
   m_AnchoredPosition: {x: 50, y: -39}
   m_SizeDelta: {x: 100, y: 26}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &254544617
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 254544619}
-  - component: {fileID: 254544618}
-  m_Layer: 0
-  m_Name: CharacterManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &254544618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 254544617}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aef9e3f0cf9bf406f9ec54fd7e2b2127, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &254544619
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 254544617}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304789717
 GameObject:
   m_ObjectHideFlags: 0
@@ -2626,6 +2582,7 @@ MonoBehaviour:
   dungeonStateManager: {fileID: 1348055333}
   enemyManager: {fileID: 1665713301}
   inventoryUI: {fileID: 672341470}
+  dungeonData: {fileID: 11400000, guid: a786f3ae3741b4ee499259246c3b443c, type: 2}
 --- !u!114 &672341470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2712,7 +2669,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyParent: {fileID: 304789717}
-  enemyPrefab: {fileID: 1233923294277433561, guid: f7f3d723095c5446fa08126d9df89abb, type: 3}
+  enemyPrefab: {fileID: 1233923294277433561, guid: b53433d8e8ea54d8d89efb17c8d9b11e, type: 3}
   itemParent: {fileID: 1523949384}
   itemPrefab: {fileID: 1734026874544617083, guid: ca68d3306ee3242a3afa0179cbf1385d, type: 3}
   itemCount: 50
@@ -3041,7 +2998,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 2.9700012, y: 0.5}
+  m_AnchoredPosition: {x: 2.9700317, y: 0.5}
   m_SizeDelta: {x: 124.17, y: 94.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &761223441
@@ -5371,54 +5328,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1370034771}
   m_CullTransparentMesh: 1
---- !u!1 &1381403288
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1381403290}
-  - component: {fileID: 1381403289}
-  m_Layer: 0
-  m_Name: GameAssets(Clone)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1381403289
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381403288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce6fa3987901245adb3527457cbc660b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateMachine: {fileID: 11400000, guid: cf7a514598f9d4046aa27239b1772783, type: 2}
-  playerState: {fileID: 11400000, guid: 6e8be94b2a73d4abe9c562bf34fa4474, type: 2}
-  enemyState: {fileID: 11400000, guid: 312592a419ccb4f53894e15f7d28d574, type: 2}
-  allItemListSO: {fileID: 11400000, guid: f02748bb580f54cb38f7c0d0b992eb74, type: 2}
---- !u!4 &1381403290
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1381403288}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1385033604
 GameObject:
   m_ObjectHideFlags: 0
@@ -5804,14 +5713,17 @@ MonoBehaviour:
   _name: {fileID: 11400000, guid: e99dac36fc0814847a1db8a8207c9d0d, type: 2}
   _type: {fileID: 11400000, guid: 9892970652f3f44b7af2af0868ef56be, type: 2}
   _roomNum: {fileID: 11400000, guid: d5ef14108e9224689802fc0935925c7b, type: 2}
-  playerLevel: {fileID: 11400000, guid: 093e306a5fafa4c27960051af0db2d09, type: 2}
-  playerMaxHealth: {fileID: 11400000, guid: b45f49a7ec16344929efb75f88081605, type: 2}
-  playerCurrentHealth: {fileID: 11400000, guid: 8652b5061823a4d378aa8f1d9648d4d7, type: 2}
-  playerMaxMuscle: {fileID: 11400000, guid: 7ac217534b836409eaac8efe43676010, type: 2}
-  playerCurrentMuscle: {fileID: 11400000, guid: 3365e382c20e94382ac3357ec9765814, type: 2}
-  playerBasicAttackPower: {fileID: 11400000, guid: e5d5e968024854ab5825e499b5ce51f8, type: 2}
-  playerDefencePower: {fileID: 11400000, guid: 64610349fe4c24e8db70fe7e1038eb3d, type: 2}
-  playerExperience: {fileID: 11400000, guid: b417f9e4b99db4444b0d87b3465ffc95, type: 2}
+  _position: {fileID: 11400000, guid: 2a0401bef74d141588319b077f8888e1, type: 2}
+  <playerLevel>k__BackingField: {fileID: 11400000, guid: 093e306a5fafa4c27960051af0db2d09, type: 2}
+  <playerMaxHealth>k__BackingField: {fileID: 11400000, guid: b45f49a7ec16344929efb75f88081605, type: 2}
+  <playerCurrentHealth>k__BackingField: {fileID: 11400000, guid: 8652b5061823a4d378aa8f1d9648d4d7, type: 2}
+  <playerMaxMuscle>k__BackingField: {fileID: 11400000, guid: 7ac217534b836409eaac8efe43676010, type: 2}
+  <playerCurrentMuscle>k__BackingField: {fileID: 11400000, guid: 3365e382c20e94382ac3357ec9765814, type: 2}
+  <playerBasicAttackPower>k__BackingField: {fileID: 11400000, guid: e5d5e968024854ab5825e499b5ce51f8, type: 2}
+  <playerDefencePower>k__BackingField: {fileID: 11400000, guid: 64610349fe4c24e8db70fe7e1038eb3d, type: 2}
+  <playerExperience>k__BackingField: {fileID: 11400000, guid: b417f9e4b99db4444b0d87b3465ffc95, type: 2}
+  <EquipWeapon>k__BackingField: {fileID: 0}
+  <EquipShield>k__BackingField: {fileID: 0}
 --- !u!1 &1448197673
 GameObject:
   m_ObjectHideFlags: 0
@@ -5846,7 +5758,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -256.1, y: 147}
+  m_AnchoredPosition: {x: -256.10004, y: 147}
   m_SizeDelta: {x: 0.000015258789, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1449670103
@@ -6961,5 +6873,3 @@ SceneRoots:
   - {fileID: 19750210}
   - {fileID: 1874388000}
   - {fileID: 145286390}
-  - {fileID: 1381403290}
-  - {fileID: 254544619}

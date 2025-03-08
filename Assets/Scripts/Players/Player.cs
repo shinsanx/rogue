@@ -60,6 +60,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     [SerializeField] private StringVariable _name;
     [SerializeField] private StringVariable _type;
     [SerializeField] private IntVariable _roomNum;
+    [SerializeField] private Vector2IntVariable _position;
 
     // オブジェクトデータ
     public IntVariable Id { get => _id; set => _id.SetValue(value); }
@@ -68,20 +69,29 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     public IntVariable RoomNum { get => _roomNum; set => _roomNum.SetValue(value); }    
 
     public Vector2IntVariable Position {
-        get => Position;
+        get => _position;
         set {
-            Position.SetValue(value);
-            isMoving = false; //本当はtrueにする。デバッグのためにfalseにしている。
-            transform.DOMove(Position.Value.ToVector2() + moveOffset, 0.3f)
-                .SetEase(Ease.Linear)
-                .OnComplete(() => {
-                    isMoving = false;
-                    OnObjectUpdated?.Invoke(this);
-                });
+            _position.SetValue(value);
+            // isMoving = false; //本当はtrueにする。デバッグのためにfalseにしている。
+            // Debug.Log("Playerの位置を" + _position.Value + "に変更します");
+            // transform.DOMove(_position.Value.ToVector2() + moveOffset, 0.3f)
+            //     .SetEase(Ease.Linear)
+            //     .OnComplete(() => {
+            //         isMoving = false;
+            //         OnObjectUpdated?.Invoke(this);
+            //     });
         }
     }
 
-
+    public void SetPosition(Vector2Int position) {
+        Position.SetValue(position);
+        transform.DOMove(position.ToVector2() + moveOffset, 0.3f)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => {
+                isMoving = false;
+                OnObjectUpdated?.Invoke(this);
+            });
+    }
 
     // ================================================
     // ============= IAnimationAdapter ===============
@@ -112,17 +122,17 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     // ================================================
 
 
-    public IntVariable playerLevel;
-    public IntVariable playerMaxHealth;
-    public IntVariable playerCurrentHealth;
-    public IntVariable playerMaxMuscle;
-    public IntVariable playerCurrentMuscle;
-    public IntVariable playerBasicAttackPower;
-    public IntVariable playerDefencePower;
-    public IntVariable playerExperience;
+    [field: SerializeField] public IntVariable playerLevel{get;private set;}
+    [field: SerializeField] public IntVariable playerMaxHealth{get;private set;}
+    [field: SerializeField] public IntVariable playerCurrentHealth{get;private set;}
+    [field: SerializeField] public IntVariable playerMaxMuscle{get;private set;}
+    [field: SerializeField] public IntVariable playerCurrentMuscle{get;private set;}
+    [field: SerializeField] public IntVariable playerBasicAttackPower{get;private set;}
+    [field: SerializeField] public IntVariable playerDefencePower{get;private set;}
+    [field: SerializeField] public IntVariable playerExperience{get;private set;}
 
-    public WeaponSO EquipWeapon { get; set; }
-    public ShieldSO EquipShield { get; set; }
+    [field: SerializeField] public WeaponSO EquipWeapon { get; private set; }
+    [field: SerializeField] public ShieldSO EquipShield { get; private set; }
 
 
     // プレイヤーのHPを変更するメソッド
@@ -177,14 +187,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
     }
 
 
-    // Additional properties
-    public int Level { get; set; }
-    public int MaxSatiety { get; set; }
-    public int Satiety { get; set; }
-    public int MaxMuscle { get; set; }
-    public int Muscle { get; set; }
-    public int BasicAttackPower { get; set; }
-    public int DefencePower { get; set; }
+    
 
     public int level {
         get => _currentLv;
@@ -226,7 +229,7 @@ public class Player : MonoBehaviour, IAnimationAdapter, IDamageable, IPlayerStat
         SetPlayerStatusDefault();
         //Id = CharacterManager.GetUniqueID();
         CharacterManager.i.AddCharacter(this);
-        Position.SetValue(new Vector2Int((int)transform.position.x, (int)transform.position.y));
+        //Position.SetValue(new Vector2Int((int)transform.position.x, (int)transform.position.y));
         playerAnimLogic = new PlayerAnimLogic(this);
         playerMoveLogic = new PlayerMoveLogic(this, playerAnimLogic, this, OnPlayerStateComplete);
         playerAttackLogic = new PlayerAttackLogic(playerAnimLogic, this, this, this, OnPlayerStateComplete, this);

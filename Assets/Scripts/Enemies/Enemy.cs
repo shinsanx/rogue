@@ -8,7 +8,7 @@ using System;
 public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimationAdapter, IObjectData, IEnemyAIState, IEffectReceiver {
     [SerializeField] Animator animator;
     [SerializeField] SpriteRenderer sr;
-    [SerializeField] MonsterStatusSO monsterSO;
+    public MonsterStatusSO monsterSO;
 
     private EnemyStatusLogic enemyStatusLogic;
     private EnemyAnimLogic enemyAnimLogic;
@@ -16,7 +16,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     private EnemyMoveLogic enemyMoveLogic;
 
     Vector2 moveOffset = new Vector2(.5f, .5f);
-    private Vector2Int _enemyPosition;
     private int _hp;
     public int MaxHealth { get; set; }
 
@@ -24,26 +23,34 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
     // =================== IPositionAdapter ===================
     // ========================================================
     public Vector2IntVariable Position {
-        get { return Position; }
-        set {            
-             transform.DOMove(Position.Value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
+        get { return _position; }
+        set {
+            //  transform.DOMove(Position.Value.ToVector2() + moveOffset, (0.3f)).SetEase(Ease.Linear);
              Position.SetValue(value);
-             OnObjectUpdated.Invoke(this);
+            //  OnObjectUpdated.Invoke(this);
         }
     }
 
+    public void SetPosition(Vector2Int position) {
+        Position.SetValue(position);
+        transform.DOMove(position.ToVector2() + moveOffset, 0.3f)
+            .SetEase(Ease.Linear);
+        OnObjectUpdated?.Invoke(this);
+    }  
     // ========================================================
     // ===================== IObjectData =====================
     // ========================================================
-    //public int Id { get; set; }
-    //public string Name { get; set; }
-    //string IObjectData.Type { get; set; }
-    //int IObjectData.RoomNum { get; set; }
 
-    public IntVariable Id{get;set;}
-    public StringVariable Name{get;set;}
-    public StringVariable Type{get;set;}
-    public IntVariable RoomNum{get;set;}    
+    [SerializeField] private IntVariable _id;
+    [SerializeField] private StringVariable _name;
+    [SerializeField] private StringVariable _type;
+    [SerializeField] private IntVariable _roomNum;
+    [SerializeField] private Vector2IntVariable _position;
+
+    public IntVariable Id{get => _id; set => _id.SetValue(value);}
+    public StringVariable Name{get => _name; set => _name.SetValue(value);}
+    public StringVariable Type{get => _type; set => _type.SetValue(value);}
+    public IntVariable RoomNum{get => _roomNum; set => _roomNum.SetValue(value);}    
     
     // オブジェクトが更新された時に呼び出されるイベント
     // subscribeしているのは
@@ -157,8 +164,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
         enemyMoveLogic = new EnemyMoveLogic(this, enemyAnimLogic);
         enemyAttackLogic = new EnemyAttackLogic(enemyAnimLogic, this, this, this);        
 
-        enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
-        Id.SetValue(CharacterManager.GetUniqueID()); // Assign a unique ID
+        //enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
+        Id.SetValue(CharacterManager.GetUniqueID()); // Assign a unique ID        
         CharacterManager.i.AddCharacter(this);
 
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
@@ -180,6 +187,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IAnimati
 
     private void OnEnable() {
     }
+
+    
 
     // ========================================================
     // ==================== IEffectReceiver ===================

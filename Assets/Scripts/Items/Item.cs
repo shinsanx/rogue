@@ -16,23 +16,29 @@ public class Item : MonoBehaviour, IObjectData
     public StringVariable Name{get;set;}
     public StringVariable Type{get;set;}
     public IntVariable RoomNum{get;set;}
+    [SerializeField] private Vector2IntVariable _position;
 
     public Vector2IntVariable Position {
-        get => Position;
+        get => _position;
         set{
-            Position.SetValue(value);
+            _position.SetValue(value);
             transform.position = Position.Value.ToVector2() + moveOffset;
             RoomNum.SetValue(TileManager.i.LookupRoomNum(Position.Value));
             OnObjectUpdated?.Invoke(this);
         }
     }
 
+    public void SetPosition(Vector2Int position) {
+        Position.SetValue(position);
+        transform.position = Position.Value.ToVector2() + moveOffset;
+        RoomNum.SetValue(TileManager.i.LookupRoomNum(Position.Value));
+        OnObjectUpdated?.Invoke(this);
+    }
     // キャラクターマネージャーによって更新される
     public event System.Action<IObjectData> OnObjectUpdated;
 
     
     public ItemSO itemSO;
-    private Vector2Int _position;
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
 
     public void Initialize()

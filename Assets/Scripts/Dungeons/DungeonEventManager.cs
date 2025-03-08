@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RandomDungeonWithBluePrint;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
 public class DungeonEventManager : MonoBehaviour {
@@ -17,6 +18,12 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
     [SerializeField] InventoryController inventoryUI;
+    [SerializeField] DungeonDataSO dungeonData;
+
+    private EnemyTableSO currentEnemyTable;
+    private ItemTableSO currentItemTable;
+
+
 
     private async void Start() {
         //try {
@@ -30,7 +37,7 @@ public class DungeonEventManager : MonoBehaviour {
             await InitializeRandomMapGenerator();
 
             // 4. キャラクターマネージャーの初期化
-            await InitializeCharacterManager();                        
+            await InitializeCharacterManager();
 
             // 6. ダンジョンステートマネージャーの初期化
             await InitializeDungeonStateManager();
@@ -38,23 +45,44 @@ public class DungeonEventManager : MonoBehaviour {
             // 7. プレイヤーをランダムな位置へ召喚
             await InitializePlayer();
 
-            // 8. モンスターの生成
-            //await GenerateEnemies();
+            // 8. ダンジョンデータの読み込み
+            LoadDungeonData();
 
-            // 9. インベントリUIの初期化
+            // 9. モンスターの生成
+            await GenerateEnemies();
+
+            // 10. インベントリUIの初期化
             // await InitializeInventoryUI();
 
-            // 10. アイテムの生成（必要に応じて実装）
+            // 11. アイテムの生成（必要に応じて実装）
             //await GenerateItems();
 
-            // 11. ミニマップの生成
-            await CreateMiniMap();
+            // 12. ミニマップの生成
+            //await CreateMiniMap();
 
             Debug.Log("Initialize completed");
         // }
         // catch (System.Exception ex) {
         //     Debug.LogError($"DungeonEventManager Initialization Failed: {ex.Message}");
         // }
+    }
+
+    //ダンジョンデータを読み込む
+    private void LoadDungeonData() {
+        currentEnemyTable = dungeonData.DungeonTable.Floors[0].EnemyTable;
+        currentItemTable = dungeonData.DungeonTable.Floors[0].ItemTable;
+    }
+
+    // //EnemyTableから敵をランダムに選択する
+    // private MonsterStatusSO SelectEnemy() {
+    //     int randomIndex = Random.Range(0, currentEnemyTable.Enemies.Count);
+    //     return currentEnemyTable.Enemies[randomIndex];
+    // }
+
+    //ItemTableからアイテムをランダムに選択する
+    private ItemSO SelectItem() {
+        int randomIndex = Random.Range(0, currentItemTable.Items.Count);
+        return currentItemTable.Items[randomIndex];
     }
 
     private Task InitializeStateMachine() {
@@ -85,7 +113,7 @@ public class DungeonEventManager : MonoBehaviour {
 
     private Task InitializePlayer() {
         player.InitializePlayer();
-        player.GetComponent<IObjectData>().Position.SetValue(TileManager.i.GetRandomPosition());
+        player.SetPosition(TileManager.i.GetRandomPosition());
         return Task.CompletedTask;
     }
 
@@ -95,7 +123,7 @@ public class DungeonEventManager : MonoBehaviour {
     // }
 
     private async Task GenerateEnemies() {
-        await ArrangeManager.i.ArrangeEnemyToRandomPosition();
+        await ArrangeManager.i.ArrangeEnemyToRandomPosition(currentEnemyTable.Enemies, dungeonData.DungeonTable.Floors[0].InitialEnemyCount);
         enemyManager.Initialize();
     }
 
