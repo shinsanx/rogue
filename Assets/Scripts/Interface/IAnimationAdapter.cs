@@ -4,8 +4,8 @@ using UnityEngine;
 
 public interface IAnimationAdapter
 {
-    public Vector2 MoveAnimationDirection {get; set;}
-    public bool AttackAnimation {set;}
-    public bool TakeDamageAnimation{set;}
-    public bool EatAnimation {set;}
+    public Vector2Variable MoveAnimationDirection {get;}
+    public BoolVariable AttackAnimation {get;}
+    public BoolVariable TakeDamageAnimation{get;}
+    public BoolVariable EatAnimation {get;}
     }

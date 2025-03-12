@@ -4,47 +4,48 @@ using UnityEngine;
 using System.Threading.Tasks;
 
 public class PlayerAttackLogic
-{
-    private PlayerAnimLogic playerAnimLogic;
-    private IAnimationAdapter animationAdapter;
+{    
     private IObjectData objectData;
-    private IPlayerStatusAdapter playerStatusAdapter;    
     private DamageCalculate damageCalculate;
     private bool isAttacking = false;
-    private GameEvent OnPlayerStateComplete;    
     private Player player;
+    private ObjectDataRuntimeSet objectDataSet;
+    private Vector2Variable playerFaceDirection;
+
+    //イベント
+    private GameEvent OnPlayerStateComplete;
+    private GameEvent OnPlayerAttack;
     
 
     //コンストラクタ
-    public PlayerAttackLogic(
-        PlayerAnimLogic playerAnimLogic,
-        IAnimationAdapter animationAdapter,
-        IObjectData objectData,
-        IPlayerStatusAdapter playerStatusAdapter,        
+    public PlayerAttackLogic(    
+        Player player,
         GameEvent OnPlayerStateComplete,
-        Player player
+        ObjectDataRuntimeSet objectDataSet,
+        Vector2Variable playerFaceDirection,
+        GameEvent OnPlayerAttack
     ){
-        this.playerAnimLogic = playerAnimLogic;
-        this.animationAdapter = animationAdapter;
-        this.objectData = objectData;
-        this.playerStatusAdapter = playerStatusAdapter;                
-        this.OnPlayerStateComplete = OnPlayerStateComplete;        
-        this.player = player;
+        this.player = player;        
+        this.objectData = player.playerObjectData;        
+        this.OnPlayerStateComplete = OnPlayerStateComplete;
+        this.objectDataSet = objectDataSet;
+        this.playerFaceDirection = playerFaceDirection;
+        this.OnPlayerAttack = OnPlayerAttack;
     }
 
     public void Attack(){
         if(isAttacking) return;
-        playerAnimLogic.SetAttackAnimation();
-        DealDamage(CharacterManager.i.GetObjectByPosition(GetTargetPosition())); 
+        OnPlayerAttack.Raise();
+        DealDamage(objectDataSet.GetObjectByPosition(GetTargetPosition())); 
         LockInputWhileAttacking();
         OnPlayerStateComplete.Raise();
     }
 
     private Vector2Int GetTargetPosition(){
-        int selfXpos = Mathf.FloorToInt(player.Position.Value.x);
-        int selfYpos = Mathf.FloorToInt(player.Position.Value.y);
-        int faceXpos = (int)Mathf.Round(player.MoveAnimationDirection.x);
-        int faceYpos = (int)Mathf.Round(player.MoveAnimationDirection.y);
+        int selfXpos = Mathf.FloorToInt(objectData.Position.Value.x);
+        int selfYpos = Mathf.FloorToInt(objectData.Position.Value.y);
+        int faceXpos = (int)Mathf.Round(playerFaceDirection.Value.x);
+        int faceYpos = (int)Mathf.Round(playerFaceDirection.Value.y);
         Vector2Int targetVector = new Vector2Int(selfXpos + faceXpos, selfYpos + faceYpos);
         return targetVector;
     }
@@ -66,7 +67,7 @@ public class PlayerAttackLogic
         IMonsterStatusAdapter monsterStatusAdapter = targetObject.GetComponent<IMonsterStatusAdapter>();
         int damage = damageCalculate.CalculateAttackDamage(player.playerLevel.Value, player.playerMaxMuscle.Value, weaponPw, monsterStatusAdapter.Defence);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
-        damageable.TakeDamage(damage, player.Name.Value);
+        damageable.TakeDamage(damage, objectData.Name.Value);
     }
 
     async void LockInputWhileAttacking(){

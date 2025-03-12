@@ -18,6 +18,7 @@ public class GameAssets: MonoBehaviour {
     public State enemyState;        
     public CreateMessageLogic createMessageLogic = new CreateMessageLogic();  
 
-    public AllItemListSO allItemListSO;        
+    public AllItemListSO allItemListSO;
+    public RandomDungeonWithBluePrint.TileSet tileSet;
 
 }

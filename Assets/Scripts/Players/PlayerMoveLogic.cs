@@ -5,23 +5,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 public class PlayerMoveLogic {
-    private IObjectData objectData;
-    private PlayerAnimLogic playerAnimLogic;
+    private IObjectData objectData;    
     private StateMachine stateMachine;
     private Player player;
-
+    private Vector2Variable playerFaceDirection;
+    private PlayerInventory playerInventory;
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
     private GameEvent OnPlayerStateComplete;
+    public GameEvent OnPlayerDirectionChanged;
 
     //コンストラクタ
-    public PlayerMoveLogic(IObjectData objectData, PlayerAnimLogic playerAnimLogic, Player player, GameEvent OnPlayerStateComplete) {
-        this.objectData = objectData;
-        this.playerAnimLogic = playerAnimLogic;
+    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, PlayerInventory playerInventory) {
+        this.player = player;        
         this.stateMachine = GameAssets.i.stateMachine;
-        this.player = player;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
+        this.objectData = player.playerObjectData;
+        this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
+        this.playerFaceDirection = playerFaceDirection;
+        this.playerInventory = playerInventory;
     }
 
     Vector2 inputVector;
@@ -42,7 +45,7 @@ public class PlayerMoveLogic {
             Vector2Int currentPos = objectData.Position.Value;
             Vector2Int targetPos = inputVectorInt + currentPos;
 
-            if (isMoving) return;            
+            if (isMoving) return;
             inputs.Add(inputVectorInt);
             DevideInput(currentPos, targetPos);
         } catch (Exception e) {
@@ -73,7 +76,6 @@ public class PlayerMoveLogic {
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
         
             if (stateMachine.CurrentState != GameAssets.i.playerState) {
-                Debug.Log("enemyStateで動けません");
                 return;
             }
 
@@ -83,17 +85,17 @@ public class PlayerMoveLogic {
             }
 
             //アニメーションを再生する
-            playerAnimLogic.SetMoveAnimation(new Vector2(inputVector.x, inputVector.y));
+            playerFaceDirection.SetValue(new Vector2(roundX, roundY));
+            OnPlayerDirectionChanged.Raise();
             if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
 
             //アイテムを拾う
-            if(TileManager.i.CheckExistItem(targetPos) is Item item) {                
-                item.GetComponent<Item>().OnPicked(player.playerInventory);
+            if(TileManager.i.CheckExistItem(targetPos) is Item item) {
+                item.GetComponent<Item>().OnPicked(playerInventory);
             }
 
             Vector2 newPosition = targetPos + moveOffset;
-            player.SetPosition(newPosition.ToVector2Int());
-            //objectData.Position.SetValue(newPosition.ToVector2Int());
+            objectData.SetPosition(newPosition.ToVector2Int());
             OnPlayerStateComplete.Raise();
     }
 

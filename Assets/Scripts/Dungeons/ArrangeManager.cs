@@ -60,6 +60,6 @@ public class ArrangeManager : MonoBehaviour {
         enemy.monsterSO = monsterSO;
         enemy.InitializeEnemy();
         enemyObject.transform.SetParent(enemyParent.transform);        
-        enemyObject.GetComponent<IObjectData>().Position.SetValue(position);
+        enemyObject.GetComponent<IObjectData>().SetPosition(position);
     }
 }

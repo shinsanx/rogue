@@ -21,12 +21,8 @@ namespace RandomDungeonWithBluePrint
         public void BuildGrid()
         {
             Grid.Build(Size, Rooms, Branches);
+            GameAssets.i.tileSet.Build(Size, Rooms, Branches);//自作
         }
-
-        public void BuildTileInfo(){
-            tileInfo.Build(Size, Rooms, Branches);
-        }
-
         public Section GetSection(int index)
         {
             return Sections?.FirstOrDefault(s => s.Index == index);

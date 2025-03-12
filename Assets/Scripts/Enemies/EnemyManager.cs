@@ -11,18 +11,19 @@ public class EnemyManager : MonoBehaviour {
     private State enemyState;
     private IEnemyAIState enemyAIState;
     private GameObject player;
+    [SerializeField] private Vector2IntVariable _playerPos;
     private Vector2Int playerPos;
     private Vector2Int enemyCurrentPos;
     private Vector2Int enemyTargetPos;        
     private EnemyAction enemyAction;    
     private IObjectData objectData;
     private AStarPathfinding pathfinding;
+    [SerializeField] private ObjectDataRuntimeSet objectDataSet;
 
     public void Initialize() {
         stateMachine = GameAssets.i.stateMachine;
         enemyState = GameAssets.i.enemyState;
-        player = CharacterManager.i.GetPlayer();
-        
+        player = objectDataSet.GetPlayer();
         // MainThreadHelperのインスタンスを確実に生成
         var helper = MainThreadHelper.Instance;
     }
@@ -33,10 +34,10 @@ public class EnemyManager : MonoBehaviour {
     public async Task ProcessEnemies() {
 
         //最初にプレイヤーの位置を取得
-        playerPos = player.GetComponent<IObjectData>().Position.Value;
-
+        //playerPos = player.GetComponent<ObjectData>().Position.Value;
+        playerPos = _playerPos.Value;
         if (stateMachine.CurrentState != enemyState) return;
-        enemies = CharacterManager.i.GetAllEnemies();
+        enemies = objectDataSet.GetAllEnemies();
 
         foreach (var enemy in enemies) {
             try {

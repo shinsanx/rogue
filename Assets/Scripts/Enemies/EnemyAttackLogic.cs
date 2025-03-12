@@ -5,30 +5,26 @@ using UnityEngine.Tilemaps;
 
 public class EnemyAttackLogic
 {
-    private EnemyAnimLogic enemyAnimLogic;
-    private IAnimationAdapter animationAdapter;
+    private EnemyAnimLogic enemyAnimLogic;    
     private IObjectData objectData;
     private IPlayerStatusAdapter playerStatusAdapter;
 
     private DamageCalculate damageCalculate;
-    private IMonsterStatusAdapter monsterStatusAdapter;    
+    private Enemy enemy;
+    
 
     private StateMachine stateMachine;
     private State enemyState;
     private int targetDefencePw;
 
     public EnemyAttackLogic(
-        EnemyAnimLogic enemyAnimLogic,
-        IAnimationAdapter animationAdapter,
-        IObjectData objectData,
-        IMonsterStatusAdapter monsterStatusAdapter
-        ) {
-            this.enemyAnimLogic = enemyAnimLogic;
-            this.animationAdapter = animationAdapter;
-            this.objectData = objectData;
-            this.monsterStatusAdapter = monsterStatusAdapter;
-            stateMachine = GameAssets.i.stateMachine;
-            enemyState = GameAssets.i.enemyState;            
+        Enemy enemy
+    ) {
+        this.enemy = enemy;
+        this.enemyAnimLogic = enemy.enemyAnimLogic;
+        this.objectData = enemy.objectData;
+        stateMachine = GameAssets.i.stateMachine;
+        enemyState = GameAssets.i.enemyState;            
     }
 
     public void Attack(GameObject go, Vector2Int direction){
@@ -58,7 +54,7 @@ public class EnemyAttackLogic
             targetDefencePw = targetMonsterStatusAdapter.Defence;
         }
 
-        int damage = damageCalculate.CalculateEnemyAttackDamage(monsterStatusAdapter.AttackPower, targetDefencePw);
+        int damage = damageCalculate.CalculateEnemyAttackDamage(enemy.AttackPower, targetDefencePw);
         IDamageable damageable = targetObject.GetComponent<IDamageable>();
         damageable.TakeDamage(damage, objectData.Name.Value);
     }

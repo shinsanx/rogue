@@ -26,10 +26,10 @@ public abstract class BaseMenuController : MonoBehaviour {
     /// <summary>
     /// Start で初期化し、カーソル位置を更新する
     /// </summary>
-    protected virtual void Start() {
-        InitializeMenu();
-        UpdateCursorPosition();
-    }
+    // protected virtual void Start() {
+    //     InitializeMenu();
+    //     UpdateCursorPosition();
+    // }
 
     /// <summary>
     /// 共通のカーソル移動処理（上下入力のみ対応の例）

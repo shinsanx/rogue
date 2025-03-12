@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RandomDungeonWithBluePrint
 {
-    [CreateAssetMenu(menuName = "ScriptableObject/FieldBluePrint")]
+    [CreateAssetMenu(menuName = "Dungeon/FieldBluePrint")]
     public class FieldBluePrint : ScriptableObject
     {
         [Serializable]

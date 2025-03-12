@@ -23,8 +23,7 @@ namespace RandomDungeonWithBluePrint {
             var field = FieldBuilder.Build(bluePrint.BluePrint);
             currentField = field;
             MessageBus.Instance.Subscribe<Field>(DungeonConstants.GetCurrentField, GetCurrentField);            
-            fieldView.ShowField(field);
-            TileManager.i.UpdateFieldInformation(currentField);            
+            fieldView.ShowField(field);            
         }
 
         private BluePrintWithWeight Raffle() {

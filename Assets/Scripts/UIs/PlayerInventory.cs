@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Threading.Tasks;
-public class PlayerInventory {
+public class PlayerInventory : MonoBehaviour {
 
     public PlayerInventory(GameEvent OnPlayerStateComplete){
         if(createMessageLogic == null){
@@ -17,6 +17,8 @@ public class PlayerInventory {
     private List<ItemSO> items = new List<ItemSO>();
     private CreateMessageLogic createMessageLogic;
     private GameEvent OnPlayerStateComplete;
+    [SerializeField] private Vector2Variable playerFaceDirection;
+
     // インベントリが更新された時に発行されるイベント
     public event Action OnInventoryUpdated;
     
@@ -76,7 +78,8 @@ public class PlayerInventory {
     }
 
     //アイテムを投げる
-    public async Task ThrowItem(ItemSO item, Vector2Int position, Vector2Int direction) {
+    public async Task ThrowItem(ItemSO item, Vector2Int position) {
+        Vector2Int direction = playerFaceDirection.Value.RoundVector2().ToVector2Int();
         Debug.Log("ThrowItemDirection:"+direction);
         Vector2Int throwPosition = TileManager.i.GetCharactersInFront(position, direction, 10);
         //throwPositionのタイプが壁だった場合は一つ前のポジションを取得する

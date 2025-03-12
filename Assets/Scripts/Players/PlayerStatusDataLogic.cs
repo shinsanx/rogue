@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerStatusDataLogic
-{
-    private IPlayerStatusAdapter playerStatusAdapter;    
-    private IAnimationAdapter animationAdapter;
+{    
     private List<string> messages = new List<string>();
     private Player player;
-    public PlayerStatusDataLogic(IPlayerStatusAdapter playerStatusAdapter, IAnimationAdapter animationAdapter, IObjectData objectData, Player player){
-        this.playerStatusAdapter = playerStatusAdapter;
-        this.animationAdapter = animationAdapter;        
+
+    public PlayerStatusDataLogic(Player player){        
         this.player = player;
     }    
 
@@ -27,9 +24,7 @@ public class PlayerStatusDataLogic
     
 
     public void TakeDamage(int damage, string dealerName){
-        Debug.Log("ダメージを受けました" + damage);
-        player.ChangePlayerCurrentHealth(player.playerCurrentHealth.Value - damage);
-        animationAdapter.TakeDamageAnimation = true;
+        player.ChangePlayerCurrentHealth(player.playerCurrentHealth.Value - damage);        
 
         //Todo: dealerのタグによってメッセージを変える。Enemyかその他か
         messages.Clear();

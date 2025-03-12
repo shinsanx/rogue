@@ -13,14 +13,13 @@ namespace RandomDungeonWithBluePrint
             var field = new Field
             {
                 Size = bluePrint.Size,
-                MaxRoomNum = Random.Range(bluePrint.MinRoomNum, bluePrint.MaxRoomNum + 1)　// intのRandom.Rangeの仕様の都合で+1
+                MaxRoomNum = Random.Range(bluePrint.MinRoomNum, bluePrint.MaxRoomNum + 1) // intのRandom.Rangeの仕様の都合で+1
             };
 
             MakeSection(field, bluePrint); // 盤面を区分けする
             MakeRooms(field); // 部屋を作る
             MakeBranches(field, bluePrint); // 道を作る
-            field.BuildGrid(); // サイズと部屋と道を二次元平面にする
-            field.BuildTileInfo(); //自作。
+            field.BuildGrid(); // サイズと部屋と道を二次元平面にする            
             return field;
         }
 

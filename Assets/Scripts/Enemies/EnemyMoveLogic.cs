@@ -12,14 +12,13 @@ public class EnemyMoveLogic
 
     //コンストラクタ
     public EnemyMoveLogic(
-        IObjectData objectData,
-        EnemyAnimLogic enemyAnimLogic
+        Enemy enemy
     ) {
-        this.objectData = objectData;
-        this.enemyAnimLogic = enemyAnimLogic;
+        this.objectData = enemy.objectData;
+        this.enemyAnimLogic = enemy.enemyAnimLogic;
     }
 
-    public void Move(Vector2Int targetPos, Vector2Int direction){
+    public void Move(Vector2Int targetPos, Vector2Int direction){                
         enemyAnimLogic.SetMoveAnimation(new Vector2(direction.x, direction.y));
 
         Vector2 newPosition = targetPos + moveOffset;        

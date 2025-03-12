@@ -19,6 +19,8 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] EnemyManager enemyManager;
     [SerializeField] InventoryController inventoryUI;
     [SerializeField] DungeonDataSO dungeonData;
+    [SerializeField] CharacterManager characterManager;
+    [SerializeField] TileManager tileManager;
 
     private EnemyTableSO currentEnemyTable;
     private ItemTableSO currentItemTable;
@@ -26,41 +28,46 @@ public class DungeonEventManager : MonoBehaviour {
 
 
     private async void Start() {
-        //try {
-            // 1. StateMachineの初期化を最初に行う
-            await InitializeStateMachine();
+        // 1. TileManagerの初期化
+        await InitializeTileManager();
 
-            // 2. ミニマップの初期化
-            await InitializeAutoMapping();
+        
+        // 2. キャラクターマネージャーの初期化
+        await InitializeCharacterManager();
+        // 1. StateMachineの初期化を最初に行う
+        await InitializeStateMachine();
 
-            // 3. マップ生成
-            await InitializeRandomMapGenerator();
 
-            // 4. キャラクターマネージャーの初期化
-            await InitializeCharacterManager();
+        // 2. ミニマップの初期化
+        await InitializeAutoMapping();
 
-            // 6. ダンジョンステートマネージャーの初期化
-            await InitializeDungeonStateManager();
+        // 3. マップ生成
+        await InitializeRandomMapGenerator();
 
-            // 7. プレイヤーをランダムな位置へ召喚
-            await InitializePlayer();
 
-            // 8. ダンジョンデータの読み込み
-            LoadDungeonData();
 
-            // 9. モンスターの生成
-            await GenerateEnemies();
+        // 6. ダンジョンステートマネージャーの初期化
+        await InitializeDungeonStateManager();
 
-            // 10. インベントリUIの初期化
-            // await InitializeInventoryUI();
+        // 7. プレイヤーをランダムな位置へ召喚
+        await InitializePlayer();
 
-            // 11. アイテムの生成（必要に応じて実装）
-            //await GenerateItems();
+        // 8. ダンジョンデータの読み込み
+        LoadDungeonData();
 
-            // 12. ミニマップの生成
-            //await CreateMiniMap();
+        // 9. モンスターの生成
+        await GenerateEnemies();
 
-            Debug.Log("Initialize completed");
+        // 10. インベントリUIの初期化
+        // await InitializeInventoryUI();
+
+        // 11. アイテムの生成（必要に応じて実装）
+        //await GenerateItems();
+
+        // 12. ミニマップの生成
+        //await CreateMiniMap();
+
+        Debug.Log("Initialize completed");
         // }
         // catch (System.Exception ex) {
         //     Debug.LogError($"DungeonEventManager Initialization Failed: {ex.Message}");
@@ -102,9 +109,9 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private Task InitializeCharacterManager() {
-        CharacterManager.i.Initialize();
+        characterManager.Initialize();
         return Task.CompletedTask;
-    }    
+    }
 
     private Task InitializeDungeonStateManager() {
         dungeonStateManager.Initialize();
@@ -113,7 +120,7 @@ public class DungeonEventManager : MonoBehaviour {
 
     private Task InitializePlayer() {
         player.InitializePlayer();
-        player.SetPosition(TileManager.i.GetRandomPosition());
+        player.playerObjectData.SetPosition(TileManager.i.GetRandomPosition());
         return Task.CompletedTask;
     }
 
@@ -128,11 +135,16 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private async Task GenerateItems() {
-        await ArrangeManager.i.ArrangeItemToRandomPosition();        
+        await ArrangeManager.i.ArrangeItemToRandomPosition();
     }
 
     private Task CreateMiniMap() {
         randomMapGenerator.CreateMiniMap();
+        return Task.CompletedTask;
+    }
+
+    private Task InitializeTileManager() {
+        tileManager.Initialize();
         return Task.CompletedTask;
     }
 }

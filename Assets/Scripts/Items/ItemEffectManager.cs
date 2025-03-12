@@ -28,15 +28,15 @@ public class ItemEffectManager : MonoBehaviour {
 
     public void HealPlayer(Player player, int amount) {
         //体力MAXの場合
-        if (player.MaxHealth == player.health) {
-            player.MaxHealth += 1;
-            player.health = player.MaxHealth;
+        if (player.playerMaxHealth.Value == player.playerCurrentHealth.Value) {
+            player.playerMaxHealth.SetValue(player.playerMaxHealth.Value + 1);
+            player.playerCurrentHealth.SetValue(player.playerMaxHealth.Value);
             MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateMaxHpUpMessage(1));
             return;
         }
-        int healAmount = Mathf.Clamp(amount, 0, player.MaxHealth - player.health);
-        player.health += amount;
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, player.Name.Value));
+        int healAmount = Mathf.Clamp(amount, 0, player.playerMaxHealth.Value - player.playerCurrentHealth.Value);
+        player.playerCurrentHealth.SetValue(player.playerCurrentHealth.Value + healAmount);
+        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, player.playerObjectData.Name.Value));
     }
 
     public void HealEnemy(Enemy enemy, int amount) {

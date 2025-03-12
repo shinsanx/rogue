@@ -2,44 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using RandomDungeonWithBluePrint;
-using JetBrains.Annotations;
 using System.Linq;
 
-public class TileManager{
+public class TileManager : MonoBehaviour {
 
     private static TileManager _i;
-    public static TileManager i{
+    public static TileManager i {
         get {
-            if(_i == null) {
-                _i = new TileManager();
+            if (_i == null) {
+                Debug.Log("TileManagerが見つかりません");
             }
             return _i;
         }
     }
 
-    private Field field;
+    //全オブジェクトのセット
+    [SerializeField] ObjectDataRuntimeSet objectDataSet;
+    [SerializeField] TileSet tileSet;    
 
     //頻繁にroomNumを取得するためのキャッシュ
     private Dictionary<Vector2Int, int> roomNumCache = new Dictionary<Vector2Int, int>();
 
-    //コンストラクタ
-    public TileManager() {
-        this.field = MessageBus.Instance.Publish<Field>(DungeonConstants.GetCurrentField, this);
-        MessageBus.Instance.Subscribe("UpdateFieldInformation", UpdateFieldInformation);
-    }
 
     // 基本的な通行可能判定を行う共通メソッド
     private bool IsBasicallyWalkable(Vector2Int currentPos, Vector2Int targetPos) {
         //floor =>0 wall =>1
-        bool canMoveY = field.tileInfo.GetMapChipTypeByPosition(currentPos) == 0;
-        bool canMoveX = field.tileInfo.GetMapChipTypeByPosition(targetPos) == 0;
-        bool canMove = field.tileInfo.GetMapChipTypeByPosition(targetPos) == 0;
+        bool canMoveY = tileSet.GetMapChipTypeByPosition(currentPos) == 0;
+        bool canMoveX = tileSet.GetMapChipTypeByPosition(targetPos) == 0;
+        bool canMove = tileSet.GetMapChipTypeByPosition(targetPos) == 0;        
         return canMoveX && canMoveY && canMove;
     }
 
     //床が移動可能かどうか判別する
     public bool CheckMovableTile(Vector2Int currentPos, Vector2Int targetPos) {
-        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        bool existEnemy = objectDataSet.GetObjectTypeByPosition(targetPos) == "Enemy";
         return IsBasicallyWalkable(currentPos, targetPos) && !existEnemy;
     }
 
@@ -55,32 +51,26 @@ public class TileManager{
 
     //そのポジションに他オブジェクトがないかチェックする
     public bool CheckTileStandable(Vector2Int targetPos) {
-        bool canMove = field.tileInfo.GetMapChipTypeByPosition(targetPos) == 0;
-        bool existEnemy = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Enemy";
+        bool canMove = tileSet.GetMapChipTypeByPosition(targetPos) == 0;
+        bool existEnemy = objectDataSet.GetObjectTypeByPosition(targetPos) == "Enemy";
         return canMove && !existEnemy;
     }
 
     public Item CheckExistItem(Vector2Int targetPos) {
-         if(CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Item"){
-            return CharacterManager.i.GetObjectByPosition(targetPos).GetComponent<Item>();
-         }
-         return null;
+        if (objectDataSet.GetObjectTypeByPosition(targetPos) == "Item") {
+            return objectDataSet.GetObjectByPosition(targetPos).GetComponent<Item>();
+        }
+        return null;
     }
 
     //aisleとnothingのみ。MapChipTypeとは別
     public int GetTileType(Vector2Int vector) {
-        return field.tileInfo.GetTileTypeByPosition(vector);
+        return tileSet.GetTileTypeByPosition(vector);
     }
 
     //TileTypeとは別。
     public int GetMapChipType(Vector2Int vector) {
-        return field.tileInfo.GetMapChipTypeByPosition(vector);
-    }
-
-    //マップが変わった時に使用。Field情報を更新する
-    public void UpdateFieldInformation(object fieldData) {
-        this.field = (Field)fieldData;
-        roomNumCache.Clear();
+        return tileSet.GetMapChipTypeByPosition(vector);
     }
 
     //自身のpositionから自身が存在するRoomを特定。通路の場合はゼロ。
@@ -90,17 +80,17 @@ public class TileManager{
         }
 
         // TileInfoのメソッドを使用してroomNumを取得
-        int roomNumber = field.tileInfo.GetRoomNumByPosition(selfPos);
+        int roomNumber = tileSet.GetRoomNumByPosition(selfPos);
         roomNumCache[selfPos] = roomNumber;
         return roomNumber;
     }
 
     //Room内のジョイントポジションを検索する
     public List<Vector2Int> ExtractJointPosInRoom(Vector2Int selfPos) {
-        int roomNum = LookupRoomNum(selfPos);             
-        Room room = field.tileInfo.GetRoomByNum(roomNum);        
+        int roomNum = LookupRoomNum(selfPos);
+        Room room = tileSet.GetRoomByNum(roomNum);
         if (room == null || room.jointPositions == null) return null;
-        
+
         return room.jointPositions;
     }
 
@@ -110,7 +100,7 @@ public class TileManager{
         if (roomNum == 0) return null;
 
         // TileInfoの辞書を使用してタイルを取得
-        List<Vector2Int> roomPositions = field.tileInfo.GetTilePositionsByRoomNum(roomNum);
+        List<Vector2Int> roomPositions = tileSet.GetTilePositionsByRoomNum(roomNum);
         if (roomPositions == null || roomPositions.Count == 0) return null;
 
         // room内の全ポジションを取得
@@ -165,25 +155,25 @@ public class TileManager{
 
     //Character自動配置用
     //ランダムでRoomを選択して、そのRoom内のランダムなポジションを返す
-    public Vector2Int GetRandomPosition(){
+    public Vector2Int GetRandomPosition() {
         // Fieldの中からランダムでRoomを選択
-        if (field.Rooms.Count == 0) return Vector2Int.zero;        
+        if (tileSet.rooms.Count == 0) return Vector2Int.zero;
 
-        int roomNum = Random.Range(1, field.Rooms.Count + 1);         
+        int roomNum = Random.Range(1, tileSet.rooms.Count + 1);
         return GetRandomRoomPositions(roomNum);
-        
+
     }
 
     //指定されたRoomの中からランダムなポジションを返す
-    private Vector2Int GetRandomRoomPositions(int roomNum){        
-        List<Vector2Int> roomPositions = field.tileInfo.GetTilePositionsByRoomNum(roomNum);
-        
+    private Vector2Int GetRandomRoomPositions(int roomNum) {
+        List<Vector2Int> roomPositions = tileSet.GetTilePositionsByRoomNum(roomNum);
+
         if (roomPositions == null || roomPositions.Count == 0) {
             Debug.LogError("roomPositions is null or empty");
             return Vector2Int.zero;
         }
-        
-        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];                        
+
+        Vector2Int randomPosition = roomPositions[Random.Range(0, roomPositions.Count)];
         return randomPosition;
     }
 
@@ -191,20 +181,20 @@ public class TileManager{
     public Vector2Int GetCharactersInFront(Vector2Int selfPos, Vector2Int direction, int distance) {
         Vector2Int objectPos2 = Vector2Int.zero;
         for (int i = 1; i <= distance; i++) {
-            Vector2Int objectPos = selfPos + direction * i;            
+            Vector2Int objectPos = selfPos + direction * i;
             //壁だった場合は一つ前のポジションを返す            
-            if(GetMapChipType(objectPos) == (int)Constants.MapChipType.Wall) {
+            if (GetMapChipType(objectPos) == (int)Constants.MapChipType.Wall) {
                 Debug.Log(objectPos + "に壁があります");
                 return objectPos;
             }
             //キャラクターがいた場合はそのポジションを返す
-            if(CharacterManager.i.GetObjectTypeByPosition(objectPos) != null) {
-                string objectType = CharacterManager.i.GetObjectTypeByPosition(objectPos);
+            if (objectDataSet.GetObjectTypeByPosition(objectPos) != null) {
+                string objectType = objectDataSet.GetObjectTypeByPosition(objectPos);
                 //アイテムの場合は処理しない
-                if(objectType == "Item") {
+                if (objectType == "Item") {
                     continue;
                 }
-                Debug.Log(objectPos + "に" + objectType + "がいます");                
+                Debug.Log(objectPos + "に" + objectType + "がいます");
                 return objectPos;
             }
             objectPos2 = selfPos + direction * i;
@@ -212,5 +202,11 @@ public class TileManager{
         Debug.Log("前方にキャラクターがいません");
         return objectPos2;
     }
-    
+
+    public void Initialize() {
+        if (_i == null) {
+            _i = this;
+        }                
+    }
+
 }

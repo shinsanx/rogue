@@ -17,5 +17,9 @@ public abstract class RuntimeSet<T> : ScriptableObject
         if (Items.Contains(item))
             Items.Remove(item);
     }
+
+    public List<T> GetRuntimeSet() {
+        return Items;
+    }
 }
 

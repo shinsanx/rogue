@@ -6,9 +6,7 @@ using UnityEngine.Events;
 using System.Threading.Tasks;
 
 public class UserInput : MonoBehaviour {
-    // インスペクターで設定
-    public UnityEvent<Vector2> onMoveInput;
-    public UnityEvent onAttack;
+    // インスペクターで設定        
     public UnityEvent onMenuOpen;
     public UnityEvent onMenuClose;    
     public UnityEvent<Vector2> onNavigate;
@@ -16,6 +14,13 @@ public class UserInput : MonoBehaviour {
     Vector2 inputVector;
     public bool isMoveButtonLongPrresed = false;
     private bool isInputLocked = true;  // 入力ロックのフラグ
+
+    public GameEvent OnAttackInput;
+    public Vector2EventChannelSO OnMoveInput;
+    public GameEvent OnMenuOpenInput;
+    public GameEvent OnMenuCloseInput;
+    public Vector2EventChannelSO OnNavigateInput;
+    public GameEvent OnSubmitInput;
 
     [SerializeField]
     private InputActionAsset inputActionAsset;
@@ -51,7 +56,8 @@ public class UserInput : MonoBehaviour {
             return;
         }
         inputVector = context.ReadValue<Vector2>();
-        onMoveInput.Invoke(inputVector);
+        //onMoveInput.Invoke(inputVector);
+        OnMoveInput.RaiseEvent(inputVector);
     }
 
     //長押し移動
@@ -66,7 +72,8 @@ public class UserInput : MonoBehaviour {
     private async void MoveContinuously() {
         if (!isMoveButtonLongPrresed) return;
         while (isMoveButtonLongPrresed) {
-            onMoveInput.Invoke(inputVector);
+            //onMoveInput.Invoke(inputVector);
+            OnMoveInput.RaiseEvent(inputVector);
             await Task.Delay(300);
         }
     }
@@ -76,7 +83,8 @@ public class UserInput : MonoBehaviour {
 
         if (context.started) return;
         if (context.canceled) return;
-        onAttack?.Invoke();
+        //onAttack?.Invoke();
+        OnAttackInput.Raise();
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 public class EnemyStatusLogic
 {
+    private Enemy enemy;
     private IMonsterStatusAdapter monsterStatusAdapter;
     private MonsterStatusSO monsterSO;
     private CreateMessageLogic createMessageLogic;
@@ -22,7 +23,7 @@ public class EnemyStatusLogic
             createMessageLogic = new CreateMessageLogic();            
         }
 
-    public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, IObjectData objectData){        
+    public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, Enemy enemy){        
         monsterStatusAdapter.HP = monsterStatusSO.HP;
         monsterStatusAdapter.MaxHealth = monsterStatusSO.HP;
         monsterStatusAdapter.AttackPower = monsterStatusSO.AttackPower;
@@ -32,10 +33,11 @@ public class EnemyStatusLogic
         monsterStatusAdapter.Attribute = monsterStatusSO.Attribute;
         monsterStatusAdapter.ItemDropRate = monsterStatusSO.ItemDropRate;
         monsterStatusAdapter.AnimatorController = monsterStatusSO.AnimatorController;
+        
         monsterStatusAdapter.Sprite = monsterStatusSO.Sprite;
 
-        objectData.Name.Value = monsterStatusSO.Name;
-        objectData.Type.Value = "Enemy";        
+        enemy.objectData.Name.SetValue(monsterStatusSO.Name);
+        enemy.objectData.Type.SetValue("Enemy");        
     }
 
     

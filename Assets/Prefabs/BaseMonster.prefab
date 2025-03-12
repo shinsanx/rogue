@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 5978019968782865588}
   - component: {fileID: 1651929932614615033}
   - component: {fileID: 8700155895330858269}
+  - component: {fileID: 2406515258070522134}
+  - component: {fileID: -7549516727931103344}
+  - component: {fileID: -8392652818357298570}
   m_Layer: 0
   m_Name: BaseMonster
   m_TagString: Enemy
@@ -68,14 +71,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05cce0489cda9445ab2714dd3ebe8d38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
-  sr: {fileID: 0}
+  animator: {fileID: 1419695476721704348}
+  sr: {fileID: 1651929932614615033}
   monsterSO: {fileID: 0}
-  _id: {fileID: 11400000, guid: 2ab89549a5d7f47adaa24e5f91343915, type: 2}
-  _name: {fileID: 11400000, guid: 292327c65e0e1413a949b0b857153aad, type: 2}
-  _type: {fileID: 11400000, guid: 5e9b27bab95ac4d319f296b438f6b518, type: 2}
-  _roomNum: {fileID: 11400000, guid: d611fc5fd2cbc4130a6eae755adde88a, type: 2}
-  _position: {fileID: 11400000, guid: 0d2dd266eb6ac4f0bafccaf81fb1f220, type: 2}
+  objectData: {fileID: 2406515258070522134}
+  animationAdapter: {fileID: -8392652818357298570}
 --- !u!212 &1651929932614615033
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -141,3 +141,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RuntimeSet: {fileID: 11400000, guid: f01bf25a874894f839a33075a1e3a583, type: 2}
+--- !u!114 &2406515258070522134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233923294277433561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77e3be9c4f19740518bd267388d189f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Id>k__BackingField: {fileID: 11400000, guid: 2ab89549a5d7f47adaa24e5f91343915, type: 2}
+  <Name>k__BackingField: {fileID: 11400000, guid: 292327c65e0e1413a949b0b857153aad, type: 2}
+  <Type>k__BackingField: {fileID: 11400000, guid: 5e9b27bab95ac4d319f296b438f6b518, type: 2}
+  <RoomNum>k__BackingField: {fileID: 11400000, guid: d611fc5fd2cbc4130a6eae755adde88a, type: 2}
+  <Position>k__BackingField: {fileID: 11400000, guid: 0d2dd266eb6ac4f0bafccaf81fb1f220, type: 2}
+  _objectDataRuntimeSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
+  onPositionChanged: {fileID: 11400000, guid: 7175ef424049243248bfec963b7d26b2, type: 2}
+--- !u!114 &-7549516727931103344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233923294277433561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544a15f976c9f45be8a6cb58da3fac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 7175ef424049243248bfec963b7d26b2, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5978019968782865588}
+        m_TargetAssemblyTypeName: Enemy, Assembly-CSharp
+        m_MethodName: MovePosition
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &-8392652818357298570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1233923294277433561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c8c92756f21d4d9da60c85d3e8db51c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 1419695476721704348}
+  <MoveAnimationDirection>k__BackingField: {fileID: 11400000, guid: 5458c9947e8ac4e93a6caa7a72c4a4fb, type: 2}
+  <AttackAnimation>k__BackingField: {fileID: 0}
+  <TakeDamageAnimation>k__BackingField: {fileID: 0}
+  <EatAnimation>k__BackingField: {fileID: 0}

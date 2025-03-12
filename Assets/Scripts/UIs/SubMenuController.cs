@@ -8,7 +8,7 @@ public class SubMenuController : BaseMenuController {
     [SerializeField] private GameObject useMenu;
     [SerializeField] private GameObject placeMenu;
     [SerializeField] private GameObject throwMenu;
-    [SerializeField] private Player player;
+    [SerializeField] private Player player;    
     
     private ItemSO selectedItem;
 
@@ -81,8 +81,7 @@ public class SubMenuController : BaseMenuController {
 
     //アイテムを投げる
     private async Task ThrowItem() {
-        MenuManager.Instance.CloseAllMenus();        
-        Vector2Int direction = player.MoveAnimationDirection.RoundVector2().ToVector2Int();
-        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value, direction);
+        MenuManager.Instance.CloseAllMenus();                
+        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyState", menuName = "EnemyState/EnemyState", order = 0)]
+[CreateAssetMenu(fileName = "EnemyState", menuName = "StateMachine/EnemyState", order = 0)]
 public class EnemyState : State
 {
     public override void OnEnter() {

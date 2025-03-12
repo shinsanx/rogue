@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a8ebd18df7846c0bdc308beffc5df1, type: 3}
   m_Name: EnemyPosition
   m_EditorClassIdentifier: 
-  Value: {x: 0, y: 0}
+  Value: {x: 9, y: 29}

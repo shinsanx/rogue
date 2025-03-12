@@ -1,24 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+// using System.Collections;
+// using System.Collections.Generic;
+// using UnityEngine;
 
-public class PlayerAnimLogic
-{
-    IAnimationAdapter animationAdapter;
+// public class PlayerAnimLogic
+// {
+//     private AnimationAdapter animationAdapter;
 
-    public PlayerAnimLogic(IAnimationAdapter animationAdapter){
-        this.animationAdapter = animationAdapter;
-    }
+//     public PlayerAnimLogic(AnimationAdapter animationAdapter){
+//         this.animationAdapter = animationAdapter;
+//     }
 
-    public void SetMoveAnimation(Vector2 vector){
-        animationAdapter.MoveAnimationDirection = vector;
-    }
+//     public void SetMoveAnimation(){
+//         animationAdapter.OnMoveAnimation();
+//     }
 
-    public void SetAttackAnimation(){        
-        animationAdapter.AttackAnimation = true;
-    }
+//     public void SetAttackAnimation(){        
+//         animationAdapter.OnAttackAnimation();
+//     }
 
-    public void SetEatAnimation(){
-        animationAdapter.EatAnimation = true;
-    }
-}
+//     public void SetEatAnimation(){
+//         animationAdapter.OnEatAnimation();
+//     }
+// }
