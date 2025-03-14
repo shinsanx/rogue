@@ -29,44 +29,9 @@ public class AnimationAdapter : MonoBehaviour, IAnimationAdapter
     }
     
     
-    // public BoolVariable AttackAnimation {
-    //     get => animator.GetBool("AtkTrigger");
-    //     set => animator.SetTrigger("AtkTrigger");
-    // }
-
-    // public Vector2Variable MoveAnimationDirection {
-    //     get => playerFaceDirection.Value;
-    //     set {
-    //         playerFaceDirection.SetValue(value);
-    //         animator.SetFloat("x", value.x);
-    //         animator.SetFloat("y", value.y);
-    //     }
-    // }
-
-    // public BoolVariable TakeDamageAnimation {
-    //     get => animator.GetBool("TakeDamageTrigger");
-    //     set => animator.SetTrigger("TakeDamageTrigger");
-    // }
-
-    // public BoolVariable EatAnimation {
-    //     get => animator.GetBool("EatTrigger");
-    //     set => animator.SetTrigger("EatTrigger");
-    // }
-
-    // public void SetAttackAnimation(){        
-    //     MoveAnimationDirection = playerFaceDirection.Value;
-    //     AttackAnimation.SetValue(true);
-    // }
-
-    // public void SetMoveAnimation(){
-    //     MoveAnimationDirection = playerFaceDirection.Value;
-    // }
-
-    // public void SetTakeDamageAnimation(){
-    //     TakeDamageAnimation.SetValue(true);
-    // }
-
-    // public void SetEatAnimation(){
-    //     EatAnimation.SetValue(true);
-    // }
+    //SO生成用
+    public void CreateSOInstance(){
+        MoveAnimationDirection = ScriptableObject.CreateInstance<Vector2Variable>();
+    }
+ 
 }

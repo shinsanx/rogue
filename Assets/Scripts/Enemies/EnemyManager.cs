@@ -33,8 +33,7 @@ public class EnemyManager : MonoBehaviour {
     // 敵の行動をスタートする
     public async Task ProcessEnemies() {
 
-        //最初にプレイヤーの位置を取得
-        //playerPos = player.GetComponent<ObjectData>().Position.Value;
+        //最初にプレイヤーの位置を取得        
         playerPos = _playerPos.Value;
         if (stateMachine.CurrentState != enemyState) return;
         enemies = objectDataSet.GetAllEnemies();
@@ -97,11 +96,13 @@ public class EnemyManager : MonoBehaviour {
         if (enemyAIState.LastKnownPlayerPosition == enemyCurrentPos) {
             // LastKnownPlayerPositionに辿り着いた場合はリセットする
             enemyAIState.LastKnownPlayerPosition = Vector2Int.zero;
+            Debug.Log("enemyAIState.LastKnownPlayerPosition == enemyCurrentPos");
         }
 
         if (enemyTargetPos == enemyCurrentPos) {
             // 目的地が自分の位置にある場合はリセットする
             enemyTargetPos = Vector2Int.zero;
+            Debug.Log("enemyTargetPos == enemyCurrentPos");
         }
 
         if (enemyAIState.CanSeePlayer) {
@@ -168,6 +169,12 @@ public class EnemyManager : MonoBehaviour {
 
         if (targetPosition == enemyCurrentPos) return false;
 
+        // 目的地が0の場合は移動しない ただしこのままだと永遠に移動しないので別の目的地を探索するメソッドが必要になる。
+        if(targetPosition == Vector2Int.zero) {
+            enemyAction.TargetPosition = objectData.Position.Value;
+            return false;
+        }
+        
         List<Vector2Int> route = MakeRoute(enemyCurrentPos, targetPosition);
         if (route != null && route.Count > 0) {
             enemyAction.Type = ActionType.Move;            
@@ -199,10 +206,12 @@ public class EnemyManager : MonoBehaviour {
                     return MoveAlternativeTarget(enemyCurrentPos, enemyAIState.LastKnownPlayerPosition);
                 }
             }
+            // プレイヤーの最後の位置情報を返す
             return enemyAIState.LastKnownPlayerPosition;
         }
 
-        // 新規に目的地を設定する
+        // 目的地がない場合、新規に目的地を設定する
+        // 部屋にいる場合、通路にいる場合で処理を分ける
         return enemyAIState.IsInRoomAtStart ?
             DetermineRoomTargetPosition() :
             DetermineCorridorTargetPosition();
@@ -270,13 +279,16 @@ public class EnemyManager : MonoBehaviour {
 
     // JointPositionの目的地を決める
     private Vector2Int DetermineJointTargetPosition() {
-        var joints = TileManager.i.ExtractJointPosInRoom(enemyCurrentPos);
+        var joints = TileManager.i.ExtractJointPosByRoomNum(objectData.RoomNum.Value);        
 
         //EnterJointPositionが0の場合は、最も近いジョイントポイントを選択
         if (enemyAIState.EnterJointPosition == Vector2Int.zero) {
+
+            //jointsが一つ以上ある場合
             if (joints != null && joints.Count > 0) {
                 // 最も近いジョイントポイントを選択
-                enemyAIState.EnterJointPosition = joints
+                //enemyAIState.EnterJointPosition = joints
+                return joints
                     .OrderBy(j => Vector2Int.Distance(enemyCurrentPos, j))
                     .First();
             } else {
@@ -298,6 +310,7 @@ public class EnemyManager : MonoBehaviour {
         //もしJointPositionが0の場合は、とりあえず一歩進む
         if (joints.Count == 0) {
             enemyAIState.EnterJointPosition = Vector2Int.zero;
+            Debug.Log("joints.Count == 0");
             return DetermineCorridorTargetPosition();
         }
         
@@ -321,17 +334,20 @@ public class EnemyManager : MonoBehaviour {
         var facingDirection = GetFacingDirection();
 
         // 前方5方向で移動可能な方向に移動する
-        var directions = DirectionUtils.GetSurroundingFacingTiles(enemyCurrentPos, facingDirection);
-        foreach (var direction in directions) {
-            if (TileManager.i.CheckTileStandable(direction)) {
-                return direction;
+        var facingPositions = DirectionUtils.GetSurroundingFacingTiles(enemyCurrentPos, facingDirection);
+        
+        foreach (var facePos in facingPositions) {              
+            if (TileManager.i.CheckMovableTile(enemyCurrentPos, facePos)) {                
+                return facePos;
             }
         }
-        return enemyCurrentPos;
+        Debug.Log("目の前の5マスに移動可能な目的地が見つかりませんでした enemyCurrentPos:" + enemyCurrentPos);
+        // 移動できない場合はその場に留まる        
+        return Vector2Int.zero;
     }
 
     // 自身の向いている方向を取得する
-    private DungeonConstants.Direction GetFacingDirection() {                
+    private DungeonConstants.Direction GetFacingDirection() {  
         return DungeonConstants.ToDirection[enemyAIState.FacingDirection];
     }
 

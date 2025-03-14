@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour, IObjectData
+public class Item : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
     void Start(){
@@ -24,7 +24,6 @@ public class Item : MonoBehaviour, IObjectData
             _position.SetValue(value);
             transform.position = Position.Value.ToVector2() + moveOffset;
             RoomNum.SetValue(TileManager.i.LookupRoomNum(Position.Value));
-            OnObjectUpdated?.Invoke(this);
         }
     }
 
@@ -32,7 +31,6 @@ public class Item : MonoBehaviour, IObjectData
         Position.SetValue(position);
         transform.position = Position.Value.ToVector2() + moveOffset;
         RoomNum.SetValue(TileManager.i.LookupRoomNum(Position.Value));
-        OnObjectUpdated?.Invoke(this);
     }
     // キャラクターマネージャーによって更新される
     public event System.Action<IObjectData> OnObjectUpdated;
@@ -48,16 +46,14 @@ public class Item : MonoBehaviour, IObjectData
         Type.Value="Item";
         Position.SetValue(new Vector2Int(0, 0));
         RoomNum.SetValue(0);
-        gameObject.GetComponent<SpriteRenderer>().sprite = itemSO.icon;
-        CharacterManager.i.AddCharacter(this);
+        gameObject.GetComponent<SpriteRenderer>().sprite = itemSO.icon;        
     }    
 
     public void OnPicked(PlayerInventory playerInventory){        
         // インベントリへの追加が成功した場合のみ、アイテムを削除
         if (playerInventory.AddItem(itemSO))
         {
-            MessageBus.Instance.Publish("sendMessage", GameAssets.i.createMessageLogic.CreatePickUpMessage(itemSO.itemName));
-            CharacterManager.i.RemoveCharacter(this);
+            MessageBus.Instance.Publish("sendMessage", GameAssets.i.createMessageLogic.CreatePickUpMessage(itemSO.itemName));            
             Destroy(gameObject);
         }
         else

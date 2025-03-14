@@ -18,8 +18,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public AnimationAdapter animationAdapter;
     Vector2 moveOffset = new Vector2(.5f, .5f);
     private int _hp;
-    public int MaxHealth { get; set; }
-    
+    public int MaxHealth { get; set; }            
+        
 
     public void MovePosition() {        
         transform.DOMove(objectData.Position.Value.ToVector2() + moveOffset, 0.3f)
@@ -98,6 +98,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     }
 
     public void InitializeEnemy() {
+        CreateSOInstance();
         enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
@@ -123,6 +124,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         enemyAnimLogic.KillTween();
     }
 
+    private void CreateSOInstance() {
+        objectData.CreateSOInstance();
+        animationAdapter.CreateSOInstance();
+    }
     
 
     // ========================================================

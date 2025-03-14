@@ -18,18 +18,19 @@ public class TileManager : MonoBehaviour {
 
     //全オブジェクトのセット
     [SerializeField] ObjectDataRuntimeSet objectDataSet;
-    [SerializeField] TileSet tileSet;    
+    [SerializeField] TileSet tileSet;
 
     //頻繁にroomNumを取得するためのキャッシュ
-    private Dictionary<Vector2Int, int> roomNumCache = new Dictionary<Vector2Int, int>();
+    //private Dictionary<Vector2Int, int> roomNumCache = new Dictionary<Vector2Int, int>();
 
 
     // 基本的な通行可能判定を行う共通メソッド
     private bool IsBasicallyWalkable(Vector2Int currentPos, Vector2Int targetPos) {
         //floor =>0 wall =>1
-        bool canMoveY = tileSet.GetMapChipTypeByPosition(currentPos) == 0;
-        bool canMoveX = tileSet.GetMapChipTypeByPosition(targetPos) == 0;
-        bool canMove = tileSet.GetMapChipTypeByPosition(targetPos) == 0;        
+        Vector2Int direction = targetPos - currentPos;
+        bool canMoveY = tileSet.GetMapChipTypeByPosition(currentPos + direction.y * Vector2Int.up) == 0;        
+        bool canMoveX = tileSet.GetMapChipTypeByPosition(currentPos + direction.x * Vector2Int.right) == 0;        
+        bool canMove = tileSet.GetMapChipTypeByPosition(targetPos) == 0;         
         return canMoveX && canMoveY && canMove;
     }
 
@@ -75,13 +76,13 @@ public class TileManager : MonoBehaviour {
 
     //自身のpositionから自身が存在するRoomを特定。通路の場合はゼロ。
     public int LookupRoomNum(Vector2Int selfPos) {
-        if (roomNumCache.TryGetValue(selfPos, out var cachedRoomNum)) {
-            return cachedRoomNum;
-        }
+        // if (roomNumCache.TryGetValue(selfPos, out var cachedRoomNum)) {
+        //     return cachedRoomNum;
+        // }
 
         // TileInfoのメソッドを使用してroomNumを取得
         int roomNumber = tileSet.GetRoomNumByPosition(selfPos);
-        roomNumCache[selfPos] = roomNumber;
+        //roomNumCache[selfPos] = roomNumber;
         return roomNumber;
     }
 
@@ -90,6 +91,16 @@ public class TileManager : MonoBehaviour {
         int roomNum = LookupRoomNum(selfPos);
         Room room = tileSet.GetRoomByNum(roomNum);
         if (room == null || room.jointPositions == null) return null;
+
+        return room.jointPositions;
+    }
+
+    public List<Vector2Int> ExtractJointPosByRoomNum(int roomNum) {
+        Room room = tileSet.GetRoomByNum(roomNum);
+        if (room == null || room.jointPositions == null){
+            Debug.Log("jointPositionsが見つかりません roomNum:" + roomNum);
+            return null;
+        }        
 
         return room.jointPositions;
     }

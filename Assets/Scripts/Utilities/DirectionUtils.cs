@@ -19,7 +19,7 @@ public static class DirectionUtils {
     public static List<Vector2Int> GetSurroundingFacingTiles(Vector2Int currentPos, DungeonConstants.Direction direction) {
         var (forward, left, right) = DirectionVectors[direction];
         return new List<Vector2Int> {
-            currentPos + forward,                    // 前
+            currentPos + forward,                    // 前            
             currentPos + forward + left,             // 斜め前左
             currentPos + forward + right,            // 斜め前右
             currentPos + left,                       // 左

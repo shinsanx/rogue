@@ -24,6 +24,7 @@ public class ObjectData : MonoBehaviour, IObjectData
 
     public void SetPosition(Vector2Int position) {
         Position.SetValue(position);
+        SetRoomNum(TileManager.i.LookupRoomNum(position));
         onPositionChanged.Raise();
         OnObjectUpdated?.Invoke(this);
     }
@@ -49,6 +50,13 @@ public class ObjectData : MonoBehaviour, IObjectData
     }
     
     
-    
+    //SOインスタンス生成用
+    public void CreateSOInstance() {
+        Id = ScriptableObject.CreateInstance<IntVariable>();
+        Name = ScriptableObject.CreateInstance<StringVariable>();
+        Type = ScriptableObject.CreateInstance<StringVariable>();
+        RoomNum = ScriptableObject.CreateInstance<IntVariable>();
+        Position = ScriptableObject.CreateInstance<Vector2IntVariable>();
+    }
 
 }
