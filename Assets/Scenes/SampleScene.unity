@@ -2879,10 +2879,10 @@ MonoBehaviour:
   statusUI: {fileID: 972607837}
   dungeonStateManager: {fileID: 1348055333}
   enemyManager: {fileID: 1665713301}
-  inventoryUI: {fileID: 0}
   dungeonData: {fileID: 11400000, guid: a786f3ae3741b4ee499259246c3b443c, type: 2}
   characterManager: {fileID: 1741563297}
   tileManager: {fileID: 693550566}
+  currentDungeonData: {fileID: 11400000, guid: d72a4e83bf8054663881dba28c4b7532, type: 2}
 --- !u!114 &672341474
 MonoBehaviour:
   m_ObjectHideFlags: 0

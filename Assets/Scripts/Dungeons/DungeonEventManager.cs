@@ -16,12 +16,11 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] Player player;
     [SerializeField] StatusUI statusUI;
     [SerializeField] DungeonStateManager dungeonStateManager;
-    [SerializeField] EnemyManager enemyManager;
-    [SerializeField] InventoryController inventoryUI;
+    [SerializeField] EnemyManager enemyManager;    
     [SerializeField] DungeonDataSO dungeonData;
     [SerializeField] CharacterManager characterManager;
     [SerializeField] TileManager tileManager;
-
+    [SerializeField] CurrentDungeonData currentDungeonData;
     private EnemyTableSO currentEnemyTable;
     private ItemTableSO currentItemTable;
 
@@ -66,6 +65,9 @@ public class DungeonEventManager : MonoBehaviour {
 
         // 12. ミニマップの生成
         await CreateMiniMap();
+
+        // 13. ダンジョンデータの保存
+        SaveDungeonData();
 
         Debug.Log("Initialize completed");
         // }
@@ -140,5 +142,10 @@ public class DungeonEventManager : MonoBehaviour {
     private Task InitializeTileManager() {
         tileManager.Initialize();
         return Task.CompletedTask;
+    }
+
+    private void SaveDungeonData() {
+        currentDungeonData.currentDungeonData = dungeonData;
+        currentDungeonData.currentFloor = 1;
     }
 }
