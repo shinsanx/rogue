@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 143c68fcbacc944ea86894e5738ba50d, type: 3}
+  m_Name: TestDungeonFloor2
+  m_EditorClassIdentifier: 
+  InitialEnemyCount: 5
+  InitialItemCount: 5
+  EnemyTable: {fileID: 11400000, guid: 7f5c19a4949c54f049174d0ead324492, type: 2}
+  ItemTable: {fileID: 11400000, guid: e38b9b30e78134762a43087eff912f55, type: 2}

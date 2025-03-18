@@ -10,6 +10,7 @@ public class DungeonStateLogic {
 
     private StateMachine stateMachine;
     private State playerState;
+    private GameEvent updateMiniMap;
     
     
     private EnemyManager enemyManager;
@@ -18,8 +19,9 @@ public class DungeonStateLogic {
     public List<Transform> gameObjectsTransform = new List<Transform>();
     public List<Enemy> enemies = new List<Enemy>();        
 
-    public DungeonStateLogic(EnemyManager enemyManager) {        
+    public DungeonStateLogic(EnemyManager enemyManager, GameEvent updateMiniMap) {        
         this.enemyManager = enemyManager;
+        this.updateMiniMap = updateMiniMap;
         stateMachine = GameAssets.i.stateMachine;
         playerState = GameAssets.i.playerState;
     }
@@ -45,7 +47,8 @@ public class DungeonStateLogic {
     }
 
     private void EndEnemyTurn(){
-        MessageBus.Instance.Publish("CreateCharacterUI", null);
+        //MessageBus.Instance.Publish("CreateCharacterUI", null);
+        updateMiniMap.Raise();
         stateMachine.SetState(playerState);
     }
 

@@ -6,11 +6,7 @@ using UnityEngine.Events;
 using System.Threading.Tasks;
 
 public class UserInput : MonoBehaviour {
-    // インスペクターで設定        
-    public UnityEvent onMenuOpen;
-    public UnityEvent onMenuClose;    
-    public UnityEvent<Vector2> onNavigate;
-    public UnityEvent onSubmit;
+    // インスペクターで設定                
     Vector2 inputVector;
     public bool isMoveButtonLongPrresed = false;
     private bool isInputLocked = true;  // 入力ロックのフラグ
@@ -55,8 +51,7 @@ public class UserInput : MonoBehaviour {
             isMoveButtonLongPrresed = false;
             return;
         }
-        inputVector = context.ReadValue<Vector2>();
-        //onMoveInput.Invoke(inputVector);
+        inputVector = context.ReadValue<Vector2>();        
         OnMoveInput.RaiseEvent(inputVector);
     }
 
@@ -71,8 +66,7 @@ public class UserInput : MonoBehaviour {
 
     private async void MoveContinuously() {
         if (!isMoveButtonLongPrresed) return;
-        while (isMoveButtonLongPrresed) {
-            //onMoveInput.Invoke(inputVector);
+        while (isMoveButtonLongPrresed) {            
             OnMoveInput.RaiseEvent(inputVector);
             await Task.Delay(300);
         }
@@ -95,7 +89,7 @@ public class UserInput : MonoBehaviour {
         if (context.canceled) return;                
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        onMenuOpen?.Invoke();
+        OnMenuOpenInput.Raise();
     }
 
     /// <summary>
@@ -106,7 +100,7 @@ public class UserInput : MonoBehaviour {
         if (context.canceled) return;                
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        onMenuClose?.Invoke();
+        OnMenuCloseInput.Raise();
     }
 
     public void OnToggleActionMap(){
@@ -126,12 +120,14 @@ public class UserInput : MonoBehaviour {
         if (context.canceled) return;
         Vector2 navigateVector = context.ReadValue<Vector2>();
         if (navigateVector.magnitude == 0) return;
-        onNavigate?.Invoke(navigateVector);
+        //onNavigate?.Invoke(navigateVector);
+        OnNavigateInput.RaiseEvent(navigateVector);
     }
 
     public void OnSubmit(InputAction.CallbackContext context) {
         if (context.started) return;
         if (context.canceled) return;
-        onSubmit?.Invoke();
+        //onSubmit?.Invoke();
+        OnSubmitInput.Raise();
     }
 }

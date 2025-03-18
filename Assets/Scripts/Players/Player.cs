@@ -12,11 +12,11 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
     // === Private Fields ===    
     private PlayerMoveLogic playerMoveLogic;
-    private PlayerAttackLogic playerAttackLogic;    
-    public PlayerInventory playerInventory;
+    private PlayerAttackLogic playerAttackLogic;        
     private PlayerStatusDataLogic playerStatusDataLogic;
-    private CreateMessageLogic createMessageLogic;
+    [SerializeField]private CreateMessageLogic createMessageLogic;
     public ObjectData playerObjectData;
+    [SerializeField] private MessageEventChannelSO onMessageSend;    
 
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
     [SerializeField] bool resetStatus = true;
@@ -44,7 +44,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     [SerializeField] GameEvent OnPlayerDirectionChanged;
     [SerializeField] GameEvent OnPlayerAttack;
     [SerializeField] GameEvent OnPlayerEat;
-        
+    [SerializeField] ItemEventChannelSO OnItemPicked; //PlayerMoveLogicで使用
 
     // ================================================
     // ============= IPlayerStatusAdapter =============
@@ -96,8 +96,8 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // プレイヤーの経験値を変更するメソッド
-    public void ChangePlayerExperience(int value) {
-        playerExperience.Value = value;
+    public void AddPlayerExperience(int value) {
+        playerExperience.Value += value;
 
         // レベルアップ判定
         if (playerExperience.Value >= DungeonConstants.necessarryExp[playerLevel.Value + 1]) {
@@ -137,13 +137,9 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     public void InitializePlayer() {
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());                        
-        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, playerInventory);
+        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack);
-        playerStatusDataLogic = new PlayerStatusDataLogic(this);
-        createMessageLogic = new CreateMessageLogic();
-        playerInventory = new PlayerInventory(OnPlayerStateComplete);
-        
-        MessageBus.Instance.Subscribe(DungeonConstants.GetExp, playerStatusDataLogic.GetExp);
+        playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);                
     }
 
     private void SetPlayerStatusDefault() {
@@ -176,12 +172,16 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         //体力MAXの場合
         if (playerMaxHealth.Value == playerCurrentHealth.Value) {
             ChangePlayerMaxHealth(playerMaxHealth.Value + 1);
-            MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateMaxHpUpMessage(1));
+            onMessageSend.RaiseEvent(createMessageLogic.CreateMaxHpUpMessage(1));
             return;
         }
         int healAmount = Mathf.Clamp(amount, 0, playerMaxHealth.Value - playerCurrentHealth.Value);
         ChangePlayerCurrentHealth(healAmount);
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, createMessageLogic.CreateHealMessage(healAmount, playerObjectData.Name.Value));
+        onMessageSend.RaiseEvent(createMessageLogic.CreateHealMessage(healAmount, playerObjectData.Name.Value));
+    }
+
+    public void HandleItemPicked(bool success) {
+        playerMoveLogic.HandleItemPicked(success);
     }
 
 }

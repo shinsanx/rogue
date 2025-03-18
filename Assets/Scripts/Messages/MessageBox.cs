@@ -14,14 +14,13 @@ public class MessageBox : MonoBehaviour {
     public Vector2 initialTextsPos;
 
     [SerializeField] private GameObject texts;
-    [SerializeField] private GameObject box;
+    [SerializeField] private GameObject box;    
 
     private readonly Queue<List<string>> messageQueue = new Queue<List<string>>();
     private bool isProcessing = false;
     private CancellationTokenSource cancellationTokenSource;
 
-    private void Start() {
-        MessageBus.Instance.Subscribe("sendMessage", OnMessageReceived);
+    private void Start() {        
         initialTextsPos = texts.transform.position;
     }
 
@@ -30,7 +29,7 @@ public class MessageBox : MonoBehaviour {
     /// </summary>
     /// <param name="data">受信したメッセージ</param>
     /// <returns>非同期タスク</returns>
-    async void OnMessageReceived(object data) {
+    public async void OnMessageReceived(object data) {
         await EnqueueMessageAsync((List<string>)data);
     }
 

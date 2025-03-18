@@ -12,6 +12,13 @@ public class StatusMenuController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI NextExpText;
     
     [SerializeField] private GameObject StatusMenuObject;
+
+    [SerializeField] private WeaponSO playerSword;
+    [SerializeField] private ShieldSO playerShield;
+    [SerializeField] private IntVariable playerCurrentMuscle;
+    [SerializeField] private IntVariable playerCurrentLv;
+    [SerializeField] private IntVariable playerCurrentExp;
+
     
     public void OpenStatusMenu() {
         StatusMenuObject.SetActive(true);
@@ -23,10 +30,19 @@ public class StatusMenuController : MonoBehaviour
     }
 
     private void UpdateStatus() {
-        // SwordPowerText.text = Player.i.SwordPower.ToString();
-        // ShieldPowerText.text = Player.i.ShieldPower.ToString();
-        // MuscleText.text = Player.i.Muscle.ToString();
-        // ExpText.text = Player.i.Exp.ToString();
-        // NextExpText.text = Player.i.NextExp.ToString();
+        if(playerSword != null) {
+            SwordPowerText.text = playerSword.attackPower.ToString();
+        } else{
+            SwordPowerText.text = "---";
+        }
+        if(playerShield != null) {
+            ShieldPowerText.text = playerShield.defensePower.ToString();
+        } else{
+            ShieldPowerText.text = "---";
+        }
+        MuscleText.text = playerCurrentMuscle.Value.ToString();
+        ExpText.text = playerCurrentExp.Value.ToString();
+        int nextExp = DungeonConstants.necessarryExp[playerCurrentLv.Value +1];
+        NextExpText.text = (nextExp-playerCurrentExp.Value).ToString();
     }
 }

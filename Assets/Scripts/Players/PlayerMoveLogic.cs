@@ -5,26 +5,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 public class PlayerMoveLogic {
-    private IObjectData objectData;    
+    private IObjectData objectData;
     private StateMachine stateMachine;
     private Player player;
-    private Vector2Variable playerFaceDirection;
-    private PlayerInventory playerInventory;
+    private Vector2Variable playerFaceDirection;    
+    private GameObject currentItemObject;
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
     private GameEvent OnPlayerStateComplete;
     public GameEvent OnPlayerDirectionChanged;
+    public ItemEventChannelSO OnItemPicked;
 
     //コンストラクタ
-    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, PlayerInventory playerInventory) {
-        this.player = player;        
+    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, ItemEventChannelSO OnItemPicked) {
+        this.player = player;
         this.stateMachine = GameAssets.i.stateMachine;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
         this.objectData = player.playerObjectData;
         this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
-        this.playerFaceDirection = playerFaceDirection;
-        this.playerInventory = playerInventory;
+        this.playerFaceDirection = playerFaceDirection;        
+        this.OnItemPicked = OnItemPicked;
     }
 
     Vector2 inputVector;
@@ -36,7 +37,7 @@ public class PlayerMoveLogic {
 
     public void MoveByInput(Vector2 inputVector) {
         try {
-            this.inputVector = inputVector;            
+            this.inputVector = inputVector;
 
             roundX = Mathf.Round(inputVector.x);
             roundY = Mathf.Round(inputVector.y);
@@ -54,49 +55,69 @@ public class PlayerMoveLogic {
     }
 
     async void DevideInput(Vector2Int currentPos, Vector2Int targetPos) {
-        
-            //0.03秒待つ
-            await Task.Delay(30);
 
-            if (inputs.Count == 1) Move(currentPos, targetPos);
+        //0.03秒待つ
+        await Task.Delay(30);
 
-            if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpRight])) {
-                Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpRight]);
-            } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpLeft])) {
-                Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpLeft]);
-            } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownRight])) {
-                Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownRight]);
-            } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownLeft])) {
-                Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownLeft]);
-            }
-            inputs.Clear();
-        
+        if (inputs.Count == 1) Move(currentPos, targetPos);
+
+        if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpRight])) {
+            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpRight]);
+        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpLeft])) {
+            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpLeft]);
+        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownRight])) {
+            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownRight]);
+        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownLeft])) {
+            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownLeft]);
+        }
+        inputs.Clear();
+
     }
 
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
-        
-            if (stateMachine.CurrentState != GameAssets.i.playerState) {
-                return;
+
+        if (stateMachine.CurrentState != GameAssets.i.playerState) {
+            return;
+        }
+
+        if (player.IsMoving()) {
+            Debug.Log("playerが動いています");
+            return;
+        }
+
+        //アニメーションを再生する
+        playerFaceDirection.SetValue(new Vector2(roundX, roundY));
+        OnPlayerDirectionChanged.Raise();
+        if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
+
+        //アイテムを拾う
+        if (TileManager.i.CheckExistItem(targetPos) is Item item) {
+            // itemSOがnullでないことを確認
+            if (item.itemSO != null) {
+                currentItemObject = item.gameObject;
+                //item.GetComponent<Item>().OnPicked();
+                OnItemPicked.RaiseEvent(item.itemSO); // ここでエラーが発生している可能性
+            } else {
+                Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
             }
+        }
 
-            if (player.IsMoving()) {
-                Debug.Log("playerが動いています");
-                return;
+        Vector2 newPosition = targetPos + moveOffset;
+        objectData.SetPosition(newPosition.ToVector2Int());
+        OnPlayerStateComplete.Raise();
+    }
+
+    //アイテムを拾った時のアイテム側の処理
+    //Playerから呼ばれる。SuccessItemPicked
+    public void HandleItemPicked(bool success) {
+        if (success) {
+            Item item = currentItemObject.GetComponent<Item>();
+            if (item != null) {                
+                currentItemObject.GetComponent<Item>().OnPicked();                
             }
-
-            //アニメーションを再生する
-            playerFaceDirection.SetValue(new Vector2(roundX, roundY));
-            OnPlayerDirectionChanged.Raise();
-            if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
-
-            //アイテムを拾う
-            if(TileManager.i.CheckExistItem(targetPos) is Item item) {
-                item.GetComponent<Item>().OnPicked(playerInventory);
-            }
-
-            Vector2 newPosition = targetPos + moveOffset;
-            objectData.SetPosition(newPosition.ToVector2Int());
-            OnPlayerStateComplete.Raise();
+        } else {
+            Debug.Log("アイテムを拾えませんでした。");
+        }
     }
 
     // async void LockInputWhileMoving() {

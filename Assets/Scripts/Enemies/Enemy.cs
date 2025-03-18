@@ -9,7 +9,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public Animator animator;
     public SpriteRenderer sr;
     public MonsterStatusSO monsterSO;    
-
+    [SerializeField] private CreateMessageLogic createMessageLogic;
+    [SerializeField] private MessageEventChannelSO onMessageSend;
+    [SerializeField] private IntEventChannelSO addExp;
     public EnemyStatusLogic enemyStatusLogic;
     public EnemyAnimLogic enemyAnimLogic;
     public EnemyAttackLogic enemyAttackLogic;    
@@ -99,13 +101,13 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
 
     public void InitializeEnemy() {
         CreateSOInstance();
-        enemyStatusLogic = new EnemyStatusLogic(this, monsterSO);
+        enemyStatusLogic = new EnemyStatusLogic(this, monsterSO, onMessageSend, addExp);
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
         enemyMoveLogic = new EnemyMoveLogic(this);
         enemyAttackLogic = new EnemyAttackLogic(this);        
 
-        enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this);
+        enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this, createMessageLogic);
         objectData.SetId(CharacterManager.GetUniqueID()); // Assign a unique ID                
 
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように

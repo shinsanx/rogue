@@ -12,6 +12,7 @@ public class DungeonStateManager : MonoBehaviour {
     [SerializeField] GameObject enemyParent;
     [SerializeField] EnemyManager enemyManager;
     DungeonStateLogic dungeonStateLogic;
+    [SerializeField] GameEvent updateMiniMap;
 
 
     public void Initialize() {
@@ -19,7 +20,7 @@ public class DungeonStateManager : MonoBehaviour {
         playerState = GameAssets.i.playerState;
         enemyState = GameAssets.i.enemyState;        
 
-        dungeonStateLogic = new DungeonStateLogic(enemyManager);
+        dungeonStateLogic = new DungeonStateLogic(enemyManager, updateMiniMap);
 
         playerState.OnEnterEvent += dungeonStateLogic.PlayerStateStart;
         enemyState.OnEnterEvent += dungeonStateLogic.EnemyStateStart;

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[System.Serializable]
-public class CreateMessageLogic {
+[CreateAssetMenu(fileName = "CreateMessageLogic", menuName = "Dungeon/CreateMessageLogic")]
+public class CreateMessageLogic : ScriptableObject {
 
 
 

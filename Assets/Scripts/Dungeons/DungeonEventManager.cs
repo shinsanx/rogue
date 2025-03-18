@@ -59,13 +59,13 @@ public class DungeonEventManager : MonoBehaviour {
         await GenerateEnemies();
 
         // 10. インベントリUIの初期化
-        // await InitializeInventoryUI();
+        await InitializeInventoryUI();
 
         // 11. アイテムの生成（必要に応じて実装）
-        //await GenerateItems();
+        await GenerateItems();
 
         // 12. ミニマップの生成
-        //await CreateMiniMap();
+        await CreateMiniMap();
 
         Debug.Log("Initialize completed");
         // }
@@ -79,12 +79,6 @@ public class DungeonEventManager : MonoBehaviour {
         currentEnemyTable = dungeonData.DungeonTable.Floors[0].EnemyTable;
         currentItemTable = dungeonData.DungeonTable.Floors[0].ItemTable;
     }
-
-    // //EnemyTableから敵をランダムに選択する
-    // private MonsterStatusSO SelectEnemy() {
-    //     int randomIndex = Random.Range(0, currentEnemyTable.Enemies.Count);
-    //     return currentEnemyTable.Enemies[randomIndex];
-    // }
 
     //ItemTableからアイテムをランダムに選択する
     private ItemSO SelectItem() {
@@ -124,10 +118,10 @@ public class DungeonEventManager : MonoBehaviour {
         return Task.CompletedTask;
     }
 
-    // private Task InitializeInventoryUI() {
-    //     inventoryUI.InitializeMenu();
-    //     return Task.CompletedTask;
-    // }
+    private Task InitializeInventoryUI() {
+        //inventoryUI.InitializeMenu();
+        return Task.CompletedTask;
+    }
 
     private async Task GenerateEnemies() {
         await ArrangeManager.i.ArrangeEnemyToRandomPosition(currentEnemyTable.Enemies, dungeonData.DungeonTable.Floors[0].InitialEnemyCount);
@@ -135,7 +129,7 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private async Task GenerateItems() {
-        await ArrangeManager.i.ArrangeItemToRandomPosition();
+        await ArrangeManager.i.ArrangeItemToRandomPosition(currentItemTable.Items, dungeonData.DungeonTable.Floors[0].InitialItemCount);
     }
 
     private Task CreateMiniMap() {

@@ -2,12 +2,10 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class MenuController : MonoBehaviour {
-    
-    //[SerializeField] private InventoryController inventoryUI; // インベントリUIのオブジェクト
+        
     private bool isMenuOpen = false;
-    public UnityEvent onToggleActionMap; //UserInputのOnTggleActionMapが登録
-    
-    // [SerializeField] private GameObject menuUI;
+    public GameEvent OnToggleActionMap; //UserInputのOnToggleActionMapが登録
+        
 
     private float roundX;
     private float roundY;
@@ -28,7 +26,7 @@ public class MenuController : MonoBehaviour {
         MenuManager.Instance.SetActiveMenu<MainMenuController>();
         if(MenuManager.Instance.activeMenus.Count >= 1){
             isMenuOpen = true;
-            onToggleActionMap?.Invoke();
+            OnToggleActionMap.Raise();
         }
     }
     /// <summary>
@@ -40,7 +38,7 @@ public class MenuController : MonoBehaviour {
         //アクティブメニューがゼロになると、移動可能にする
         if(MenuManager.Instance.activeMenus.Count == 0){
             isMenuOpen = false;
-            onToggleActionMap?.Invoke();
+            OnToggleActionMap.Raise();
         }
     }
 
@@ -49,7 +47,7 @@ public class MenuController : MonoBehaviour {
     public void CheckMenuClosed() {        
         if(MenuManager.Instance.activeMenus.Count == 0){
             isMenuOpen = false;
-            onToggleActionMap?.Invoke();
+            OnToggleActionMap.Raise();
         }
     }
 

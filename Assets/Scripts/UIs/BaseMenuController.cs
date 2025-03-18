@@ -21,7 +21,7 @@ public abstract class BaseMenuController : MonoBehaviour {
     /// 派生クラスでメニュー項目の初期化を行う
     /// （たとえばシーン上の Text や Button、スロットを menuItems リストに追加する）
     /// </summary>
-    protected abstract void InitializeMenu();
+    //protected abstract void InitializeMenu();
 
     /// <summary>
     /// Start で初期化し、カーソル位置を更新する

@@ -17,7 +17,8 @@ public class StatusUI : MonoBehaviour {
     [SerializeField] IntVariable playerLevel;
     [SerializeField] IntVariable playerExperience;    
     [SerializeField] StringVariable playerName;
-    
+    [SerializeField] CreateMessageLogic createMessageLogic;
+    [SerializeField] MessageEventChannelSO onMessageSend;
 
     //本当はロジックに移行したい。StatusUILogicとか作って
     public void UpdateHPText() {
@@ -33,7 +34,7 @@ public class StatusUI : MonoBehaviour {
         currentLvTxt.text = updateTxt.ConvertNumToUpperString(playerLevel.Value);
         if (playerLevel.Value == 1) return;
 
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.LvUppedMessage(playerName.Value, playerLevel.Value));
+        onMessageSend.RaiseEvent(createMessageLogic.LvUppedMessage(playerName.Value, playerLevel.Value));
     }
     
 }

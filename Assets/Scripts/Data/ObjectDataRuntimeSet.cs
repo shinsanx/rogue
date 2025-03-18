@@ -72,4 +72,8 @@ public class ObjectDataRuntimeSet : RuntimeSet<ObjectData> {
         return Items.FirstOrDefault(item => item.Id.Value == id);
     }
 
+    public List<ObjectData> GetAllObjectData() {
+        return Items;
+    }
+
 }

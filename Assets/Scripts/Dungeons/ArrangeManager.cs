@@ -20,25 +20,28 @@ public class ArrangeManager : MonoBehaviour {
     [SerializeField] GameObject enemyParent;
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] GameObject itemParent;
-    [SerializeField] GameObject itemPrefab;
-    [SerializeField] int itemCount;
-    [SerializeField] int enemyCount;
+    [SerializeField] GameObject itemPrefab;        
     //ランダムなポジションにアイテムを配置
     //itemPrefabはやがて置き換える
-    public async Task ArrangeItemToRandomPosition() {
-        // アイテムを取得                
+    public async Task ArrangeItemToRandomPosition(List<ItemSO> itemSOs, int itemCount) {
+        //itemSOsの中からアイテムをランダムに選択
+        ItemSO selectedItem = itemSOs.OrderBy(item => Random.Range(0, int.MaxValue)).First();
+
+        // アイテムを配置
         for (int i = 0; i < itemCount; i++) {
-            PlaceItem(itemPrefab, TileManager.i.GetRandomPosition());
-            await Task.Yield();            
+            PlaceItem(TileManager.i.GetRandomPosition(), selectedItem);
+            await Task.Yield();
         }
     }
 
-    public void PlaceItem(GameObject itemPrefab, Vector2Int position) {
+    public void PlaceItem(Vector2Int position , ItemSO itemSO) {
         // アイテムを配置
         GameObject itemObject = Instantiate(itemPrefab, position.ToVector2(), Quaternion.identity);
+        Item item = itemObject.GetComponent<Item>();
+        item.itemSO = itemSO;
+        item.Initialize();
         itemObject.transform.SetParent(itemParent.transform);
-        itemObject.GetComponent<Item>().Initialize();
-        itemObject.GetComponent<IObjectData>().Position.SetValue(position);
+        item.objectData.SetPosition(position);
     }
 
     //敵をランダムなポジションに配置

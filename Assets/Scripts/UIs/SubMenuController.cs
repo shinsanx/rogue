@@ -12,7 +12,8 @@ public class SubMenuController : BaseMenuController {
     
     private ItemSO selectedItem;
 
-    protected override void InitializeMenu() {
+    void OnEnable() {
+        Debug.Log("SubMenuControllerのOnEnableが呼び出されました。");
         menuItems = new List<GameObject>();
         menuItems.Add(useMenu);
         menuItems.Add(placeMenu);
@@ -69,19 +70,19 @@ public class SubMenuController : BaseMenuController {
 
     //アイテムを使用する
     private void UseItem() {
-        player.playerInventory.UseItem(selectedItem, player);
+        MenuManager.Instance.UseItem(selectedItem, player);
         MenuManager.Instance.CloseAllMenus();
     }
 
     //アイテムを置く
     private void PlaceItem() {
-        player.playerInventory.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
+        MenuManager.Instance.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
         MenuManager.Instance.CloseAllMenus();
     }
 
     //アイテムを投げる
     private async Task ThrowItem() {
         MenuManager.Instance.CloseAllMenus();                
-        await player.playerInventory.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
+        await MenuManager.Instance.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
     }
 }

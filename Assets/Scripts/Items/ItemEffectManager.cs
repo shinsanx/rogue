@@ -16,6 +16,10 @@ public class ItemEffectManager : MonoBehaviour {
         }
     }
 
+    [SerializeField] private CreateMessageLogic createMessageLogic;
+    [SerializeField] private MessageEventChannelSO onMessageSend;
+
+
 
 
     public void ApplyItemEffect(ItemSO item, GameObject target) {
@@ -31,12 +35,12 @@ public class ItemEffectManager : MonoBehaviour {
         if (player.playerMaxHealth.Value == player.playerCurrentHealth.Value) {
             player.playerMaxHealth.SetValue(player.playerMaxHealth.Value + 1);
             player.playerCurrentHealth.SetValue(player.playerMaxHealth.Value);
-            MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateMaxHpUpMessage(1));
+            onMessageSend.RaiseEvent(createMessageLogic.CreateMaxHpUpMessage(1));
             return;
         }
         int healAmount = Mathf.Clamp(amount, 0, player.playerMaxHealth.Value - player.playerCurrentHealth.Value);
         player.playerCurrentHealth.SetValue(player.playerCurrentHealth.Value + healAmount);
-        MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, player.playerObjectData.Name.Value));
+        onMessageSend.RaiseEvent(createMessageLogic.CreateHealMessage(healAmount, player.playerObjectData.Name.Value));
     }
 
     public void HealEnemy(Enemy enemy, int amount) {
@@ -46,7 +50,7 @@ public class ItemEffectManager : MonoBehaviour {
         }
         int healAmount = Mathf.Clamp(amount, 0, enemy.MaxHealth - enemy.HP);
         enemy.HP += healAmount;
-        //MessageBus.Instance.Publish(DungeonConstants.sendMessage, GameAssets.i.createMessageLogic.CreateHealMessage(healAmount, enemy.Name));
+        //onMessageSend.RaiseEvent(createMessageLogic.CreateHealMessage(healAmount, enemy.Name));
     }
 
 

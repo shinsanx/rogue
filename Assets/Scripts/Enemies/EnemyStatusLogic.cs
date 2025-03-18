@@ -13,17 +13,24 @@ public class EnemyStatusLogic
     private CreateMessageLogic createMessageLogic;
     public Action OnDestroyed;
     private List<string> messages = new List<string>();
+    private MessageEventChannelSO onMessageSend;
+    private IntEventChannelSO addExp;
+
 
     public EnemyStatusLogic(
         IMonsterStatusAdapter monsterStatusAdapter,
-        MonsterStatusSO monsterSO
+        MonsterStatusSO monsterSO,
+        MessageEventChannelSO onMessageSend,
+        IntEventChannelSO addExp
         ) {
             this.monsterStatusAdapter = monsterStatusAdapter;
             this.monsterSO = monsterSO;
-            createMessageLogic = new CreateMessageLogic();            
+            this.onMessageSend = onMessageSend;
+            this.addExp = addExp;
         }
 
-    public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, Enemy enemy){        
+    public void InitializeEnemyStatus(IMonsterStatusAdapter monsterStatusAdapter, MonsterStatusSO monsterStatusSO, Enemy enemy, CreateMessageLogic createMessageLogic){        
+        this.createMessageLogic = createMessageLogic;
         monsterStatusAdapter.HP = monsterStatusSO.HP;
         monsterStatusAdapter.MaxHealth = monsterStatusSO.HP;
         monsterStatusAdapter.AttackPower = monsterStatusSO.AttackPower;
@@ -53,9 +60,9 @@ public class EnemyStatusLogic
 
         if(monsterStatusAdapter.HP <= 0){
             messages = createMessageLogic.CreateDefeatedMessage(messages, monsterSO.Name, monsterStatusAdapter.Exp);
-            MessageBus.Instance.Publish(DungeonConstants.GetExp, monsterStatusAdapter.Exp);
+            addExp.RaiseEvent(monsterStatusAdapter.Exp);
         }
-        MessageBus.Instance.Publish("sendMessage", messages);
+        onMessageSend.RaiseEvent(messages);
     }
 
     public async void Destroy(){

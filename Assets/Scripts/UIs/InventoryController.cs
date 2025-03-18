@@ -2,14 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 
 public class InventoryController : BaseMenuController {
-    public Player player; // プレイヤーのインベントリへの参照
-    private PlayerInventory playerInventory;
+    public Player player; // プレイヤーのインベントリへの参照    
     public GameObject itemSlotPrefab;       // アイテムスロットのPrefab
     public Transform itemsParent;           // アイテムスロットを配置する親Transform            
     // シーン上でInventoryControllerをアタッチしたオブジェクトを取得    
-    [SerializeField] private GameObject itemWindow;    
+    [SerializeField] private GameObject itemWindow;
+    [SerializeField] private InventorySO inventorySO;
+    [SerializeField] private ObjectDataRuntimeSet objectSet;
 
     private List<ItemSO> itemSlots = new List<ItemSO>();    
 
@@ -17,11 +19,7 @@ public class InventoryController : BaseMenuController {
     private int currentPage = 0; // 現在のページ
 
 
-    protected override void InitializeMenu() {
-        playerInventory = player.playerInventory;
-        if (playerInventory != null) {
-            playerInventory.OnInventoryUpdated += UpdateInventoryUI; // イベントを購読            
-        }
+    void OnEnable() {
         UpdateInventoryUI();
     }
 
@@ -42,7 +40,7 @@ public class InventoryController : BaseMenuController {
 
     // 現在のページに基づいてアイテムを表示するメソッド
     private void DisplayItemsOnCurrentPage() {
-        List<ItemSO> items = playerInventory.GetAllItems();
+        List<ItemSO> items = inventorySO.GetAllItems();
         int startIndex = currentPage * ItemsPerPage;
         int endIndex = Mathf.Min(startIndex + ItemsPerPage, items.Count);
 
@@ -97,7 +95,7 @@ public class InventoryController : BaseMenuController {
         SubMenuController subMenuController = MenuManager.Instance.SetActiveMenu<SubMenuController>();
 
         // 選択されているアイテムをサブメニューに渡す
-        subMenuController.SetSubMenu(itemSlots[currentIndex]);
+        subMenuController.SetSubMenu(itemSlots[currentIndex]);        
     }
 
     // ページ切り替えを行うメソッド
@@ -109,7 +107,7 @@ public class InventoryController : BaseMenuController {
             currentPage--;
         }
 
-        int totalPages = Mathf.CeilToInt((float)playerInventory.GetAllItems().Count / ItemsPerPage);
+        int totalPages = Mathf.CeilToInt((float)inventorySO.GetAllItems().Count / ItemsPerPage);
         currentPage = Mathf.Clamp(currentPage, 0, totalPages - 1);
 
         // ページが変わったかどうかを返す

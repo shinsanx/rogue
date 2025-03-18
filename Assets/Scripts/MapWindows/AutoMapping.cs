@@ -13,6 +13,7 @@ public class AutoMapping : MonoBehaviour {
     public GameObject playerImagePrefab;
     public GameObject itemImagePrefab;
     private Field currentField;
+    [SerializeField] private ObjectDataRuntimeSet objectDataSet;
 
     float scale;
     Vector2 startPosition;
@@ -68,7 +69,7 @@ public class AutoMapping : MonoBehaviour {
         if (currentField == null) return;
         ClearCharacterUI();
         
-        foreach (var objectData in CharacterManager.i.allObjectData) {
+        foreach (var objectData in objectDataSet.GetAllObjectData()) {
             switch (objectData.Type.Value) {
                 case "Enemy":
                     CreateUIElement(enemyImagePrefab, enemies.transform, objectData.Position.Value + offset, scale, startPosition);

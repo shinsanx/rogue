@@ -15,10 +15,14 @@ public class MainMenuController : BaseMenuController {
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color highlightedColor = Color.yellow;
 
+    [SerializeField] private GameEvent openStatusMenu;
+    [SerializeField] private GameEvent closeStatusMenu;
+
     /// <summary>
     /// メニュー項目を初期化してリストに登録する（Inspector の設定内容も利用可能）
     /// </summary>
-    protected override void InitializeMenu() {
+    private void OnEnable() {        
+        Debug.Log("MainMenuControllerのInitializeMenuが呼び出されました。");
         menuItems = new List<GameObject>();
         // 各オブジェクトをリストへ追加
         menuItems.Add(itemMenuText.gameObject);
@@ -76,11 +80,13 @@ public class MainMenuController : BaseMenuController {
     public override void OpenMenu() {        
         isActive = true;
         mainMenuObject.SetActive(true);
+        openStatusMenu.Raise();
     }
 
     public override void CloseMenu() {        
         isActive = false;
         mainMenuObject.SetActive(false);        
+        closeStatusMenu.Raise();
     }
     
     
