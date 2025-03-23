@@ -16,6 +16,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     private PlayerStatusDataLogic playerStatusDataLogic;
     [SerializeField]private CreateMessageLogic createMessageLogic;
     public ObjectData playerObjectData;
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
     [SerializeField] private MessageEventChannelSO onMessageSend;    
 
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
@@ -137,7 +138,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     public void InitializePlayer() {
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());                        
-        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked);
+        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);                
     }

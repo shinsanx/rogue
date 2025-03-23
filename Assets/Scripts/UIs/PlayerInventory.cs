@@ -14,8 +14,7 @@ public class PlayerInventory : MonoBehaviour {
     [SerializeField] private BoolEventChannelSO successItemRemoved; //MenuManagerで購読
 
     // インベントリが更新された時に発行されるイベント
-    public event Action OnInventoryUpdated;
-    public ItemEventChannelSO OnItemPicked; // アイテムを拾った時に発行されるイベント
+    public event Action OnInventoryUpdated;    
 
     void OnEnable() {
         if(ResetInventory){
@@ -36,7 +35,7 @@ public class PlayerInventory : MonoBehaviour {
 
         // インベントリの更新通知（必要に応じてイベントを発行）
         //OnInventoryUpdated?.Invoke();
-        successItemPicked.RaiseEvent(true);        
+        successItemPicked.RaiseEvent(true);
     }
 
     // アイテムを削除するメソッド

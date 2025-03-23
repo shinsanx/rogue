@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b507820f22b7540feb69a5854d447533, type: 3}
+  m_Name: StandardThrowItemSO
+  m_EditorClassIdentifier: 
+  menuName: "\u6295\u3052\u308B"
+  currentSelectedObject: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}
+  objectDataRuntimeSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}

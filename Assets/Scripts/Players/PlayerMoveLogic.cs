@@ -10,6 +10,7 @@ public class PlayerMoveLogic {
     private Player player;
     private Vector2Variable playerFaceDirection;    
     private GameObject currentItemObject;
+    private CurrentSelectedObjectSO currentSelectedObjectSO;
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
@@ -18,7 +19,7 @@ public class PlayerMoveLogic {
     public ItemEventChannelSO OnItemPicked;
 
     //コンストラクタ
-    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, ItemEventChannelSO OnItemPicked) {
+    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, ItemEventChannelSO OnItemPicked, CurrentSelectedObjectSO currentSelectedObjectSO) {
         this.player = player;
         this.stateMachine = GameAssets.i.stateMachine;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
@@ -26,6 +27,7 @@ public class PlayerMoveLogic {
         this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
         this.playerFaceDirection = playerFaceDirection;        
         this.OnItemPicked = OnItemPicked;
+        this.currentSelectedObjectSO = currentSelectedObjectSO;
     }
 
     Vector2 inputVector;
@@ -92,14 +94,20 @@ public class PlayerMoveLogic {
 
         //アイテムを拾う
         if (TileManager.i.CheckExistItem(targetPos) is Item item) {
+            currentSelectedObjectSO.Object = item.gameObject;
             // itemSOがnullでないことを確認
             if (item.itemSO != null) {
                 currentItemObject = item.gameObject;
                 //item.GetComponent<Item>().OnPicked();
-                OnItemPicked.RaiseEvent(item.itemSO); // ここでエラーが発生している可能性
+                OnItemPicked.RaiseEvent(item.itemSO);
             } else {
                 Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
             }
+        }
+
+        if (TileManager.i.CheckExistStair(targetPos) != null) {
+            Debug.Log("階段があります");
+            TileManager.i.CheckExistStair(targetPos).OnSelected();
         }
 
         Vector2 newPosition = targetPos + moveOffset;
@@ -116,6 +124,7 @@ public class PlayerMoveLogic {
                 currentItemObject.GetComponent<Item>().OnPicked();                
             }
         } else {
+            
             Debug.Log("アイテムを拾えませんでした。");
         }
     }

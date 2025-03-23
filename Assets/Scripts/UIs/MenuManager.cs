@@ -9,13 +9,19 @@ public class MenuManager : MonoBehaviour {
     // 現在アクティブなメニュー（BaseMenuControllerを継承している各メニュー）
     private BaseMenuController activeMenu;
     public List<BaseMenuController> activeMenus = new List<BaseMenuController>();
-    public UnityEvent onMenuClosed;
+    //public UnityEvent onMenuClosed;
 
     [SerializeField] private GameEvent OnPlayerStateComplete;
     [SerializeField] private Vector2Variable playerFaceDirection;
     [SerializeField] private CreateMessageLogic createMessageLogic;
     public ItemEventChannelSO OnItemRemoved;
     [SerializeField] private MessageEventChannelSO onMessageSend;
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
+
+    public GameEvent OnToggleActionMap; //UserInputのOnToggleActionMapが登録
+    public GameEvent OnEnableActionMap; //UserInputのOnEnableActionMapが登録
+    public GameEvent OnDisableActionMap; //UserInputのOnDisableActionMapが登録
+    public bool isMenuOpen = false;
     
 
 
@@ -62,9 +68,15 @@ public class MenuManager : MonoBehaviour {
         RegisterActiveMenu(activeMenu);
         RegisterMenu(activeMenu);
         // Debug.Log(activeMenu.GetType().Name + "を開きました。");
+        if(activeMenus.Count >= 1){
+            isMenuOpen = true;
+            OnDisableActionMap.Raise();
+        }
     }
 
     public void CloseMenu() {
+
+        if(activeMenu == null) return;
         // 現在の activeMenu を閉じる
         activeMenu.CloseMenu();
 
@@ -80,6 +92,12 @@ public class MenuManager : MonoBehaviour {
             activeMenu = null;
             // Debug.Log("アクティブなメニューが存在しません。");
         }
+
+        //アクティブメニューがゼロになると、移動可能にする
+        if(activeMenus.Count == 0){
+            isMenuOpen = false;
+            OnEnableActionMap.Raise();
+        }
     }
 
     public void CloseAllMenus() {
@@ -88,8 +106,8 @@ public class MenuManager : MonoBehaviour {
             CloseMenu();
         }
         activeMenus.Clear();
-        activeMenu = null;
-        onMenuClosed?.Invoke();
+        activeMenu = null;        
+        CheckMenuClosed();
     }
 
     public void UnregisterActivesMenu(BaseMenuController menu) {
@@ -121,11 +139,13 @@ public class MenuManager : MonoBehaviour {
     //メニューアクション
     // アイテムを使用するメソッド
     public void UseItem(ItemSO item, IEffectReceiver receiver) {
-        OnItemRemoved.RaiseEvent(item);
+        //OnItemRemoved.RaiseEvent(item);
+        currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
         // アイテムの使用処理
-        if (item is ConsumableSO consumable) {            
+        if (item is ConsumableSO consumable) {
             onMessageSend.RaiseEvent(createMessageLogic.CreateUseItemMessage(consumable.itemName));
             consumable.effect.ApplyEffect(receiver);
+            CloseAllMenus();
             OnPlayerStateComplete.Raise();
         } else {
             Debug.Log("アイテムの使用に失敗しました。");
@@ -133,17 +153,17 @@ public class MenuManager : MonoBehaviour {
     }
 
     //アイテムを置く
-    public void PlaceItem(ItemSO item, Vector2Int position) {        
+    public void PlaceItem(ItemSO item, Vector2Int position) {                
         ArrangeManager.i.PlaceItem(position, item);
-        OnItemRemoved.RaiseEvent(item);
-        OnPlayerStateComplete.Raise();        
+        OnItemRemoved.RaiseEvent(item);        
+        OnPlayerStateComplete.Raise();
         onMessageSend.RaiseEvent(createMessageLogic.CreatePlaceItemMessage(item.itemName));
+        CloseAllMenus();
     }
 
     //アイテムを投げる
     public async Task ThrowItem(ItemSO item, Vector2Int position) {
-        Vector2Int direction = playerFaceDirection.Value.RoundVector2().ToVector2Int();
-        Debug.Log("ThrowItemDirection:" + direction);
+        Vector2Int direction = playerFaceDirection.Value.RoundVector2().ToVector2Int();        
         Vector2Int throwPosition = TileManager.i.GetCharactersInFront(position, direction, 10);
         //throwPositionのタイプが壁だった場合は一つ前のポジションを取得する
         if (TileManager.i.GetMapChipType(throwPosition) == (int)RandomDungeonWithBluePrint.Constants.MapChipType.Wall) {
@@ -153,8 +173,15 @@ public class MenuManager : MonoBehaviour {
         if (CharacterManager.i.GetObjectTypeByPosition(throwPosition) == "Enemy") {
             ItemEffectManager.i.ApplyItemEffect(item, CharacterManager.i.GetObjectByPosition(throwPosition));
             await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
-            OnItemRemoved.RaiseEvent(item);
+            OnItemRemoved.RaiseEvent(item);            
             OnPlayerStateComplete.Raise();
+            CloseAllMenus();
+
+            //足元メニューからアイテムを投げたときに足元のアイテムを削除する
+            if(currentSelectedObjectSO.Object != null) {
+                currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
+                currentSelectedObjectSO.ResetCurrentSelectedObject();
+            }
             return;
         }        
         await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
@@ -162,5 +189,22 @@ public class MenuManager : MonoBehaviour {
         OnItemRemoved.RaiseEvent(item);
         OnPlayerStateComplete.Raise();
         onMessageSend.RaiseEvent(createMessageLogic.CreateThrowItemMessage(item.itemName));
+        CloseAllMenus();
+
+        //足元メニューからアイテムを投げたときに足元のアイテムを削除する
+        if(currentSelectedObjectSO.Object != null) {
+            currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
+            currentSelectedObjectSO.ResetCurrentSelectedObject();
+        }
+    }
+
+    //MenuOpenの状態を確認してActionMapを変更する
+    //MenuManagerのCloseAllMenusが呼び出されたら、CheckMenuClosedを呼び出す
+    private void CheckMenuClosed() {
+        if(activeMenus.Count == 0){   
+            Debug.Log("すべてのメニューが閉じられました。");
+            isMenuOpen = false;
+            OnEnableActionMap.Raise();
+        }
     }
 }

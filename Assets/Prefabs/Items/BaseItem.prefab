@@ -103,6 +103,9 @@ MonoBehaviour:
   objectData: {fileID: 3675443601265341386}
   onMessageSend: {fileID: 11400000, guid: 3f8fd3ed6e996486cbd72f7eaa16864f, type: 2}
   createMessageLogic: {fileID: 11400000, guid: 484b2ecb0f15046118a416552d4625f1, type: 2}
+  onFootItem: {fileID: 11400000, guid: 6d5fd10d1b1b04e66a346fab796d891a, type: 2}
+  currentSelectedObjectSO: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}
+  <submitMenuSet>k__BackingField: {fileID: 11400000, guid: 4725414b1aa0645f68c602b10620f1c3, type: 2}
 --- !u!114 &3675443601265341386
 MonoBehaviour:
   m_ObjectHideFlags: 0

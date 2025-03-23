@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour {
+public class Item : MonoBehaviour, IMenuActionAdapter {
     private SpriteRenderer spriteRenderer;
     void Start() {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -13,6 +13,9 @@ public class Item : MonoBehaviour {
     private Vector2 moveOffset = new Vector2(.5f, .5f);
     [SerializeField] private MessageEventChannelSO onMessageSend;
     [SerializeField] private CreateMessageLogic createMessageLogic;
+    [SerializeField] private GameEvent onFootItem;
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
+    [field:SerializeField] public SubmitMenuSet submitMenuSet{get;private set;}
 
     public void Initialize() {
         CreateSOInstance();
@@ -38,6 +41,11 @@ public class Item : MonoBehaviour {
         objectData.Name.SetValue(itemSO.itemName);
         objectData.Type.SetValue("Item");        
         objectData.Position.SetValue(objectData.Position.Value);
+    }
+
+    public void OnSelected() {
+        currentSelectedObjectSO.Object = gameObject;
+        onFootItem.Raise();     
     }
 
 

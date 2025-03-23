@@ -17,7 +17,7 @@ public class MainMenuController : BaseMenuController {
 
     [SerializeField] private GameEvent openStatusMenu;
     [SerializeField] private GameEvent closeStatusMenu;
-
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
     /// <summary>
     /// メニュー項目を初期化してリストに登録する（Inspector の設定内容も利用可能）
     /// </summary>
@@ -59,13 +59,21 @@ public class MainMenuController : BaseMenuController {
     /// </summary>
     public override void Submit() {
         switch (currentIndex) {
-            case 0:                
+            case 0: //道具
                 // InventoryUI を呼び出す
                 MenuManager.Instance.SetActiveMenu<InventoryController>();                                
                 break;
-            case 1:
-                Debug.Log("足元が選択されました。");
-                // 足元用の処理を実装
+            case 1: //足元
+                GameObject objectByPosition = TileManager.i.GetPlayerFootObject();                
+                currentSelectedObjectSO.Object = objectByPosition;
+                if(objectByPosition == null) return;
+                IMenuActionAdapter menuActionAdapter = objectByPosition.GetComponent<IMenuActionAdapter>();
+                if(menuActionAdapter != null) {
+                    Debug.Log("menuActionAdapter:" + menuActionAdapter.GetType().Name);
+                    menuActionAdapter.OnSelected();
+                } else {
+                    Debug.Log("IMenuActionAdapterが見つかりません。");
+                }                
                 break;
             case 2:
                 Debug.Log("その他が選択されました。");

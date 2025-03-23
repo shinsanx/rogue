@@ -4,62 +4,80 @@ using UnityEngine;
 using System.Threading.Tasks;
 
 public class SubMenuController : BaseMenuController {
-    [SerializeField] private GameObject subMenuWindow; // サブメニュー        
-    [SerializeField] private GameObject useMenu;
-    [SerializeField] private GameObject placeMenu;
-    [SerializeField] private GameObject throwMenu;
-    [SerializeField] private Player player;    
-    
-    private ItemSO selectedItem;
+    [SerializeField] private GameObject subMenuWindow; // サブメニュー            
+    [SerializeField] private GameObject menuPrefab;
+    [SerializeField] private GameObject submenuParent;
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObject;
 
     void OnEnable() {
         Debug.Log("SubMenuControllerのOnEnableが呼び出されました。");
-        menuItems = new List<GameObject>();
-        menuItems.Add(useMenu);
-        menuItems.Add(placeMenu);
-        menuItems.Add(throwMenu);
         currentIndex = 0;
     }
 
-    public override void OpenMenu() {        
+    public override void OpenMenu() {
         subMenuWindow.SetActive(true);
+        ClearMenu();
+        GenerateMenuObject();
         isActive = true;
     }
 
     public override void CloseMenu() {
         isActive = false;
-        subMenuWindow.SetActive(false);        
-        if(cursorInstance != null) {
+        subMenuWindow.SetActive(false);
+        MenuManager.Instance.CloseSpecificMenu<FootMenuController>();
+        DestroyCursor();
+    }
+
+    private void DestroyCursor() {
+        if (cursorInstance != null) {
             Destroy(cursorInstance);
             cursorInstance = null;
-        }        
+        }
     }
 
-    public void SetSubMenu(ItemSO selectedItem) {        
-        this.selectedItem = selectedItem;
+    private void GenerateMenuObject() {
+        if (currentSelectedObject.Object == null) {
+            GenerateMenuFromSubmitMenuSet();
+            return;
+        }
+        
+        TryGetSubmitMenuSetFromObject();
+        GenerateMenuFromSubmitMenuSet();
     }
 
+    private void TryGetSubmitMenuSetFromObject() {
+        IMenuActionAdapter menuActionAdapter = currentSelectedObject.Object.GetComponent<IMenuActionAdapter>();
+        if (menuActionAdapter != null) {
+            // 対象がアイテムではない場合（階段など）
+            currentSelectedObject.SubmitMenuSet = menuActionAdapter.submitMenuSet;
+        }
+    }
+
+    private void GenerateMenuFromSubmitMenuSet() {
+        if (currentSelectedObject.SubmitMenuSet == null) { 
+            Debug.Log("submitMenuSetがnullです。"); 
+            return; 
+        }
+        
+        menuItems = new List<GameObject>();
+        foreach (BaseSubmitMenu menu in currentSelectedObject.SubmitMenuSet.submitMenus) {
+            CreateMenuItem(menu);
+        }
+    }
+
+    private void CreateMenuItem(BaseSubmitMenu menu) {
+        GameObject menuObject = Instantiate(menuPrefab, submenuParent.transform);
+        SubMenuPrefab subMenuPrefab = menuObject.GetComponent<SubMenuPrefab>();
+        subMenuPrefab.SetMenuText(menu.menuName);
+        menuItems.Add(menuObject);
+    }
 
     /// <summary>
     /// サブメニューで決定したときの処理
     /// </summary>
     public override void Submit() {
-        switch (currentIndex) {
-            case 0:                
-                UseItem();
-                break;
-            case 1:
-                PlaceItem();
-                break;
-            case 2:
-                ThrowItem();
-                break;
-            default:
-                Debug.LogError("無効な選択インデックスです。");
-                break;
-        }
+        currentSelectedObject.SubmitMenuSet.submitMenus[currentIndex].Submit();
     }
-
 
     protected override void UpdateCursorPosition() {
         if (cursorInstance == null) {
@@ -68,21 +86,10 @@ public class SubMenuController : BaseMenuController {
         cursorInstance.transform.SetParent(menuItems[currentIndex].transform, false);
     }
 
-    //アイテムを使用する
-    private void UseItem() {
-        MenuManager.Instance.UseItem(selectedItem, player);
-        MenuManager.Instance.CloseAllMenus();
-    }
-
-    //アイテムを置く
-    private void PlaceItem() {
-        MenuManager.Instance.PlaceItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
-        MenuManager.Instance.CloseAllMenus();
-    }
-
-    //アイテムを投げる
-    private async Task ThrowItem() {
-        MenuManager.Instance.CloseAllMenus();                
-        await MenuManager.Instance.ThrowItem(selectedItem, player.GetComponent<IObjectData>().Position.Value);
+    void ClearMenu() {
+        foreach (GameObject menu in menuItems) {
+            Destroy(menu);
+        }
+        menuItems.Clear();
     }
 }

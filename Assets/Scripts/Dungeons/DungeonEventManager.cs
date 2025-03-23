@@ -16,7 +16,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] Player player;
     [SerializeField] StatusUI statusUI;
     [SerializeField] DungeonStateManager dungeonStateManager;
-    [SerializeField] EnemyManager enemyManager;    
+    [SerializeField] EnemyManager enemyManager;
     [SerializeField] DungeonDataSO dungeonData;
     [SerializeField] CharacterManager characterManager;
     [SerializeField] TileManager tileManager;
@@ -30,7 +30,7 @@ public class DungeonEventManager : MonoBehaviour {
         // 1. TileManagerの初期化
         await InitializeTileManager();
 
-        
+
         // 2. キャラクターマネージャーの初期化
         await InitializeCharacterManager();
         // 1. StateMachineの初期化を最初に行う
@@ -63,10 +63,13 @@ public class DungeonEventManager : MonoBehaviour {
         // 11. アイテムの生成（必要に応じて実装）
         await GenerateItems();
 
-        // 12. ミニマップの生成
+        // 12. 階段の生成
+        await GenerateStair();
+
+        // 13. ミニマップの生成
         await CreateMiniMap();
 
-        // 13. ダンジョンデータの保存
+        // 14. ダンジョンデータの保存
         SaveDungeonData();
 
         Debug.Log("Initialize completed");
@@ -147,5 +150,9 @@ public class DungeonEventManager : MonoBehaviour {
     private void SaveDungeonData() {
         currentDungeonData.currentDungeonData = dungeonData;
         currentDungeonData.currentFloor = 1;
+    }
+
+    private async Task GenerateStair() {
+        await ArrangeManager.i.ArrangeStairToRandomPosition();
     }
 }

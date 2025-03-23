@@ -15,6 +15,15 @@ public class ObjectDataRuntimeSet : RuntimeSet<ObjectData> {
         return obj.gameObject;
     }
 
+    public Vector2Int GetPlayerPosition() {
+        var obj = Items.FirstOrDefault(item => item.Type.Value == "Player");
+        if (obj == null) {
+            Debug.LogWarning("Playerが見つかりません");
+            return new Vector2Int(0, 0);
+        }
+        return obj.Position.Value;
+    }
+
     public List<Enemy> GetAllEnemies() {
         var obj = Items.Where(item => item.Type.Value == "Enemy");
         if (obj == null) {
@@ -68,6 +77,15 @@ public class ObjectDataRuntimeSet : RuntimeSet<ObjectData> {
         return obj.gameObject;
     }
 
+    //特定のポジションのPlayerとEnemy以外のオブジェクトを取得する
+    public GameObject GetObjectByPositionExceptPlayerAndEnemy(Vector2Int position) {
+        var obj = Items.Where(item => item.Position.Value == position && item.Type.Value != "Player" && item.Type.Value != "Enemy");
+        if (obj == null) {
+            return null;
+        }
+        return obj.Select(item => item.gameObject).FirstOrDefault();
+    }
+    
     public ObjectData GetObjectData(int id) {
         return Items.FirstOrDefault(item => item.Id.Value == id);
     }

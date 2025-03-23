@@ -64,6 +64,13 @@ public class TileManager : MonoBehaviour {
         return null;
     }
 
+    public IMenuActionAdapter CheckExistStair(Vector2Int targetPos) {
+        if (objectDataSet.GetObjectTypeByPosition(targetPos) == "Stair") {
+            return objectDataSet.GetObjectByPosition(targetPos).GetComponent<IMenuActionAdapter>();
+        }
+        return null;
+    }
+
     //aisleとnothingのみ。MapChipTypeとは別
     public int GetTileType(Vector2Int vector) {
         return tileSet.GetTileTypeByPosition(vector);
@@ -212,6 +219,16 @@ public class TileManager : MonoBehaviour {
         }
         Debug.Log("前方にキャラクターがいません");
         return objectPos2;
+    }
+
+    //特定のポジションのオブジェクトを取得する
+    public GameObject GetObjectByPosition(Vector2Int position) {
+        return objectDataSet.GetObjectByPosition(position);
+    }
+
+    //Playerの足元のオブジェクトを取得する
+    public GameObject GetPlayerFootObject() {        
+        return objectDataSet.GetObjectByPositionExceptPlayerAndEnemy(objectDataSet.GetPlayerPosition());
     }
 
     public void Initialize() {

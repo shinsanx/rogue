@@ -2,16 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 
 public class InventoryController : BaseMenuController {
     public Player player; // プレイヤーのインベントリへの参照    
     public GameObject itemSlotPrefab;       // アイテムスロットのPrefab
     public Transform itemsParent;           // アイテムスロットを配置する親Transform            
-    // シーン上でInventoryControllerをアタッチしたオブジェクトを取得    
+    // シーン上でInventoryControllerをアタッチしたオブジェクトを取得
     [SerializeField] private GameObject itemWindow;
     [SerializeField] private InventorySO inventorySO;
     [SerializeField] private ObjectDataRuntimeSet objectSet;
+    [SerializeField] private CurrentSelectedObjectSO currentSelectedObject;
 
     private List<ItemSO> itemSlots = new List<ItemSO>();    
 
@@ -26,7 +26,7 @@ public class InventoryController : BaseMenuController {
     // インベントリUIを更新するメソッド
     public void UpdateInventoryUI() {
         ClearExistingSlots();
-        DisplayItemsOnCurrentPage();        
+        DisplayItemsOnCurrentPage();
     }
 
     // 既存のスロットをクリアするメソッド
@@ -91,11 +91,13 @@ public class InventoryController : BaseMenuController {
     // アイテムを選択してサブメニューを表示するメソッド
     public override void Submit() {
         if(itemSlots.Count == 0) return;
-        // サブメニューをアクティブにする
-        SubMenuController subMenuController = MenuManager.Instance.SetActiveMenu<SubMenuController>();
+        
+        currentSelectedObject.Item = itemSlots[currentIndex];
+        currentSelectedObject.SubmitMenuSet = itemSlots[currentIndex].submitMenuSet;
 
-        // 選択されているアイテムをサブメニューに渡す
-        subMenuController.SetSubMenu(itemSlots[currentIndex]);        
+        // サブメニューをアクティブにする        
+        MenuManager.Instance.SetActiveMenu<SubMenuController>();
+                
     }
 
     // ページ切り替えを行うメソッド
@@ -118,6 +120,7 @@ public class InventoryController : BaseMenuController {
         itemWindow.SetActive(true);
         // MainMenuを閉じる
         MenuManager.Instance.CloseSpecificMenu<MainMenuController>();
+        UpdateInventoryUI();
         isActive = true;
     }
 

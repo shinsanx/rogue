@@ -4,15 +4,13 @@ using UnityEngine.Events;
 public class MenuController : MonoBehaviour {
         
     private bool isMenuOpen = false;
-    public GameEvent OnToggleActionMap; //UserInputのOnToggleActionMapが登録
+    //public GameEvent OnToggleActionMap; //UserInputのOnToggleActionMapが登録
         
 
     private float roundX;
     private float roundY;
 
-    void Start() {
-        //MenuManagerのCloseAllMenusが呼び出されたら、CheckMenuClosedを呼び出す
-        MenuManager.Instance.onMenuClosed.AddListener(CheckMenuClosed);
+    void Start() {                
     }
 
 
@@ -24,10 +22,10 @@ public class MenuController : MonoBehaviour {
     /// </summary>
     public void OpenMenu() {        
         MenuManager.Instance.SetActiveMenu<MainMenuController>();
-        if(MenuManager.Instance.activeMenus.Count >= 1){
-            isMenuOpen = true;
-            OnToggleActionMap.Raise();
-        }
+        // if(MenuManager.Instance.activeMenus.Count >= 1){
+        //     isMenuOpen = true;
+        //     OnToggleActionMap.Raise();
+        // }
     }
     /// <summary>
     /// メニューを非表示にする
@@ -35,28 +33,21 @@ public class MenuController : MonoBehaviour {
     public void CloseMenu() {        
         MenuManager.Instance.CloseMenu();
 
-        //アクティブメニューがゼロになると、移動可能にする
-        if(MenuManager.Instance.activeMenus.Count == 0){
-            isMenuOpen = false;
-            OnToggleActionMap.Raise();
-        }
+        // //アクティブメニューがゼロになると、移動可能にする
+        // if(MenuManager.Instance.activeMenus.Count == 0){
+        //     isMenuOpen = false;
+        //     OnToggleActionMap.Raise();
+        // }
     }
 
-    //MenuOpenの状態を確認してActionMapを変更する
-    //MenuManagerのCloseAllMenusが呼び出されたら、CheckMenuClosedを呼び出す
-    public void CheckMenuClosed() {        
-        if(MenuManager.Instance.activeMenus.Count == 0){
-            isMenuOpen = false;
-            OnToggleActionMap.Raise();
-        }
-    }
+    
 
 
     /// <summary>
     /// メニューの開閉をトグルする
     /// </summary>
     public void ToggleMenu() {        
-        if (isMenuOpen) {            
+        if (MenuManager.Instance.isMenuOpen) {
             CloseMenu();
         } else {            
             OpenMenu();

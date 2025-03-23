@@ -115,6 +115,16 @@ public class UserInput : MonoBehaviour {
         }        
     }
 
+    public void OnEnableActionMap(){
+        playerActionMap.Enable();
+        uiActionMap.Disable();
+    }
+
+    public void OnDisableActionMap(){
+        playerActionMap.Disable();
+        uiActionMap.Enable();
+    }
+
     public void OnNavigate(InputAction.CallbackContext context) {
         if (context.started) return;
         if (context.canceled) return;

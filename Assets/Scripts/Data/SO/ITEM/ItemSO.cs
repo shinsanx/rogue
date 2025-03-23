@@ -12,4 +12,5 @@ public abstract class ItemSO : ScriptableObject
     public int purchasePrice;
     public int sellingPrice;
     public Sprite icon;
+    public SubmitMenuSet submitMenuSet;
 }

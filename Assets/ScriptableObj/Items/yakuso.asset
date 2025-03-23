@@ -18,4 +18,5 @@ MonoBehaviour:
   purchasePrice: 30
   sellingPrice: 10
   icon: {fileID: 21300000, guid: 17cbbfbbba13141cda87edc48ff86914, type: 3}
+  submitMenuSet: {fileID: 11400000, guid: 4725414b1aa0645f68c602b10620f1c3, type: 2}
   effect: {fileID: 11400000, guid: 7d7c93cc93d1a4f28b4e035d00b3406b, type: 2}

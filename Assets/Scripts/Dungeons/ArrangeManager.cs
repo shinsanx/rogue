@@ -21,6 +21,8 @@ public class ArrangeManager : MonoBehaviour {
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] GameObject itemParent;
     [SerializeField] GameObject itemPrefab;        
+    [SerializeField] GameObject objectParent;
+    [SerializeField] GameObject stairPrefab;
     //ランダムなポジションにアイテムを配置
     //itemPrefabはやがて置き換える
     public async Task ArrangeItemToRandomPosition(List<ItemSO> itemSOs, int itemCount) {
@@ -63,6 +65,18 @@ public class ArrangeManager : MonoBehaviour {
         enemy.monsterSO = monsterSO;
         enemy.InitializeEnemy();
         enemyObject.transform.SetParent(enemyParent.transform);        
-        enemyObject.GetComponent<IObjectData>().SetPosition(position);
+        enemyObject.GetComponent<ObjectData>().SetPosition(position);
+    }
+
+    public async Task ArrangeStairToRandomPosition() {
+        PlaceStair(TileManager.i.GetRandomPosition());
+        await Task.Yield();
+    }
+
+    private void PlaceStair(Vector2Int position) {
+        GameObject stairObject = Instantiate(stairPrefab, position.ToVector2(), Quaternion.identity);
+        stairObject.transform.SetParent(objectParent.transform);
+        stairObject.GetComponent<Stair>().Initialize();
+        stairObject.GetComponent<ObjectData>().SetPosition(position);
     }
 }
