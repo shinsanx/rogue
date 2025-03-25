@@ -16,3 +16,4 @@ MonoBehaviour:
   InitialItemCount: 5
   EnemyTable: {fileID: 11400000, guid: 7f5c19a4949c54f049174d0ead324492, type: 2}
   ItemTable: {fileID: 11400000, guid: e38b9b30e78134762a43087eff912f55, type: 2}
+  FieldBluePrint: {fileID: 11400000, guid: e6254fb716ade4c18bc9eefea13924a0, type: 2}

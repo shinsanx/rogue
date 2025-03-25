@@ -18,9 +18,11 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     public ObjectData playerObjectData;
     [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
     [SerializeField] private MessageEventChannelSO onMessageSend;    
-
+    [SerializeField] private BoolVariable fixDiagonalInput;
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
     [SerializeField] bool resetStatus = true;
+    [SerializeField] private FloatVariable moveSpeed;
+    [SerializeField] private BoolVariable dashInput;
 
     private bool isMoving = false;
     public bool IsMoving() => isMoving;
@@ -115,16 +117,22 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // UserInputからのイベントを受け取るメソッド
-    public void PlayerMove(Vector2 direction) {        
-        playerMoveLogic.MoveByInput(direction);
+    public void PlayerMove(Vector2 direction) {
+        if(dashInput.Value) {
+            moveSpeed.Value = 0.05f;
+            playerMoveLogic.DashByInput(direction);
+        } else {
+            moveSpeed.Value = 0.3f;
+            playerMoveLogic.MoveByInput(direction);
+        }
     }
     public void PlayerAttack() {        
         playerAttackLogic.Attack();
     }
 
     // オブジェクトの位置を変更するメソッド
-    public void MovePosition() {
-        transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, 0.3f)
+    public void MovePosition() {        
+        transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
             .OnComplete(() => {
                 isMoving = false;
@@ -138,7 +146,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     public void InitializePlayer() {
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());                        
-        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO);
+        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);                
     }

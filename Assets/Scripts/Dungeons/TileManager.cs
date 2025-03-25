@@ -64,6 +64,13 @@ public class TileManager : MonoBehaviour {
         return null;
     }
 
+    public bool CheckExistObject(Vector2Int targetPos) {
+        if (objectDataSet.GetObjectTypeByPosition(targetPos) != null) {
+            return true;
+        }
+        return false;
+    }
+
     public IMenuActionAdapter CheckExistStair(Vector2Int targetPos) {
         if (objectDataSet.GetObjectTypeByPosition(targetPos) == "Stair") {
             return objectDataSet.GetObjectByPosition(targetPos).GetComponent<IMenuActionAdapter>();
@@ -110,6 +117,20 @@ public class TileManager : MonoBehaviour {
         }        
 
         return room.jointPositions;
+    }
+
+    public bool CheckExistJoint(Vector2Int targetPos) {
+        int roomNum = LookupRoomNum(targetPos);
+        List<Vector2Int> jointPositions = ExtractJointPosByRoomNum(roomNum);
+        if (jointPositions == null || jointPositions.Count == 0) return false;
+        return jointPositions.Contains(targetPos);
+    }
+
+    public bool CheckExitsAisle(Vector2Int targetPos) {
+        if (GetTileType(targetPos) == (int)Constants.TileType.Aisle) {
+            return true;
+        }
+        return false;
     }
 
     //部屋の中の視野検索用

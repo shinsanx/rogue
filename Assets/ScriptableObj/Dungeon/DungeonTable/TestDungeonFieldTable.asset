@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e46bb76b35f4710bb936228bd33f52, type: 3}
+  m_Name: TestDungeonFieldTable
+  m_EditorClassIdentifier: 
+  BluePrintWithWeights:
+  - BluePrint: {fileID: 11400000, guid: 7aa4c71871cfa4785972200301b9becf, type: 2}
+    Weight: 1
+  - BluePrint: {fileID: 11400000, guid: e6254fb716ade4c18bc9eefea13924a0, type: 2}
+    Weight: 0

@@ -34,7 +34,7 @@ public class DungeonStateLogic {
     }
 
     public async void EnemyStateStart() {         
-        await Task.Delay(200);
+        await Task.Yield();
         await enemyManager.ProcessEnemies();
         EndEnemyTurn();
 

@@ -833,6 +833,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: b02b0985-e47d-4ae7-9f79-e8a8b0d42ef7
     m_ActionName: UI/MenuClose[/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 190771914}
+        m_TargetAssemblyTypeName: UserInput, Assembly-CSharp
+        m_MethodName: OnFixDiagonalInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b679bf03-e607-4557-a4b5-62dff2b89a9b
+    m_ActionName: Player/FixDiagonal[/Keyboard/o]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 190771914}
+        m_TargetAssemblyTypeName: UserInput, Assembly-CSharp
+        m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 10eb5ec0-0ef5-4590-8278-0e6b823d2b43
+    m_ActionName: Player/Dash[/Keyboard/k]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -850,13 +882,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d43b19d3af1a4a78a31e360f2c3ac77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoveButtonLongPrresed: 0
+  isMoveButtonLongPrresed: {fileID: 11400000, guid: 1c3aaaa326d4246a29ae9c69830a0e28, type: 2}
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
   OnMoveInput: {fileID: 11400000, guid: 03cacfb776acc43c88e852af9247d30b, type: 2}
   OnMenuOpenInput: {fileID: 11400000, guid: b87e98a9bf8da441ba2298f0b0e3dde3, type: 2}
   OnMenuCloseInput: {fileID: 11400000, guid: 2625e7f99d1eb4d98be2c5f6ca47ac8e, type: 2}
   OnNavigateInput: {fileID: 11400000, guid: 33ed4e14321dc4ef5a12cc99b7e44a8b, type: 2}
   OnSubmitInput: {fileID: 11400000, guid: 0ef092ca94e18488b97c484a460e071f, type: 2}
+  fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
+  dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
+  moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
   inputActionAsset: {fileID: -944628639613478452, guid: b3ec8069520734aebb96eda0effdc605, type: 3}
 --- !u!114 &190771916
 MonoBehaviour:
@@ -2026,13 +2061,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0efa370ab08074568a7d4c38c87804f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generateButton: {fileID: 1385033606}
-  fieldView: {fileID: 407009773}
   bluePrints:
   - BluePrint: {fileID: 11400000, guid: e6254fb716ade4c18bc9eefea13924a0, type: 2}
     Weight: 0
   - BluePrint: {fileID: 11400000, guid: 7aa4c71871cfa4785972200301b9becf, type: 2}
     Weight: 2
+  generateButton: {fileID: 1385033606}
+  fieldView: {fileID: 407009773}
 --- !u!114 &407009773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3031,6 +3066,7 @@ GameObject:
   - component: {fileID: 672341474}
   - component: {fileID: 672341475}
   - component: {fileID: 672341476}
+  - component: {fileID: 672341477}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -3125,6 +3161,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemPrefab: {fileID: 2694796819302795709, guid: 12321769714d94bff97d1ece19eaba73, type: 3}
+--- !u!114 &672341477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672341465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544a15f976c9f45be8a6cb58da3fac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 43ee1b03e5a40495fa995f73c2119576, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 672341467}
+        m_TargetAssemblyTypeName: DungeonEventManager, Assembly-CSharp
+        m_MethodName: MoveOnFloor
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &679488204
 GameObject:
   m_ObjectHideFlags: 0
@@ -6193,7 +6257,10 @@ MonoBehaviour:
   playerObjectData: {fileID: 1419592883}
   currentSelectedObjectSO: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}
   onMessageSend: {fileID: 11400000, guid: 3f8fd3ed6e996486cbd72f7eaa16864f, type: 2}
+  fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
   resetStatus: 1
+  moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
+  dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   OnPlayerLevelChanged: {fileID: 11400000, guid: 68d63f544ab764ad586a0e0db930cd56, type: 2}
   OnPlayerHPChanged: {fileID: 11400000, guid: 984ac2f2355174f2fa14150e5c723772, type: 2}
   OnPlayerStateComplete: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}

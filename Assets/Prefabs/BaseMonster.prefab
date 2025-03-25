@@ -79,6 +79,7 @@ MonoBehaviour:
   addExp: {fileID: 11400000, guid: 8eb718b417ed0423fb797c1fad192088, type: 2}
   objectData: {fileID: 2406515258070522134}
   animationAdapter: {fileID: -8392652818357298570}
+  moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
 --- !u!212 &1651929932614615033
 SpriteRenderer:
   m_ObjectHideFlags: 0

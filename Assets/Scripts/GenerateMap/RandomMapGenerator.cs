@@ -8,15 +8,16 @@ using Random = UnityEngine.Random;
 namespace RandomDungeonWithBluePrint {
     public class RandomMapGenerator : MonoBehaviour {
 
-        [Serializable]
-        public class BluePrintWithWeight {
-            public FieldBluePrint BluePrint = default;
-            public int Weight = default;//BluePringを複数設定した場合の重さ
-        }
+        // [Serializable]
+        // public class BluePrintWithWeight {
+        //     public FieldBluePrint BluePrint = default;
+        //     public int Weight = default;//BluePringを複数設定した場合の重さ
+        // }
+
+        [SerializeField] private BluePrintWithWeight[] bluePrints = default;
         
         [SerializeField] private Button generateButton = default;
         [SerializeField] private FieldView fieldView = default;
-        [SerializeField] private BluePrintWithWeight[] bluePrints = default;        
         public Field currentField; //現在生成されているField
 
         private void Create(BluePrintWithWeight bluePrint) {
@@ -49,8 +50,9 @@ namespace RandomDungeonWithBluePrint {
             MessageBus.Instance.Publish("UpdateMiniMap", currentField);
         }        
 
-        public void Initialize() {
-            Random.InitState(DateTime.Now.Millisecond);            
+        public void Initialize(BluePrintWithWeight[] bluePrints) {
+            this.bluePrints = bluePrints;
+            Random.InitState(DateTime.Now.Millisecond);
             generateButton.onClick.AddListener(() => Create(Raffle()));
             generateButton.onClick.Invoke();
         }

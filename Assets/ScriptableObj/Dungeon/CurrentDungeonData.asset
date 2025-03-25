@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb394e3272bb04cee88b27a20a7a951e, type: 3}
   m_Name: CurrentDungeonData
   m_EditorClassIdentifier: 
-  currentFloor: 0
-  currentDungeonData: {fileID: 0}
+  currentFloor: 1
+  currentDungeonData: {fileID: 11400000, guid: a786f3ae3741b4ee499259246c3b443c, type: 2}

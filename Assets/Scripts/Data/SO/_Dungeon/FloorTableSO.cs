@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using RandomDungeonWithBluePrint;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "FloorTableSO", menuName = "Dungeon/FloorTableSO")]

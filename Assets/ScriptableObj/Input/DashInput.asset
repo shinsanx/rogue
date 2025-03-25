@@ -9,9 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ebbdbdafc2be4552a5d7742e4184c15, type: 3}
-  m_Name: TestDungeonData
+  m_Script: {fileID: 11500000, guid: 9ead1a15005f74aecb1fa4b469bb23b6, type: 3}
+  m_Name: DashInput
   m_EditorClassIdentifier: 
-  DungeonName: "\u30C6\u30B9\u30C8\u30C0\u30F3\u30B8\u30E7\u30F3"
-  FloorCount: 5
-  DungeonTable: {fileID: 11400000, guid: d4e276e85832948428aff20623043c38, type: 2}
+  Value: 0

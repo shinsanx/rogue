@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ac110c248a7a44738de9361e98e97de, type: 3}
-  m_Name: StairSubmitMenuSet
+  m_Script: {fileID: 11500000, guid: e8b7c2198944c48feb2146b736246a1b, type: 3}
+  m_Name: CancelSO
   m_EditorClassIdentifier: 
-  submitMenus:
-  - {fileID: 11400000, guid: ac1fc977dd1d94a9baf9932316d70a37, type: 2}
-  - {fileID: 11400000, guid: c702441df3af34e938ef7902e7ea9591, type: 2}
+  menuName: "\u3082\u3069\u308B"
+  currentSelectedObject: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}

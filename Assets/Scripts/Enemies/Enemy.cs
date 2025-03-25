@@ -20,11 +20,12 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public AnimationAdapter animationAdapter;
     Vector2 moveOffset = new Vector2(.5f, .5f);
     private int _hp;
-    public int MaxHealth { get; set; }            
+    public int MaxHealth { get; set; }   
+    [SerializeField] private FloatVariable moveSpeed;
         
 
     public void MovePosition() {        
-        transform.DOMove(objectData.Position.Value.ToVector2() + moveOffset, 0.3f)
+        transform.DOMove(objectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear);        
     }  
 

@@ -75,8 +75,17 @@ public class ArrangeManager : MonoBehaviour {
 
     private void PlaceStair(Vector2Int position) {
         GameObject stairObject = Instantiate(stairPrefab, position.ToVector2(), Quaternion.identity);
-        stairObject.transform.SetParent(objectParent.transform);
+        stairObject.transform.SetParent(itemParent.transform);
         stairObject.GetComponent<Stair>().Initialize();
         stairObject.GetComponent<ObjectData>().SetPosition(position);
+    }
+
+    public void DestroyAllObjects() {
+        foreach (Transform child in enemyParent.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in itemParent.transform) {
+            Destroy(child.gameObject);
+        }
     }
 }

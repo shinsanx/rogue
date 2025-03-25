@@ -22,8 +22,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] TileManager tileManager;
     [SerializeField] CurrentDungeonData currentDungeonData;
     private EnemyTableSO currentEnemyTable;
-    private ItemTableSO currentItemTable;
-
+    private ItemTableSO currentItemTable;    
 
 
     private async void Start() {
@@ -79,17 +78,55 @@ public class DungeonEventManager : MonoBehaviour {
         // }
     }
 
-    //ダンジョンデータを読み込む
-    private void LoadDungeonData() {
-        currentEnemyTable = dungeonData.DungeonTable.Floors[0].EnemyTable;
-        currentItemTable = dungeonData.DungeonTable.Floors[0].ItemTable;
+    private async Task NextFloor() {      
+        ArrangeManager.i.DestroyAllObjects();
+        
+                // 2. キャラクターマネージャーの初期化
+        await InitializeCharacterManager();
+        // 1. StateMachineの初期化を最初に行う
+        await InitializeStateMachine();
+
+        // 2. ミニマップの初期化
+        await InitializeAutoMapping();
+
+        // 3. マップ生成
+        await InitializeRandomMapGenerator();
+
+        // 6. ダンジョンステートマネージャーの初期化
+        await InitializeDungeonStateManager();
+
+        // 7. プレイヤーをランダムな位置へ召喚
+        await InitializePlayer();
+
+        // 8. ダンジョンデータの読み込み
+        LoadDungeonData();
+
+        // 9. モンスターの生成
+        await GenerateEnemies();
+
+        // 10. インベントリUIの初期化
+        await InitializeInventoryUI();
+
+        // 11. アイテムの生成（必要に応じて実装）
+        await GenerateItems();
+
+        // 12. 階段の生成
+        await GenerateStair();
+
+        // 13. ミニマップの生成
+        await CreateMiniMap();
+
+        // 14. ダンジョンデータの保存
+        SaveDungeonData();
+        MenuManager.Instance.CloseAllMenus();
     }
 
-    //ItemTableからアイテムをランダムに選択する
-    private ItemSO SelectItem() {
-        int randomIndex = Random.Range(0, currentItemTable.Items.Count);
-        return currentItemTable.Items[randomIndex];
+    //ダンジョンデータを読み込む
+    private void LoadDungeonData() {
+        currentEnemyTable = dungeonData.DungeonTable.Floors[currentDungeonData.currentFloor].EnemyTable;
+        currentItemTable = dungeonData.DungeonTable.Floors[currentDungeonData.currentFloor].ItemTable;
     }
+
 
     private Task InitializeStateMachine() {
         // StateMachineの初期化はメインスレッドで実行
@@ -103,7 +140,7 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private Task InitializeRandomMapGenerator() {
-        randomMapGenerator.Initialize();
+        randomMapGenerator.Initialize(dungeonData.DungeonFieldTable.BluePrintWithWeights);
         return Task.CompletedTask;
     }
 
@@ -148,11 +185,15 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private void SaveDungeonData() {
-        currentDungeonData.currentDungeonData = dungeonData;
-        currentDungeonData.currentFloor = 1;
+        currentDungeonData.currentDungeonData = dungeonData;        
     }
 
     private async Task GenerateStair() {
         await ArrangeManager.i.ArrangeStairToRandomPosition();
+    }
+
+    public async void MoveOnFloor(){
+        currentDungeonData.currentFloor++;
+        await NextFloor();
     }
 }

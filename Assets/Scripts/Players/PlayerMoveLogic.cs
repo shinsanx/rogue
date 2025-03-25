@@ -8,9 +8,10 @@ public class PlayerMoveLogic {
     private IObjectData objectData;
     private StateMachine stateMachine;
     private Player player;
-    private Vector2Variable playerFaceDirection;    
+    private Vector2Variable playerFaceDirection;
     private GameObject currentItemObject;
     private CurrentSelectedObjectSO currentSelectedObjectSO;
+    private BoolVariable fixDiagonalInput;
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
@@ -19,15 +20,24 @@ public class PlayerMoveLogic {
     public ItemEventChannelSO OnItemPicked;
 
     //コンストラクタ
-    public PlayerMoveLogic(Player player, GameEvent OnPlayerStateComplete, GameEvent OnPlayerDirectionChanged, Vector2Variable playerFaceDirection, ItemEventChannelSO OnItemPicked, CurrentSelectedObjectSO currentSelectedObjectSO) {
+    public PlayerMoveLogic(
+        Player player,
+        GameEvent OnPlayerStateComplete,
+        GameEvent OnPlayerDirectionChanged,
+        Vector2Variable playerFaceDirection,
+        ItemEventChannelSO OnItemPicked,
+        CurrentSelectedObjectSO currentSelectedObjectSO,
+        BoolVariable fixDiagonalInput) {//引数ここまで
+
         this.player = player;
         this.stateMachine = GameAssets.i.stateMachine;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
         this.objectData = player.playerObjectData;
         this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
-        this.playerFaceDirection = playerFaceDirection;        
+        this.playerFaceDirection = playerFaceDirection;
         this.OnItemPicked = OnItemPicked;
         this.currentSelectedObjectSO = currentSelectedObjectSO;
+        this.fixDiagonalInput = fixDiagonalInput;
     }
 
     Vector2 inputVector;
@@ -79,6 +89,7 @@ public class PlayerMoveLogic {
     private void Move(Vector2Int currentPos, Vector2Int targetPos) {
 
         if (stateMachine.CurrentState != GameAssets.i.playerState) {
+            Debug.Log("playerのターンではありません");
             return;
         }
 
@@ -90,6 +101,12 @@ public class PlayerMoveLogic {
         //アニメーションを再生する
         playerFaceDirection.SetValue(new Vector2(roundX, roundY));
         OnPlayerDirectionChanged.Raise();
+
+        // 斜め移動を固定する
+        if (fixDiagonalInput.Value) {
+            if (roundX == 0 || roundY == 0) return;
+        }
+
         if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
 
         //アイテムを拾う
@@ -120,13 +137,50 @@ public class PlayerMoveLogic {
     public void HandleItemPicked(bool success) {
         if (success) {
             Item item = currentItemObject.GetComponent<Item>();
-            if (item != null) {                
-                currentItemObject.GetComponent<Item>().OnPicked();                
+            if (item != null) {
+                currentItemObject.GetComponent<Item>().OnPicked();
             }
         } else {
-            
+
             Debug.Log("アイテムを拾えませんでした。");
         }
+    }
+
+    public async void DashByInput(Vector2 inputVector) {
+
+        Debug.Log("DashByInput");
+        this.inputVector = inputVector;
+
+        roundX = Mathf.Round(inputVector.x);
+        roundY = Mathf.Round(inputVector.y);
+
+        Vector2Int direction = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
+        Vector2Int currentPos = objectData.Position.Value;
+
+        // オブジェクトがあるまで移動する
+        while (true) {
+            Vector2Int targetPos = currentPos + direction;
+            //移動不可なら終了
+            if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) {
+                return;
+            }
+
+            //オブジェクトがあったら終了
+            if (TileManager.i.CheckExistObject(targetPos)) {
+                return;
+            }
+
+            //ジョイントポジションがあるかつ、targetPosが通路でないなら終了
+            if (TileManager.i.CheckExistJoint(currentPos) && !TileManager.i.CheckExitsAisle(targetPos)) {
+                return;
+            }
+
+            //移動
+            currentPos = targetPos;            
+            Move(currentPos, targetPos);            
+            await Task.Delay(50);
+        }        
+
     }
 
     // async void LockInputWhileMoving() {
