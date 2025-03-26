@@ -23,7 +23,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     [SerializeField] bool resetStatus = true;
     [SerializeField] private FloatVariable moveSpeed;
     [SerializeField] private BoolVariable dashInput;
-
+    [SerializeField] private BoolVariable isTurnButtonLongPressed;
     private bool isMoving = false;
     public bool IsMoving() => isMoving;
 
@@ -117,10 +117,12 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // UserInputからのイベントを受け取るメソッド
-    public void PlayerMove(Vector2 direction) {
+    public void PlayerMove(Vector2 direction) {        
         if(dashInput.Value) {
             moveSpeed.Value = 0.05f;
             playerMoveLogic.DashByInput(direction);
+        } else if (isTurnButtonLongPressed.Value) {
+            playerMoveLogic.ManualTurn(direction);
         } else {
             moveSpeed.Value = 0.3f;
             playerMoveLogic.MoveByInput(direction);
@@ -137,6 +139,10 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             .OnComplete(() => {
                 isMoving = false;
             });
+    }
+
+    public void AutoTurn() {
+        playerMoveLogic.AutoTurn(playerObjectData.Position.Value);
     }
     
 

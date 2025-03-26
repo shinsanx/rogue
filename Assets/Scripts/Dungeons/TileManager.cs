@@ -111,8 +111,7 @@ public class TileManager : MonoBehaviour {
 
     public List<Vector2Int> ExtractJointPosByRoomNum(int roomNum) {
         Room room = tileSet.GetRoomByNum(roomNum);
-        if (room == null || room.jointPositions == null){
-            Debug.Log("jointPositionsが見つかりません roomNum:" + roomNum);
+        if (room == null || room.jointPositions == null){            
             return null;
         }        
 
@@ -190,6 +189,18 @@ public class TileManager : MonoBehaviour {
     //指定のポジションが隣接しているか確認する
     public bool IsAdjacentTo(Vector2Int selfPos, Vector2Int targetPos) {
         return GetSurroundingPositions(selfPos).Contains(targetPos);
+    }
+
+    //周囲8マスのオブジェクトを取得する
+    public List<GameObject> GetSurroundingObjects(Vector2Int selfPos) {
+        List<Vector2Int> surroundingPositions = GetSurroundingPositions(selfPos);
+        List<GameObject> surroundingObjects = new List<GameObject>();
+        foreach (var position in surroundingPositions) {
+            if (objectDataSet.GetObjectTypeByPosition(position) != null) {
+                surroundingObjects.Add(objectDataSet.GetObjectByPosition(position));
+            }
+        }
+        return surroundingObjects;
     }
 
     //Character自動配置用

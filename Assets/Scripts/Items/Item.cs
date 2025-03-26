@@ -48,5 +48,9 @@ public class Item : MonoBehaviour, IMenuActionAdapter {
         onFootItem.Raise();     
     }
 
+    public void OnGetOnItem() {
+        onMessageSend.RaiseEvent(createMessageLogic.CreateGetOnItemMessage(itemSO.itemName));
+    }
+
 
 }

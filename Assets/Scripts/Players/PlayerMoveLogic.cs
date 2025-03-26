@@ -61,6 +61,23 @@ public class PlayerMoveLogic {
             if (isMoving) return;
             inputs.Add(inputVectorInt);
             DevideInput(currentPos, targetPos);
+
+            //アイテムを拾う
+            if (TileManager.i.CheckExistItem(targetPos) is Item item) {
+                currentSelectedObjectSO.Object = item.gameObject;
+                // itemSOがnullでないことを確認
+                if (item.itemSO != null) {
+                    currentItemObject = item.gameObject;
+                    OnItemPicked.RaiseEvent(item.itemSO);
+                } else {
+                    Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
+                }
+            }
+
+            if (TileManager.i.CheckExistStair(targetPos) != null) {
+                TileManager.i.CheckExistStair(targetPos).OnSelected();
+            }
+
         } catch (Exception e) {
             Debug.LogError($"PlayerMoveLogic MoveByInput failed: {e.Message}");
         }
@@ -109,23 +126,7 @@ public class PlayerMoveLogic {
 
         if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
 
-        //アイテムを拾う
-        if (TileManager.i.CheckExistItem(targetPos) is Item item) {
-            currentSelectedObjectSO.Object = item.gameObject;
-            // itemSOがnullでないことを確認
-            if (item.itemSO != null) {
-                currentItemObject = item.gameObject;
-                //item.GetComponent<Item>().OnPicked();
-                OnItemPicked.RaiseEvent(item.itemSO);
-            } else {
-                Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
-            }
-        }
 
-        if (TileManager.i.CheckExistStair(targetPos) != null) {
-            Debug.Log("階段があります");
-            TileManager.i.CheckExistStair(targetPos).OnSelected();
-        }
 
         Vector2 newPosition = targetPos + moveOffset;
         objectData.SetPosition(newPosition.ToVector2Int());
@@ -148,7 +149,6 @@ public class PlayerMoveLogic {
 
     public async void DashByInput(Vector2 inputVector) {
 
-        Debug.Log("DashByInput");
         this.inputVector = inputVector;
 
         roundX = Mathf.Round(inputVector.x);
@@ -156,6 +156,13 @@ public class PlayerMoveLogic {
 
         Vector2Int direction = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
         Vector2Int currentPos = objectData.Position.Value;
+
+        //アイテムに乗る処理
+        if (TileManager.i.CheckExistItem(currentPos + direction) is Item item) {
+            item.OnGetOnItem();
+            Move(currentPos, currentPos + direction);
+            return;
+        }
 
         // オブジェクトがあるまで移動する
         while (true) {
@@ -170,16 +177,23 @@ public class PlayerMoveLogic {
                 return;
             }
 
-            //ジョイントポジションがあるかつ、targetPosが通路でないなら終了
-            if (TileManager.i.CheckExistJoint(currentPos) && !TileManager.i.CheckExitsAisle(targetPos)) {
+            //移動
+            currentPos = targetPos;
+            Move(currentPos, targetPos);
+
+            //移動後に周囲8マスにEnemyがいるかつ、攻撃可能なら終了
+            List<GameObject> surroundingEnemy = TileManager.i.GetSurroundingObjects(currentPos).Where(o => o.GetComponent<Enemy>() != null).ToList();
+            foreach (var enemy in surroundingEnemy) {
+                if (TileManager.i.CheckAttackableTile(currentPos, enemy.GetComponent<Enemy>().objectData.Position.Value)) {
+                    return;
+                }
+            }
+            //移動後にジョイントポジションなら終了         
+            if (TileManager.i.CheckExistJoint(currentPos)) {
                 return;
             }
-
-            //移動
-            currentPos = targetPos;            
-            Move(currentPos, targetPos);            
             await Task.Delay(50);
-        }        
+        }
 
     }
 
@@ -188,5 +202,24 @@ public class PlayerMoveLogic {
     //     await Task.Delay(15);
     //     isMoving = false;
     // }
+
+    public void AutoTurn(Vector2Int currentPos) {
+        // 周囲8マスを調べる
+        List<GameObject> surroundingObjects = TileManager.i.GetSurroundingObjects(currentPos);
+        foreach (var obj in surroundingObjects) {
+            if (obj.GetComponent<Enemy>() != null) {
+                // 敵がいる場合は敵の方向を向く
+                playerFaceDirection.SetValue(obj.GetComponent<Enemy>().objectData.Position.Value - currentPos);
+                OnPlayerDirectionChanged.Raise();
+            }
+        }
+    }
+
+    public void ManualTurn(Vector2 inputVector) {
+        roundX = Mathf.Round(inputVector.x);
+        roundY = Mathf.Round(inputVector.y);
+        playerFaceDirection.SetValue(new Vector2(roundX, roundY));
+        OnPlayerDirectionChanged.Raise();
+    }
 
 }

@@ -9,6 +9,7 @@ public class UserInput : MonoBehaviour {
     // インスペクターで設定                
     Vector2 inputVector;
     [SerializeField] private BoolVariable isMoveButtonLongPrresed;
+    [SerializeField] private BoolVariable isTurnButtonLongPressed;
 
     // イベント
     public GameEvent OnAttackInput;
@@ -17,6 +18,7 @@ public class UserInput : MonoBehaviour {
     public GameEvent OnMenuCloseInput;
     public Vector2EventChannelSO OnNavigateInput;
     public GameEvent OnSubmitInput;
+    public GameEvent OnAutoTurnInput;    
 
 
     [SerializeField] private BoolVariable fixDiagonalInput;
@@ -147,6 +149,29 @@ public class UserInput : MonoBehaviour {
         if (context.canceled) dashInput.Value = false;
     }
 
+    // 振り向く keyboard:U
+    public void OnTurn(InputAction.CallbackContext context) {        
+        // 押している時間が0.5秒未満ならOnAutoTurnInputを呼び出す
+        // 押している時間が0.5秒以上ならisTurnButtonLongPressedをtrueにする
+        if (context.started) {
+            isTurnButtonLongPressed.Value = true;
+            StartCoroutine(CheckTurnButtonHoldTime());
+        }
+        if (context.canceled) {
+            isTurnButtonLongPressed.Value = false;
+        }
+    }
+
+    private IEnumerator CheckTurnButtonHoldTime() {
+        float pressStartTime = Time.time;
+        yield return new WaitForSeconds(0.2f);
+        
+        // 0.5秒後もボタンが押されていれば長押し状態を維持
+        // そうでなければ（既にキャンセルされていれば）自動回転を実行
+        if (!isTurnButtonLongPressed.Value) {
+            OnAutoTurnInput.Raise();
+        }
+    }
 }
 
 

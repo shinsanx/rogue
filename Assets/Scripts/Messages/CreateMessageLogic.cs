@@ -74,7 +74,7 @@ public class CreateMessageLogic : ScriptableObject {
     }
 
     //アイテムに乗った時
-    public List<string> CreateRideItemMessage(string itemName) {
+    public List<string> CreateGetOnItemMessage(string itemName) {
         string firstText = itemName + "に乗った。";
 
         List<string> strings = new List<string>{
