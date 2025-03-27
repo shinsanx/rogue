@@ -19,11 +19,13 @@ public class UserInput : MonoBehaviour {
     public Vector2EventChannelSO OnNavigateInput;
     public GameEvent OnSubmitInput;
     public GameEvent OnAutoTurnInput;    
+    public GameEvent OnFootStepInput;
 
 
     [SerializeField] private BoolVariable fixDiagonalInput;
     [SerializeField] private BoolVariable dashInput;
-    [SerializeField] private FloatVariable moveSpeed;
+    [SerializeField] private FloatVariable moveSpeed;   
+    private bool isFootStep = false;
 
     [SerializeField] private InputActionAsset inputActionAsset; //アクションマップ
     private InputActionMap playerActionMap;
@@ -37,66 +39,6 @@ public class UserInput : MonoBehaviour {
         // 初期状態ではPlayer ActionMapを有効化し、UI ActionMapを無効化
         playerActionMap.Enable();
         uiActionMap.Disable();
-
-    }
-
-    //移動
-    public void OnMove(InputAction.CallbackContext context) {        
-
-        if (context.started) {
-            isMoveButtonLongPrresed.Value = true;
-            return;
-        }
-        if (context.canceled) {
-            isMoveButtonLongPrresed.Value = false;
-            return;
-        }
-        inputVector = context.ReadValue<Vector2>();
-        OnMoveInput.RaiseEvent(inputVector);
-    }
-
-    //長押し移動
-    public void OnLongPress(InputAction.CallbackContext context) {        
-
-        if (context.performed) {
-            MoveContinuously();
-        }
-    }
-
-    private async void MoveContinuously() {
-        if (!isMoveButtonLongPrresed.Value) return;
-        while (isMoveButtonLongPrresed.Value) {
-            OnMoveInput.RaiseEvent(inputVector);
-            await Task.Delay((int)(moveSpeed.Value * 1000));            
-        }
-    }
-
-    public void OnAttack(InputAction.CallbackContext context) {        
-        if (context.started) return;
-        if (context.canceled) return;        
-        OnAttackInput.Raise();
-    }
-
-    /// <summary>
-    /// メニューを開く際に呼び出す
-    /// </summary>
-    public void OnMenuOpen(InputAction.CallbackContext context) {
-        if (context.started) return;
-        if (context.canceled) return;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        OnMenuOpenInput.Raise();
-    }
-
-    /// <summary>
-    /// メニューを閉じる際に呼び出す
-    /// </summary>
-    public void OnMenuClose(InputAction.CallbackContext context) {
-        if (context.started) return;
-        if (context.canceled) return;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        OnMenuCloseInput.Raise();
     }
 
     public void OnToggleActionMap() {
@@ -121,22 +63,51 @@ public class UserInput : MonoBehaviour {
         uiActionMap.Enable();
     }
 
-    public void OnNavigate(InputAction.CallbackContext context) {
-        if (context.started) return;
-        if (context.canceled) return;
-        Vector2 navigateVector = context.ReadValue<Vector2>();
-        if (navigateVector.magnitude == 0) return;
-        //onNavigate?.Invoke(navigateVector);
-        OnNavigateInput.RaiseEvent(navigateVector);
+
+    // ================================================
+    // ==================== Playerの入力 ====================
+    // ================================================
+
+    //移動
+    public void OnMove(InputAction.CallbackContext context) {        
+
+        if (context.started) {
+            isMoveButtonLongPrresed.Value = true;
+            return;
+        }
+        if (context.canceled) {
+            isMoveButtonLongPrresed.Value = false;
+            return;
+        }
+        inputVector = context.ReadValue<Vector2>();
+        OnMoveInput.RaiseEvent(inputVector);
     }
 
-    public void OnSubmit(InputAction.CallbackContext context) {
-        if (context.started) return;
-        if (context.canceled) return;
-        //onSubmit?.Invoke();
-        OnSubmitInput.Raise();
+    //長押し移動
+    public void OnLongPress(InputAction.CallbackContext context) {        
+
+        if (context.performed) {
+            MoveContinuously();
+        }
     }
 
+    // 長押し移動
+    private async void MoveContinuously() {
+        if (!isMoveButtonLongPrresed.Value) return;
+        while (isMoveButtonLongPrresed.Value) {
+            OnMoveInput.RaiseEvent(inputVector);
+            await Task.Delay((int)(moveSpeed.Value * 1000));
+        }
+    }
+
+    // 攻撃 keyboard:Space
+    public void OnAttack(InputAction.CallbackContext context) {        
+        if (context.started) return;
+        if (context.canceled) return;        
+        OnAttackInput.Raise();
+    }
+
+    
     // 斜め移動を固定する keyboard:O
     public void OnFixDiagonalInput(InputAction.CallbackContext context) {
         if (context.started) fixDiagonalInput.Value = true;
@@ -162,8 +133,8 @@ public class UserInput : MonoBehaviour {
         }
     }
 
-    private IEnumerator CheckTurnButtonHoldTime() {
-        float pressStartTime = Time.time;
+    // 振り向くボタンの長押しをチェック
+    private IEnumerator CheckTurnButtonHoldTime() {        
         yield return new WaitForSeconds(0.2f);
         
         // 0.5秒後もボタンが押されていれば長押し状態を維持
@@ -172,6 +143,66 @@ public class UserInput : MonoBehaviour {
             OnAutoTurnInput.Raise();
         }
     }
+
+    // 足踏み
+    public void OnFootStep(InputAction.CallbackContext context) {
+        if(context.started) {
+            isFootStep = true;
+            FootStepContinuously();
+        }
+        if(context.canceled) {
+            isFootStep = false;
+        }
+    }
+
+    // 足踏み長押し処理
+    private async void FootStepContinuously() {
+        if(!isFootStep) return;
+        while(isFootStep) {
+            OnFootStepInput.Raise();
+            await Task.Delay(50);
+        }
+    }
+    // ================================================
+    // ==================== UIの入力 ====================
+    // ================================================
+
+    /// <summary>
+    /// メニューを開く際に呼び出す
+    /// </summary>
+    public void OnMenuOpen(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        OnMenuOpenInput.Raise();
+    }
+
+    /// <summary>
+    /// メニューを閉じる際に呼び出す
+    /// </summary>
+    public void OnMenuClose(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        OnMenuCloseInput.Raise();
+    }
+
+    public void OnNavigate(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;
+        Vector2 navigateVector = context.ReadValue<Vector2>();
+        if (navigateVector.magnitude == 0) return;        
+        OnNavigateInput.RaiseEvent(navigateVector);
+    }
+
+    public void OnSubmit(InputAction.CallbackContext context) {
+        if (context.started) return;
+        if (context.canceled) return;        
+        OnSubmitInput.Raise();
+    }
+
 }
 
 

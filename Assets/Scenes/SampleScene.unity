@@ -881,6 +881,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 2bb0d5db-3e75-4288-8015-03d005b73adc
     m_ActionName: Player/Turn[/Keyboard/u]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 190771914}
+        m_TargetAssemblyTypeName: UserInput, Assembly-CSharp
+        m_MethodName: OnFootStep
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b043e3f5-b477-4c32-818e-0c3e7f9371c2
+    m_ActionName: Player/Skip[/Keyboard/space,/Keyboard/k]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -907,6 +923,7 @@ MonoBehaviour:
   OnNavigateInput: {fileID: 11400000, guid: 33ed4e14321dc4ef5a12cc99b7e44a8b, type: 2}
   OnSubmitInput: {fileID: 11400000, guid: 0ef092ca94e18488b97c484a460e071f, type: 2}
   OnAutoTurnInput: {fileID: 11400000, guid: 0b697caa8fc9b41899c0b55d6f805e7c, type: 2}
+  OnFootStepInput: {fileID: 11400000, guid: b2580d970ef5d457799be75b4f11de84, type: 2}
   fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
@@ -6164,6 +6181,7 @@ GameObject:
   - component: {fileID: 1419592892}
   - component: {fileID: 1419592893}
   - component: {fileID: 1419592894}
+  - component: {fileID: 1419592895}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -6604,6 +6622,34 @@ MonoBehaviour:
       - m_Target: {fileID: 1419592882}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
         m_MethodName: AutoTurn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1419592895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1419592878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544a15f976c9f45be8a6cb58da3fac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: b2580d970ef5d457799be75b4f11de84, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1419592882}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: FootStep
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -141,8 +141,18 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             });
     }
 
+    // OnAutoTurnInputから呼び出される
     public void AutoTurn() {
         playerMoveLogic.AutoTurn(playerObjectData.Position.Value);
+    }
+
+    // OnFootStepInputから呼び出される
+    public void FootStep() {
+        // todo: 足踏みのアニメーションを再生する
+        //gameObject.GetComponent<Animator>().speed = 2f;
+        // todo: 同じ部屋にEnemyがいる場合は足踏みスピードを遅くする
+        // Playerのターンを終了する
+        OnPlayerStateComplete.Raise();
     }
     
 
