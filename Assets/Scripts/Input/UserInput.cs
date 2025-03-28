@@ -17,6 +17,12 @@ public class UserInput : MonoBehaviour {
     private Vector2 lastInputDirection = Vector2.zero;
     private float lastInputTime = 0f;
     private bool isBufferingInput = false;
+    private Coroutine bufferCoroutine = null;
+    
+    // 入力ロック機構
+    [SerializeField] private float inputLockDuration = 0.2f; // 入力ロック時間（秒）
+    private bool isInputLocked = false;
+    private Coroutine inputLockCoroutine = null;
 
     // イベント
     public GameEvent OnAttackInput;
@@ -84,14 +90,20 @@ public class UserInput : MonoBehaviour {
             return;
         }
         
+        // 入力がロックされている場合は処理しない
+        if (isInputLocked) {
+            return;
+        }
+        
         // 現在の入力を取得
         Vector2 currentInput = context.ReadValue<Vector2>();
+        Debug.Log($"OnMove: {currentInput}");
         
         // 入力値を四捨五入して方向ベクトルに変換
         Vector2 roundedInput = new Vector2(
             Mathf.Round(currentInput.x),
             Mathf.Round(currentInput.y)
-        );
+        );        
         
         // 入力がない場合は処理しない
         if (roundedInput == Vector2.zero) return;
@@ -113,12 +125,22 @@ public class UserInput : MonoBehaviour {
             
             // 斜め入力になっている場合のみ処理
             if (Mathf.Abs(combinedInput.x) > 0 && Mathf.Abs(combinedInput.y) > 0) {
+                // 実行中のコルーチンがあれば停止
+                if (bufferCoroutine != null) {
+                    StopCoroutine(bufferCoroutine);
+                    bufferCoroutine = null;
+                }
+                
                 inputVector = combinedInput;
                 OnMoveInput.RaiseEvent(inputVector);
                 
                 // バッファをリセット
                 lastInputDirection = Vector2.zero;
                 isBufferingInput = false;
+                
+                // 入力をロックして余分な入力を防止
+                LockInput();
+                
                 return;
             }
         }
@@ -130,8 +152,13 @@ public class UserInput : MonoBehaviour {
             lastInputDirection = roundedInput;
             lastInputTime = currentTime;
             
+            // 実行中のコルーチンがあれば停止
+            if (bufferCoroutine != null) {
+                StopCoroutine(bufferCoroutine);
+            }
+            
             // バッファ時間後に入力を処理するコルーチンを開始
-            StartCoroutine(ProcessBufferedInput());
+            bufferCoroutine = StartCoroutine(ProcessBufferedInput());
         } else {
             // バッファリング中に新しい入力があった場合は更新
             lastInputDirection = roundedInput;
@@ -152,6 +179,28 @@ public class UserInput : MonoBehaviour {
             lastInputDirection = Vector2.zero;
             isBufferingInput = false;
         }
+        
+        bufferCoroutine = null;
+    }
+    
+    // 入力をロックする
+    private void LockInput() {
+        isInputLocked = true;
+        
+        // 既存のロック解除コルーチンがあれば停止
+        if (inputLockCoroutine != null) {
+            StopCoroutine(inputLockCoroutine);
+        }
+        
+        // 指定時間後に入力ロックを解除するコルーチンを開始
+        inputLockCoroutine = StartCoroutine(UnlockInputAfterDelay());
+    }
+    
+    // 指定時間後に入力ロックを解除するコルーチン
+    private IEnumerator UnlockInputAfterDelay() {
+        yield return new WaitForSeconds(inputLockDuration);
+        isInputLocked = false;
+        inputLockCoroutine = null;
     }
 
     //長押し移動
