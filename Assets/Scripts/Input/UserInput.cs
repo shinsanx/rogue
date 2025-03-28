@@ -4,12 +4,19 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using System.Threading.Tasks;
+using System;
 
 public class UserInput : MonoBehaviour {
     // インスペクターで設定                
     Vector2 inputVector;
     [SerializeField] private BoolVariable isMoveButtonLongPrresed;
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
+    
+    // 斜め入力バッファリング用
+    [SerializeField] private float diagonalInputBufferTime = 0.1f; // バッファ時間（秒）
+    private Vector2 lastInputDirection = Vector2.zero;
+    private float lastInputTime = 0f;
+    private bool isBufferingInput = false;
 
     // イベント
     public GameEvent OnAttackInput;
@@ -44,12 +51,10 @@ public class UserInput : MonoBehaviour {
     public void OnToggleActionMap() {
         if (playerActionMap.enabled) {
             playerActionMap.Disable();
-            uiActionMap.Enable();
-            // Debug.Log("playerActionMap.Disable");
+            uiActionMap.Enable();            
         } else if (MenuManager.Instance.activeMenus.Count == 0) {
             playerActionMap.Enable();
-            uiActionMap.Disable();
-            // Debug.Log("playerActionMap.Enable");
+            uiActionMap.Disable();            
         }
     }
 
@@ -70,7 +75,6 @@ public class UserInput : MonoBehaviour {
 
     //移動
     public void OnMove(InputAction.CallbackContext context) {        
-
         if (context.started) {
             isMoveButtonLongPrresed.Value = true;
             return;
@@ -79,8 +83,75 @@ public class UserInput : MonoBehaviour {
             isMoveButtonLongPrresed.Value = false;
             return;
         }
-        inputVector = context.ReadValue<Vector2>();
-        OnMoveInput.RaiseEvent(inputVector);
+        
+        // 現在の入力を取得
+        Vector2 currentInput = context.ReadValue<Vector2>();
+        
+        // 入力値を四捨五入して方向ベクトルに変換
+        Vector2 roundedInput = new Vector2(
+            Mathf.Round(currentInput.x),
+            Mathf.Round(currentInput.y)
+        );
+        
+        // 入力がない場合は処理しない
+        if (roundedInput == Vector2.zero) return;
+        
+        // 現在時刻を取得
+        float currentTime = Time.time;
+        
+        // 前回の入力からの経過時間を計算
+        float timeSinceLastInput = currentTime - lastInputTime;
+        
+        // バッファ時間内に新しい入力があった場合
+        if (timeSinceLastInput <= diagonalInputBufferTime && lastInputDirection != Vector2.zero) {
+            // 前回の入力と現在の入力を組み合わせて斜め入力を作成
+            Vector2 combinedInput = lastInputDirection + roundedInput;
+            
+            // 斜め入力の正規化（-1〜1の範囲に収める）
+            combinedInput.x = Mathf.Clamp(combinedInput.x, -1f, 1f);
+            combinedInput.y = Mathf.Clamp(combinedInput.y, -1f, 1f);
+            
+            // 斜め入力になっている場合のみ処理
+            if (Mathf.Abs(combinedInput.x) > 0 && Mathf.Abs(combinedInput.y) > 0) {
+                inputVector = combinedInput;
+                OnMoveInput.RaiseEvent(inputVector);
+                
+                // バッファをリセット
+                lastInputDirection = Vector2.zero;
+                isBufferingInput = false;
+                return;
+            }
+        }
+        
+        // バッファリング中でない場合は通常の入力処理
+        if (!isBufferingInput) {
+            // バッファリングを開始
+            isBufferingInput = true;
+            lastInputDirection = roundedInput;
+            lastInputTime = currentTime;
+            
+            // バッファ時間後に入力を処理するコルーチンを開始
+            StartCoroutine(ProcessBufferedInput());
+        } else {
+            // バッファリング中に新しい入力があった場合は更新
+            lastInputDirection = roundedInput;
+            lastInputTime = currentTime;
+        }
+    }
+    
+    // バッファ時間後に入力を処理するコルーチン
+    private IEnumerator ProcessBufferedInput() {
+        yield return new WaitForSeconds(diagonalInputBufferTime);
+        
+        // バッファ時間後も斜め入力が検出されなかった場合は、最後の入力を処理
+        if (isBufferingInput && lastInputDirection != Vector2.zero) {
+            inputVector = lastInputDirection;
+            OnMoveInput.RaiseEvent(inputVector);
+            
+            // バッファをリセット
+            lastInputDirection = Vector2.zero;
+            isBufferingInput = false;
+        }
     }
 
     //長押し移動
@@ -144,7 +215,7 @@ public class UserInput : MonoBehaviour {
         }
     }
 
-    // 足踏み
+    // 足踏み keyboard K+Space
     public void OnFootStep(InputAction.CallbackContext context) {
         if(context.started) {
             isFootStep = true;
@@ -163,6 +234,8 @@ public class UserInput : MonoBehaviour {
             await Task.Delay(50);
         }
     }
+
+
     // ================================================
     // ==================== UIの入力 ====================
     // ================================================
@@ -204,6 +277,3 @@ public class UserInput : MonoBehaviour {
     }
 
 }
-
-
-
