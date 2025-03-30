@@ -897,6 +897,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: b043e3f5-b477-4c32-818e-0c3e7f9371c2
     m_ActionName: Player/Skip[/Keyboard/space,/Keyboard/k]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 190771914}
+        m_TargetAssemblyTypeName: UserInput, Assembly-CSharp
+        m_MethodName: OnZDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 55fb8b89-eb9f-407d-832e-ab431f999cfe
+    m_ActionName: Player/ZDash[/Keyboard/h]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -916,6 +932,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMoveButtonLongPrresed: {fileID: 11400000, guid: 1c3aaaa326d4246a29ae9c69830a0e28, type: 2}
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
+  diagonalInputBufferTime: 0.1
+  inputLockDuration: 0.2
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
   OnMoveInput: {fileID: 11400000, guid: 03cacfb776acc43c88e852af9247d30b, type: 2}
   OnMenuOpenInput: {fileID: 11400000, guid: b87e98a9bf8da441ba2298f0b0e3dde3, type: 2}
@@ -926,6 +944,7 @@ MonoBehaviour:
   OnFootStepInput: {fileID: 11400000, guid: b2580d970ef5d457799be75b4f11de84, type: 2}
   fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
+  zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
   moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
   inputActionAsset: {fileID: -944628639613478452, guid: b3ec8069520734aebb96eda0effdc605, type: 3}
 --- !u!114 &190771916
@@ -6299,6 +6318,7 @@ MonoBehaviour:
   moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
+  zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
   OnPlayerLevelChanged: {fileID: 11400000, guid: 68d63f544ab764ad586a0e0db930cd56, type: 2}
   OnPlayerHPChanged: {fileID: 11400000, guid: 984ac2f2355174f2fa14150e5c723772, type: 2}
   OnPlayerStateComplete: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}

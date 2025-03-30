@@ -71,9 +71,9 @@ public class TileManager : MonoBehaviour {
         return false;
     }
 
-    public IMenuActionAdapter CheckExistStair(Vector2Int targetPos) {
+    public GameObject CheckExistStair(Vector2Int targetPos) {
         if (objectDataSet.GetObjectTypeByPosition(targetPos) == "Stair") {
-            return objectDataSet.GetObjectByPosition(targetPos).GetComponent<IMenuActionAdapter>();
+            return objectDataSet.GetObjectByPosition(targetPos);
         }
         return null;
     }

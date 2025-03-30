@@ -37,6 +37,7 @@ public class UserInput : MonoBehaviour {
 
     [SerializeField] private BoolVariable fixDiagonalInput;
     [SerializeField] private BoolVariable dashInput;
+    [SerializeField] private BoolVariable zDashInput;
     [SerializeField] private FloatVariable moveSpeed;   
     private bool isFootStep = false;
 
@@ -97,7 +98,6 @@ public class UserInput : MonoBehaviour {
         
         // 現在の入力を取得
         Vector2 currentInput = context.ReadValue<Vector2>();
-        Debug.Log($"OnMove: {currentInput}");
         
         // 入力値を四捨五入して方向ベクトルに変換
         Vector2 roundedInput = new Vector2(
@@ -203,6 +203,9 @@ public class UserInput : MonoBehaviour {
         inputLockCoroutine = null;
     }
 
+
+
+
     //長押し移動
     public void OnLongPress(InputAction.CallbackContext context) {        
 
@@ -238,6 +241,12 @@ public class UserInput : MonoBehaviour {
     public void OnDash(InputAction.CallbackContext context) {
         if (context.started) dashInput.Value = true;
         if (context.canceled) dashInput.Value = false;
+    }
+
+    // zダッシュ待機する keyboard:Z
+    public void OnZDash(InputAction.CallbackContext context) {
+        if (context.started) zDashInput.Value = true;
+        if (context.canceled) zDashInput.Value = false;
     }
 
     // 振り向く keyboard:U

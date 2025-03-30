@@ -24,6 +24,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     [SerializeField] private FloatVariable moveSpeed;
     [SerializeField] private BoolVariable dashInput;
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
+    [SerializeField] private BoolVariable zDashInput;
     private bool isMoving = false;
     public bool IsMoving() => isMoving;
 
@@ -123,6 +124,9 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             playerMoveLogic.DashByInput(direction);
         } else if (isTurnButtonLongPressed.Value) {
             playerMoveLogic.ManualTurn(direction);
+        } else if (zDashInput.Value) {
+            moveSpeed.Value = 0.05f;
+            playerMoveLogic.ZDash(direction);
         } else {
             moveSpeed.Value = 0.3f;
             playerMoveLogic.MoveByInput(direction);
@@ -191,7 +195,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         effect.ApplyEffect(this);
     }
 
-    public void Heal(int amount) {        
+    public void Heal(int amount) {
         OnPlayerEat.Raise();
 
         //体力MAXの場合
