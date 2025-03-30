@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver {
@@ -118,7 +119,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // UserInputからのイベントを受け取るメソッド
-    public void PlayerMove(Vector2 direction) {        
+    public async Task PlayerMove(Vector2 direction) {        
         if(dashInput.Value) {
             moveSpeed.Value = 0.05f;
             playerMoveLogic.DashByInput(direction);
@@ -126,7 +127,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             playerMoveLogic.ManualTurn(direction);
         } else if (zDashInput.Value) {
             moveSpeed.Value = 0.05f;
-            playerMoveLogic.ZDash(direction);
+            await playerMoveLogic.ZDash(direction);
         } else {
             moveSpeed.Value = 0.3f;
             playerMoveLogic.MoveByInput(direction);

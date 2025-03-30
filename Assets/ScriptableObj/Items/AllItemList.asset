@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: AllItemList
   m_EditorClassIdentifier: 
   itemDataList:
+  - id: 1
+    itemSO: {fileID: 11400000, guid: 40f9a0c4dd42e4725a06b8bdc16c3230, type: 2}
   - id: 42
     itemSO: {fileID: 11400000, guid: 3d069fbb012f74228b5a4b9118a1d690, type: 2}
-    itemPrefab: {fileID: 1734026874544617083, guid: ca68d3306ee3242a3afa0179cbf1385d, type: 3}
