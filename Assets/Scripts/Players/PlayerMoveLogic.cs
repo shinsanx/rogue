@@ -241,7 +241,10 @@ public class PlayerMoveLogic {
             while (true) {
                 // 前方5方向に移動可能なタイルを探索
                 List<Vector2Int> facingTiles = DirectionUtils.GetSurroundingFacingTiles(currentPos, DungeonConstants.ToDirection[playerFaceDirection.Value.ToVector2Int()]);
-                List<Vector2Int> movableTiles = facingTiles.Where(tile => TileManager.i.CheckMovableTile(currentPos, tile)).ToList();                                                        
+                List<Vector2Int> movableTiles = facingTiles.Where(tile => TileManager.i.CheckMovableTile(currentPos, tile)).ToList();
+                if(movableTiles.Count == 0) {
+                    return;
+                }
 
                 // 移動可能なタイルが2つ以上なら終了
                 if (movableTiles.Count > 1 && TileManager.i.LookupRoomNum(currentPos + direction) != 0) {                    

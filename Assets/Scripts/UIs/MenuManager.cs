@@ -138,8 +138,7 @@ public class MenuManager : MonoBehaviour {
 
     //メニューアクション
     // アイテムを使用するメソッド
-    public void UseItem(ItemSO item, IEffectReceiver receiver) {
-        //OnItemRemoved.RaiseEvent(item);
+    public void UseItem(ItemSO item, IEffectReceiver receiver) {        
         currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
         // アイテムの使用処理
         if (item is ConsumableSO consumable) {
@@ -196,6 +195,13 @@ public class MenuManager : MonoBehaviour {
             currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
             currentSelectedObjectSO.ResetCurrentSelectedObject();
         }
+    }
+
+    //アイテムを装備する
+    public void Equip(ItemSO item, IEffectReceiver receiver) {
+        receiver.Equip(item);
+        OnPlayerStateComplete.Raise();
+        CloseAllMenus();
     }
 
     //MenuOpenの状態を確認してActionMapを変更する

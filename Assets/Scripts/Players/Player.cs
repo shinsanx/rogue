@@ -119,7 +119,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // UserInputからのイベントを受け取るメソッド
-    public async Task PlayerMove(Vector2 direction) {        
+    public async void PlayerMove(Vector2 direction) {        
         if(dashInput.Value) {
             moveSpeed.Value = 0.05f;
             playerMoveLogic.DashByInput(direction);
@@ -208,6 +208,14 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         int healAmount = Mathf.Clamp(amount, 0, playerMaxHealth.Value - playerCurrentHealth.Value);
         ChangePlayerCurrentHealth(healAmount);
         onMessageSend.RaiseEvent(createMessageLogic.CreateHealMessage(healAmount, playerObjectData.Name.Value));
+    }
+
+    public void Equip(ItemSO item) {
+        if (item is WeaponSO weapon) {
+            EquipWeapon = weapon;
+        } else if (item is ShieldSO shield) {
+            EquipShield = shield;
+        }
     }
 
     public void HandleItemPicked(bool success) {

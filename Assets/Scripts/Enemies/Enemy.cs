@@ -115,7 +115,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     }
 
 
-    private void OnEnemyDestroyed() {        
+    private void OnEnemyDestroyed() {  
+        enemyAnimLogic.KillTween();
         Destroy(gameObject);
     }
 
@@ -142,5 +143,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
 
     public void Heal(int amount) {
         HP += amount;
+    }
+
+    public void Equip(ItemSO item) {
+        //TODO: 敵がアイテムを装備する?
     }
 }

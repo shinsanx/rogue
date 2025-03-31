@@ -5,6 +5,7 @@ using UnityEngine;
 public interface IEffectReceiver
 {
     void ApplyEffect(EffectSO effect);
+    void Equip(ItemSO item);
 }
     
 
