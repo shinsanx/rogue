@@ -26,11 +26,12 @@ public class ArrangeManager : MonoBehaviour {
     //ランダムなポジションにアイテムを配置
     //itemPrefabはやがて置き換える
     public async Task ArrangeItemToRandomPosition(List<ItemSO> itemSOs, int itemCount) {
-        //itemSOsの中からアイテムをランダムに選択
-        ItemSO selectedItem = itemSOs.OrderBy(item => Random.Range(0, int.MaxValue)).First();
 
         // アイテムを配置
         for (int i = 0; i < itemCount; i++) {
+        //itemSOsの中からアイテムをランダムに選択
+        ItemSO selectedItem = itemSOs.OrderBy(item => Random.Range(0, int.MaxValue)).First();
+
             PlaceItem(TileManager.i.GetRandomPosition(), selectedItem);
             await Task.Yield();
         }
