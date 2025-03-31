@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac580066478f481cbdfcde295f70fb2, type: 3}
   m_Name: TestItemTable
   m_EditorClassIdentifier: 
-  Items:
-  - {fileID: 11400000, guid: 3d069fbb012f74228b5a4b9118a1d690, type: 2}
-  - {fileID: 11400000, guid: 40f9a0c4dd42e4725a06b8bdc16c3230, type: 2}
-  - {fileID: 11400000, guid: 782590bf83324475b93111d0d9f3d0a9, type: 2}
+  weightedItems:
+  - item: {fileID: 11400000, guid: 3d069fbb012f74228b5a4b9118a1d690, type: 2}
+    weight: 60
+  - item: {fileID: 11400000, guid: 40f9a0c4dd42e4725a06b8bdc16c3230, type: 2}
+    weight: 20
+  - item: {fileID: 11400000, guid: 782590bf83324475b93111d0d9f3d0a9, type: 2}
+    weight: 20

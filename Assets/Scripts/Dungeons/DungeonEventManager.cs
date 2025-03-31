@@ -171,7 +171,7 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private async Task GenerateItems() {
-        await ArrangeManager.i.ArrangeItemToRandomPosition(currentItemTable.Items, dungeonData.DungeonTable.Floors[0].InitialItemCount);
+        await ArrangeManager.i.ArrangeItemToRandomPosition(currentItemTable, dungeonData.DungeonTable.Floors[0].InitialItemCount);
     }
 
     private Task CreateMiniMap() {
@@ -185,7 +185,7 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private void SaveDungeonData() {
-        currentDungeonData.currentDungeonData = dungeonData;        
+        currentDungeonData.currentDungeonData = dungeonData;
     }
 
     private async Task GenerateStair() {

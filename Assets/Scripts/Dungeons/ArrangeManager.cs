@@ -25,12 +25,12 @@ public class ArrangeManager : MonoBehaviour {
     [SerializeField] GameObject stairPrefab;
     //ランダムなポジションにアイテムを配置
     //itemPrefabはやがて置き換える
-    public async Task ArrangeItemToRandomPosition(List<ItemSO> itemSOs, int itemCount) {
+    public async Task ArrangeItemToRandomPosition(ItemTableSO itemTableSO, int itemCount) {
 
         // アイテムを配置
         for (int i = 0; i < itemCount; i++) {
         //itemSOsの中からアイテムをランダムに選択
-        ItemSO selectedItem = itemSOs.OrderBy(item => Random.Range(0, int.MaxValue)).First();
+        ItemSO selectedItem = itemTableSO.GetRandomItem();
 
             PlaceItem(TileManager.i.GetRandomPosition(), selectedItem);
             await Task.Yield();
