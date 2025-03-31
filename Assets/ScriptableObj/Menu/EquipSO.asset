@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb465b1302d0340b1b03fac3541700d8, type: 3}
   m_Name: EquipSO
   m_EditorClassIdentifier: 
-  menuName: "\u88C5\u5099\u3059\u308B"
+  menuName: "\u88C5\u5099"
   currentSelectedObject: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}
   objectDataRuntimeSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
