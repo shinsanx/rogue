@@ -19,6 +19,7 @@ public class EnemyManager : MonoBehaviour {
     private IObjectData objectData;
     private AStarPathfinding pathfinding;
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;
+    [SerializeField] GameEvent onCompleteEnemyTurn;
 
     public void Initialize() {
         stateMachine = GameAssets.i.stateMachine;
@@ -31,7 +32,7 @@ public class EnemyManager : MonoBehaviour {
 
     // StateLogicで呼び出される
     // 敵の行動をスタートする
-    public async Task ProcessEnemies() {
+    public async void ProcessEnemies() {
 
         //最初にプレイヤーの位置を取得        
         playerPos = _playerPos.Value;
@@ -67,6 +68,8 @@ public class EnemyManager : MonoBehaviour {
             }            
             await Task.Yield();
         }
+        onCompleteEnemyTurn.Raise();
+
     }
 
 

@@ -22,7 +22,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] TileManager tileManager;
     [SerializeField] CurrentDungeonData currentDungeonData;
     private EnemyTableSO currentEnemyTable;
-    private ItemTableSO currentItemTable;    
+    private ItemTableSO currentItemTable;
 
 
     private async void Start() {

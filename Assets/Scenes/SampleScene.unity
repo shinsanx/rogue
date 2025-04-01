@@ -5603,6 +5603,7 @@ GameObject:
   - component: {fileID: 1348055332}
   - component: {fileID: 1348055333}
   - component: {fileID: 1348055334}
+  - component: {fileID: 1348055335}
   m_Layer: 0
   m_Name: StateManager
   m_TagString: Untagged
@@ -5659,6 +5660,34 @@ MonoBehaviour:
       - m_Target: {fileID: 1348055333}
         m_TargetAssemblyTypeName: DungeonStateManager, Assembly-CSharp
         m_MethodName: PlayerActionComplete
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1348055335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1348055331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544a15f976c9f45be8a6cb58da3fac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 90d1d9bfa98a04112a8d5a034a827931, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1348055333}
+        m_TargetAssemblyTypeName: DungeonStateManager, Assembly-CSharp
+        m_MethodName: EnemyActionComplete
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7522,6 +7551,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1665713300}
   - component: {fileID: 1665713301}
+  - component: {fileID: 1665713302}
   m_Layer: 0
   m_Name: EnemyManager
   m_TagString: Untagged
@@ -7558,6 +7588,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPos: {fileID: 11400000, guid: 2a0401bef74d141588319b077f8888e1, type: 2}
   objectDataSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
+  onCompleteEnemyTurn: {fileID: 11400000, guid: 90d1d9bfa98a04112a8d5a034a827931, type: 2}
+--- !u!114 &1665713302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665713299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544a15f976c9f45be8a6cb58da3fac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: d0348ee735a064c0dbbbbf483989547e, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1665713301}
+        m_TargetAssemblyTypeName: EnemyManager, Assembly-CSharp
+        m_MethodName: ProcessEnemies
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1741563295
 GameObject:
   m_ObjectHideFlags: 0

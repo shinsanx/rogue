@@ -1,19 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "EnemyState", menuName = "StateMachine/EnemyState", order = 0)]
-public class EnemyState : State
-{
+public class EnemyState : State {    
+    [SerializeField] GameEvent onEnemyActionStart;
+    [SerializeField] GameEvent updateMiniMap;    
+    
     public override void OnEnter() {
-        base.OnEnter();
-        //   Debug.Log("EnemyState start");
-        // EnemyStateがスタートしたときの処理を書く
+        EnemyStateStart();
     }
 
     public override void OnExit() {
-        base.OnExit();
-        // Debug.Log("EnemyState end");
-        // EnemyStateが終了したときの処理を書く
+        updateMiniMap.Raise();
+    }
+
+    public void EnemyStateStart() {
+        onEnemyActionStart.Raise();        
+        
     }
 }

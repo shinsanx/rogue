@@ -5,10 +5,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerState", menuName = "StateMachine/PlayerState", order = 0)]
 public class PlayerState : State
 {
-    public override void OnEnter() {
-        base.OnEnter();
-        //  Debug.Log("PlayerState start");
-        // PlayerStateがスタートしたときの処理を書く
+    [SerializeField] GameEvent playerTurnEndEvent;
+    [SerializeField] IntVariable sleepTurnCount;
+    public override void OnEnter() {        
+        if(sleepTurnCount.Value > 0) {
+            sleepTurnCount.Value--;
+            playerTurnEndEvent.Raise();
+            Debug.Log("残りの睡眠ターン:" + sleepTurnCount.Value);
+        }                         
     }
 
     public override void OnExit() {

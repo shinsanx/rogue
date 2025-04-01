@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f0543b27aa754761ac612916173fcb5, type: 3}
   m_Name: EnemyState
   m_EditorClassIdentifier: 
+  onEnemyActionStart: {fileID: 11400000, guid: d0348ee735a064c0dbbbbf483989547e, type: 2}
+  updateMiniMap: {fileID: 11400000, guid: 4f4b6a69284dc467e90bb08acd484485, type: 2}
+  onCompleteEnemyTurn: {fileID: 11400000, guid: 90d1d9bfa98a04112a8d5a034a827931, type: 2}
