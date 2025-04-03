@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b6f59e48899c4085b91723fd8bf1dc2, type: 3}
   m_Name: PlayerState
   m_EditorClassIdentifier: 
-  playerTurnEndEvent: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}
+  playerStateComplete: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}
   sleepTurnCount: {fileID: 11400000, guid: 693937a0bcbf041a299adea152acc689, type: 2}
+  canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}

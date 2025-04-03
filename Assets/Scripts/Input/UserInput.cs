@@ -11,6 +11,7 @@ public class UserInput : MonoBehaviour {
     Vector2 inputVector;
     [SerializeField] private BoolVariable isMoveButtonLongPrresed;
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
+    [SerializeField] private BoolVariable canHandleInput;
     
     // 斜め入力バッファリング用
     [SerializeField] private float diagonalInputBufferTime = 0.1f; // バッファ時間（秒）
@@ -93,6 +94,10 @@ public class UserInput : MonoBehaviour {
         
         // 入力がロックされている場合は処理しない
         if (isInputLocked) {
+            return;
+        }
+
+        if (!canHandleInput.Value) {
             return;
         }
         
@@ -218,6 +223,9 @@ public class UserInput : MonoBehaviour {
     private async void MoveContinuously() {
         if (!isMoveButtonLongPrresed.Value) return;
         while (isMoveButtonLongPrresed.Value) {
+            if (!canHandleInput.Value) {
+                return;
+            }
             OnMoveInput.RaiseEvent(inputVector);
             await Task.Delay((int)(moveSpeed.Value * 1000));
         }
