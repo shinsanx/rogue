@@ -192,6 +192,8 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // ================================================
     // ============== IEffectReceiver =================
     // ================================================ 
+    [field: SerializeField] public IntVariable sleepTurn { get; set; }
+    
     public void ApplyEffect(EffectSO effect) {
         effect.ApplyEffect(this);
     }

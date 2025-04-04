@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IEffectReceiver
 {
+    public IntVariable sleepTurn { get; set; }
     void ApplyEffect(EffectSO effect);
     void Equip(ItemSO item);
 }

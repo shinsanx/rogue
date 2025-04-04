@@ -89,6 +89,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     // ========================================================
     public void ExecuteAction(EnemyAction action)
     {        
+        if(action == null) {
+            return;
+        }
         switch(action.Type)
         {
             case ActionType.Move:
@@ -131,12 +134,16 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     private void CreateSOInstance() {
         objectData.CreateSOInstance();
         animationAdapter.CreateSOInstance();
+
+        sleepTurn = ScriptableObject.CreateInstance<IntVariable>();        
     }
     
 
     // ========================================================
     // ==================== IEffectReceiver ===================
     // ========================================================
+    [field: SerializeField] public IntVariable sleepTurn { get; set; }
+
     public void ApplyEffect(EffectSO effect) {
         effect.ApplyEffect(this);
     }
@@ -148,4 +155,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public void Equip(ItemSO item) {
         //TODO: 敵がアイテムを装備する?
     }
+    
+
+
 }
