@@ -119,12 +119,20 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // UserInputからのイベントを受け取るメソッド
-    public async void PlayerMove(Vector2 direction) {        
+    public async void PlayerMove(Vector2 direction) {
+        if(isTurnButtonLongPressed.Value) {
+            playerMoveLogic.ManualTurn(direction);
+            return;
+        }
+        if(confusionTurn.Value > 0) {
+            if(playerMoveLogic.RandomMove()) {
+                confusionTurn.Value--;
+            }
+            return;
+        }
         if(dashInput.Value) {
             moveSpeed.Value = 0.05f;
             playerMoveLogic.DashByInput(direction);
-        } else if (isTurnButtonLongPressed.Value) {
-            playerMoveLogic.ManualTurn(direction);
         } else if (zDashInput.Value) {
             moveSpeed.Value = 0.05f;
             await playerMoveLogic.ZDash(direction);
@@ -133,7 +141,13 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             playerMoveLogic.MoveByInput(direction);
         }
     }
-    public void PlayerAttack() {        
+    public void PlayerAttack() { 
+        if(confusionTurn.Value > 0) {
+            if(playerAttackLogic.ConfusionAttack()) {
+                confusionTurn.Value--;
+            }
+            return;
+        }
         playerAttackLogic.Attack();
     }
 
@@ -168,7 +182,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());                        
         playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput);
-        playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack);
+        playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack, OnPlayerDirectionChanged);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);                
     }
 
@@ -193,7 +207,8 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // ============== IEffectReceiver =================
     // ================================================ 
     [field: SerializeField] public IntVariable sleepTurn { get; set; }
-    
+    [field: SerializeField] public IntVariable confusionTurn { get; set; }
+
     public void ApplyEffect(EffectSO effect) {
         effect.ApplyEffect(this);
     }

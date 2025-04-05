@@ -15,6 +15,7 @@ public class PlayerAttackLogic
     //イベント
     private GameEvent OnPlayerStateComplete;
     private GameEvent OnPlayerAttack;
+    private GameEvent OnPlayerDirectionChanged;
     
 
     //コンストラクタ
@@ -23,7 +24,8 @@ public class PlayerAttackLogic
         GameEvent OnPlayerStateComplete,
         ObjectDataRuntimeSet objectDataSet,
         Vector2Variable playerFaceDirection,
-        GameEvent OnPlayerAttack
+        GameEvent OnPlayerAttack,
+        GameEvent OnPlayerDirectionChanged
     ){
         this.player = player;        
         this.objectData = player.playerObjectData;        
@@ -31,6 +33,7 @@ public class PlayerAttackLogic
         this.objectDataSet = objectDataSet;
         this.playerFaceDirection = playerFaceDirection;
         this.OnPlayerAttack = OnPlayerAttack;
+        this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
     }
 
     public void Attack(){
@@ -74,6 +77,21 @@ public class PlayerAttackLogic
         isAttacking = true;
         await Task.Delay(500);
         isAttacking = false;
+    }
+
+    public bool ConfusionAttack(){
+        if(isAttacking) return false;
+        OnPlayerAttack.Raise();
+        List<Vector2Int> surroundingPositions = TileManager.i.GetSurroundingPositions(objectData.Position.Value);
+        int randomIndex = UnityEngine.Random.Range(0, surroundingPositions.Count);
+        Vector2Int randomPosition = surroundingPositions[randomIndex];
+
+        DealDamage(objectDataSet.GetObjectByPosition(randomPosition)); 
+        playerFaceDirection.Value = new Vector2(randomPosition.x - objectData.Position.Value.x, randomPosition.y - objectData.Position.Value.y);
+        OnPlayerDirectionChanged.Raise();
+        LockInputWhileAttacking();
+        OnPlayerStateComplete.Raise();
+        return true;
     }
     
 }

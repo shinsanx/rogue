@@ -50,26 +50,22 @@ public class PlayerMoveLogic {
     List<Vector2Int> inputs = new List<Vector2Int>();
 
     public void MoveByInput(Vector2 inputVector) {
-        try {
-            this.inputVector = inputVector;
 
-            roundX = Mathf.Round(inputVector.x);
-            roundY = Mathf.Round(inputVector.y);
+        this.inputVector = inputVector;
 
-            Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
-            Vector2Int currentPos = objectData.Position.Value;
-            Vector2Int targetPos = inputVectorInt + currentPos;
+        roundX = Mathf.Round(inputVector.x);
+        roundY = Mathf.Round(inputVector.y);
 
-            if (isMoving) return;
-            inputs.Add(inputVectorInt);
-            DevideInput(currentPos, targetPos);            
+        Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
+        Vector2Int currentPos = objectData.Position.Value;
+        Vector2Int targetPos = inputVectorInt + currentPos;
 
-            if (TileManager.i.CheckExistStair(targetPos) != null) {
-                TileManager.i.CheckExistStair(targetPos).GetComponent<IMenuActionAdapter>().OnSelected();
-            }
+        if (isMoving) return;
+        inputs.Add(inputVectorInt);
+        DevideInput(currentPos, targetPos);
 
-        } catch (Exception e) {
-            Debug.LogError($"PlayerMoveLogic MoveByInput failed: {e.Message}");
+        if (TileManager.i.CheckExistStair(targetPos) != null) {
+            TileManager.i.CheckExistStair(targetPos).GetComponent<IMenuActionAdapter>().OnSelected();
         }
     }
 
@@ -122,9 +118,9 @@ public class PlayerMoveLogic {
             currentSelectedObjectSO.Object = item.gameObject;
             // itemSOがnullでないことを確認
             if (item.itemSO != null) {
-                    currentItemObject = item.gameObject;
-                    OnItemPicked.RaiseEvent(item.itemSO);
-                } else {
+                currentItemObject = item.gameObject;
+                OnItemPicked.RaiseEvent(item.itemSO);
+            } else {
                 Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
             }
         }
@@ -236,29 +232,29 @@ public class PlayerMoveLogic {
             // 一歩進む
             roundX = direction.x;
             roundY = direction.y;
-            Move(currentPos, currentPos + direction);            
+            Move(currentPos, currentPos + direction);
 
             while (true) {
                 // 前方5方向に移動可能なタイルを探索
                 List<Vector2Int> facingTiles = DirectionUtils.GetSurroundingFacingTiles(currentPos, DungeonConstants.ToDirection[playerFaceDirection.Value.ToVector2Int()]);
                 List<Vector2Int> movableTiles = facingTiles.Where(tile => TileManager.i.CheckMovableTile(currentPos, tile)).ToList();
-                if(movableTiles.Count == 0) {
+                if (movableTiles.Count == 0) {
                     return;
                 }
 
                 // 移動可能なタイルが2つ以上なら終了
-                if (movableTiles.Count > 1 && TileManager.i.LookupRoomNum(currentPos + direction) != 0) {                    
+                if (movableTiles.Count > 1 && TileManager.i.LookupRoomNum(currentPos + direction) != 0) {
                     return;
                 }
                 // 移動可能なタイルが1つなら移動
-                if (movableTiles.Count == 1) {                    
-                    roundX = movableTiles[0].x - currentPos.x;                    
-                    roundY = movableTiles[0].y - currentPos.y;                    
+                if (movableTiles.Count == 1) {
+                    roundX = movableTiles[0].x - currentPos.x;
+                    roundY = movableTiles[0].y - currentPos.y;
                     Move(currentPos, movableTiles[0]);
                 }
                 // 移動不可なら終了
-                Vector2Int targetPos = movableTiles[0];                
-                if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) {                    
+                Vector2Int targetPos = movableTiles[0];
+                if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) {
                     return;
                 }
                 // currentPosを更新
@@ -391,7 +387,7 @@ public class PlayerMoveLogic {
         Vector2Int movePos = currentPos;
 
         foreach (var pos in path) {
-            Move(movePos, pos);                        
+            Move(movePos, pos);
             await Task.Delay(50);
             movePos = pos;
         }
@@ -423,5 +419,35 @@ public class PlayerMoveLogic {
         playerFaceDirection.SetValue(new Vector2(roundX, roundY));
         OnPlayerDirectionChanged.Raise();
     }
+
+    public bool RandomMove() {
+
+        // 周囲8マスから移動可能なマスを探す
+        List<Vector2Int> movableTiles = TileManager.i.GetSurroundingPositions(objectData.Position.Value).Where(tile => TileManager.i.CheckMovableTile(objectData.Position.Value, tile)).ToList();
+        if(movableTiles.Count == 0) {
+            return false;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, movableTiles.Count);
+        Vector2Int randomTile = movableTiles[randomIndex];
+
+        roundX = randomTile.x - objectData.Position.Value.x;
+        roundY = randomTile.y - objectData.Position.Value.y;
+
+        Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY); //四捨五入処理
+        Vector2Int currentPos = objectData.Position.Value;
+        Vector2Int targetPos = inputVectorInt + currentPos;
+
+        if (isMoving) return false;
+        
+        Move(currentPos, targetPos);
+
+        if (TileManager.i.CheckExistStair(targetPos) != null) {
+            TileManager.i.CheckExistStair(targetPos).GetComponent<IMenuActionAdapter>().OnSelected();
+        }
+
+        return true;
+    }
+        
 
 }

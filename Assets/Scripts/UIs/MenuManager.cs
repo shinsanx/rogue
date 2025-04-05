@@ -139,7 +139,12 @@ public class MenuManager : MonoBehaviour {
     //メニューアクション
     // アイテムを使用するメソッド
     public void UseItem(ItemSO item, IEffectReceiver receiver) {        
-        currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
+        
+        //足元にある場合だけ
+        if(currentSelectedObjectSO.Object != null) {
+            currentSelectedObjectSO.Object.GetComponent<Item>().OnPicked();
+        }
+            
         // アイテムの使用処理
         if (item is ConsumableSO consumable) {
             onMessageSend.RaiseEvent(createMessageLogic.CreateUseItemMessage(consumable.itemName));

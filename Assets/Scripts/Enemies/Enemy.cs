@@ -135,7 +135,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         objectData.CreateSOInstance();
         animationAdapter.CreateSOInstance();
 
-        sleepTurn = ScriptableObject.CreateInstance<IntVariable>();        
+        sleepTurn = ScriptableObject.CreateInstance<IntVariable>();
+        confusionTurn = ScriptableObject.CreateInstance<IntVariable>();
+        confusionTurn.Value = 10;
     }
     
 
@@ -143,6 +145,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     // ==================== IEffectReceiver ===================
     // ========================================================
     [field: SerializeField] public IntVariable sleepTurn { get; set; }
+    [field: SerializeField] public IntVariable confusionTurn { get; set; }
 
     public void ApplyEffect(EffectSO effect) {
         effect.ApplyEffect(this);

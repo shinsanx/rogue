@@ -34,7 +34,10 @@ public class EnemyAttackLogic
     
 
     private void DealDamage(GameObject targetObject, Vector2Int direction){        
-        if(targetObject == null)return;
+        if(targetObject == null){
+            enemyAnimLogic.SetAttackAnimation(direction);
+            return;
+        }
         if(damageCalculate == null){
             damageCalculate = new DamageCalculate();
         }

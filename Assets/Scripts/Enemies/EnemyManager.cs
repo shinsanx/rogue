@@ -55,15 +55,30 @@ public class EnemyManager : MonoBehaviour {
 
     public EnemyAction AIStart(Enemy enemy) {
         ResetEnemyAction();
+
+        // ステータス関連処理
+        // 睡眠
         if (enemy.sleepTurn.Value > 0) {
             enemy.sleepTurn.Value--;
             return null;
         }
+        
+        
         this.objectData = enemy.GetComponent<IObjectData>();
         enemyAIState = enemy.GetComponent<IEnemyAIState>();
         UpdateEnemyState();
         ExecuteAction();
         UpdateEndState();
+
+        // 混乱
+        if (enemy.confusionTurn.Value > 0) {
+            enemyAction.Direction = DirectionUtils.GetRandomDirection();
+
+            enemyAction.TargetPosition = objectData.Position.Value + enemyAction.Direction;
+            enemyAction.Target = objectDataSet.GetObjectByPosition(enemyAction.TargetPosition);
+            enemy.confusionTurn.Value--;
+            Debug.Log(enemy.name + "の混乱ターンが減りました。残り" + enemy.confusionTurn.Value + "ターン");
+        }
         return enemyAction;
     }
 

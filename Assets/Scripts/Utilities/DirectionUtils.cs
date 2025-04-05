@@ -3,6 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class DirectionUtils {
+
+    private static readonly Vector2Int north = new Vector2Int(0, 1);
+    private static readonly Vector2Int south = new Vector2Int(0, -1);
+    private static readonly Vector2Int east = new Vector2Int(1, 0);
+    private static readonly Vector2Int west = new Vector2Int(-1, 0);
+    private static readonly Vector2Int northeast = new Vector2Int(1, 1);
+    private static readonly Vector2Int northwest = new Vector2Int(-1, 1);
+    private static readonly Vector2Int southeast = new Vector2Int(1, -1);
+    private static readonly Vector2Int southwest = new Vector2Int(-1, -1);
+
+    private static readonly List<Vector2Int> directions = new List<Vector2Int> {
+        north, south, east, west, northeast, northwest, southeast, southwest
+    };
+
+
+    // 方向ベクトル
     private static readonly Dictionary<DungeonConstants.Direction, (Vector2Int forward, Vector2Int left, Vector2Int right)> DirectionVectors
      = new Dictionary<DungeonConstants.Direction, (Vector2Int, Vector2Int, Vector2Int)> {
         { DungeonConstants.Direction.Stay,      (Vector2Int.zero,   Vector2Int.zero,  Vector2Int.zero) },
@@ -25,5 +41,10 @@ public static class DirectionUtils {
             currentPos + left,                       // 左
             currentPos + right                       // 右
         };
+    }
+
+    public static Vector2Int GetRandomDirection() {
+        int randomIndex = UnityEngine.Random.Range(0, directions.Count);
+        return directions[randomIndex];
     }
 }

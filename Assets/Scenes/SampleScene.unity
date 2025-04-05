@@ -6410,6 +6410,7 @@ MonoBehaviour:
   <EquipWeapon>k__BackingField: {fileID: 0}
   <EquipShield>k__BackingField: {fileID: 0}
   <sleepTurn>k__BackingField: {fileID: 11400000, guid: 693937a0bcbf041a299adea152acc689, type: 2}
+  <confusionTurn>k__BackingField: {fileID: 11400000, guid: 79fd1200cc5cc43c89845ed60dead3e4, type: 2}
 --- !u!114 &1419592883
 MonoBehaviour:
   m_ObjectHideFlags: 0
