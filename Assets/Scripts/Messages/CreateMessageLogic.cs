@@ -167,4 +167,13 @@ public class CreateMessageLogic : ScriptableObject {
         };
         return strings;
     }
+
+    public List<string> CreateMuscleUpMessage(int amount) {
+        string firstText = "ちからの最大値が" + upperDamageText.ConvertNumToUpperString(amount) + "ポイント上がった。";
+
+        List<string> strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
 }

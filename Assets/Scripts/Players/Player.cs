@@ -239,4 +239,11 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         playerMoveLogic.HandleItemPicked(success);
     }
 
+    public void MuscleUp(int amount) {
+        ChangePlayerMaxMuscle(playerMaxMuscle.Value + amount);
+        playerCurrentMuscle.Value += amount;
+
+        onMessageSend.RaiseEvent(createMessageLogic.CreateMuscleUpMessage(amount));
+    }
+
 }
