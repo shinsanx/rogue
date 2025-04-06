@@ -176,4 +176,13 @@ public class CreateMessageLogic : ScriptableObject {
         };
         return strings;
     }
+
+    public List<string> CreateMuscleHealMessage() {
+        string firstText = playerName + "のちからが回復した。";
+
+        List<string> strings = new List<string>{
+            firstText,
+        };
+        return strings;
+    }
 }

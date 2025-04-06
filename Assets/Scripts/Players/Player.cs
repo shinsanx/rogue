@@ -115,7 +115,9 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     public void ChangePlayerCurrentMuscle(int value) {
-        playerCurrentMuscle.SetValue(value);
+
+        // palyerMaxMuscleを超えないようにする
+        playerCurrentMuscle.SetValue(Mathf.Min(value, playerMaxMuscle.Value));
     }
 
     // UserInputからのイベントを受け取るメソッド
@@ -239,11 +241,18 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         playerMoveLogic.HandleItemPicked(success);
     }
 
+    // ちからの最大値を上げる
     public void MuscleUp(int amount) {
         ChangePlayerMaxMuscle(playerMaxMuscle.Value + amount);
         playerCurrentMuscle.Value += amount;
 
         onMessageSend.RaiseEvent(createMessageLogic.CreateMuscleUpMessage(amount));
+    }
+
+    // ちからを全回復する
+    public void MuscleHeal() {
+        ChangePlayerCurrentMuscle(playerMaxMuscle.Value);
+        onMessageSend.RaiseEvent(createMessageLogic.CreateMuscleHealMessage());
     }
 
 }
