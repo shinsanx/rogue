@@ -10,10 +10,7 @@ public class StateMachine : ScriptableObject
     public State CurrentState => _currentState;
     public State _currentState;
 
-    [SerializeField] private State defaultState;
-
-    //Stateが変わった時に呼ばれるイベント 未使用。
-    // public event Action<State> OnStateChanged;
+    [SerializeField] private State defaultState;    
 
     public void init(){
         _currentState = null; //生成した時に前の情報を引き継がない

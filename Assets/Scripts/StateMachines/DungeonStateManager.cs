@@ -8,7 +8,8 @@ public class DungeonStateManager : MonoBehaviour {
 
     StateMachine stateMachine;
     State playerState;
-    State enemyState;            
+    State enemyState;
+    [SerializeField] private IntVariable playerTimeGage;
 
     public void Initialize() {
         stateMachine = GameAssets.i.stateMachine;
@@ -18,6 +19,9 @@ public class DungeonStateManager : MonoBehaviour {
 
     // Playerのターンを終わらせる
     public void PlayerActionComplete() {
+        if(playerTimeGage.Value >= 100) {
+            playerTimeGage.Value = 0;
+        }
         stateMachine.SetState(enemyState);
     }
 

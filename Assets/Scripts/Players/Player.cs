@@ -5,9 +5,10 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Animator))]
-public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver {
+public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver, IStatusEffectTarget {
     // === Serialized Fields ===            
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;    
 
@@ -28,6 +29,11 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     [SerializeField] private BoolVariable zDashInput;
     private bool isMoving = false;
     public bool IsMoving() => isMoving;
+
+    //行動ゲージ関連
+    private int threshold = 100; //行動の閾値
+    [SerializeField] private IntVariable timeGage;
+    [SerializeField] private IntVariable playerActionRate;
 
 
     // ================================================
@@ -123,13 +129,13 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // UserInputからのイベントを受け取るメソッド
     public async void PlayerMove(Vector2 direction) {
         if(isTurnButtonLongPressed.Value) {
-            playerMoveLogic.ManualTurn(direction);
+            playerMoveLogic.ManualTurn(direction);            
             return;
         }
         if(confusionTurn.Value > 0) {
             if(playerMoveLogic.RandomMove()) {
-                confusionTurn.Value--;
-            }
+                confusionTurn.Value--;                
+            }            
             return;
         }
         if(dashInput.Value) {
@@ -140,7 +146,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             await playerMoveLogic.ZDash(direction);
         } else {
             moveSpeed.Value = 0.3f;
-            playerMoveLogic.MoveByInput(direction);
+            playerMoveLogic.MoveByInput(direction);            
         }
     }
     public void PlayerAttack() { 
@@ -255,4 +261,20 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         onMessageSend.RaiseEvent(createMessageLogic.CreateMuscleHealMessage());
     }
 
+
+    // ================================================
+    // ============== IStatusEffectTarget =============
+    // ================================================
+    public void AddStatusEffect(StatusEffect effect) {
+        
+    }
+
+    public void RemoveStatusEffect(StatusEffect effect) {
+        
+    }
+
+    public List<StatusEffect> GetStatusEffects() {
+        return new List<StatusEffect>();
+    }
+        
 }

@@ -39,6 +39,9 @@ public class EnemyManager : MonoBehaviour {
         enemies = objectDataSet.GetAllEnemies();
 
         foreach (var enemy in enemies) {
+
+            enemy.Tick();
+            if (!enemy.CanAct()) continue;
             var action = await MainThreadHelper.RunOnMainThread<EnemyAction>(() => {
                 var result = AIStart(enemy);
                 return result;
@@ -62,8 +65,8 @@ public class EnemyManager : MonoBehaviour {
             enemy.sleepTurn.Value--;
             return null;
         }
-        
-        
+
+
         this.objectData = enemy.GetComponent<IObjectData>();
         enemyAIState = enemy.GetComponent<IEnemyAIState>();
         UpdateEnemyState();

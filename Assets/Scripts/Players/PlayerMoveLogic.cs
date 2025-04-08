@@ -128,7 +128,7 @@ public class PlayerMoveLogic {
 
 
         Vector2 newPosition = targetPos + moveOffset;
-        objectData.SetPosition(newPosition.ToVector2Int());
+        objectData.SetPosition(newPosition.ToVector2Int());        
         OnPlayerStateComplete.Raise();
     }
 

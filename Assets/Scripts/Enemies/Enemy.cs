@@ -5,7 +5,7 @@ using DG.Tweening;
 using System;
 [RequireComponent(typeof(Animator))]
 
-public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver {
+public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver, IStatusEffectTarget {
     public Animator animator;
     public SpriteRenderer sr;
     public MonsterStatusSO monsterSO;    
@@ -82,6 +82,9 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public Vector2Int EndPosition { get; set; }
     public List<Vector2Int> MonsterView { get; set; }
     public List<Vector2Int> RouteCache { get; set; }    
+    public const int Threshold = 100; //行動の閾値
+    public int ActionRate = 50;
+    public int TimeGage = 0;
 
 
     // ========================================================
@@ -101,6 +104,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
                 enemyAttackLogic.Attack(action.Target, action.Direction);
                 break;
         }
+        TimeGage -= Threshold; //行動したらゲージ消費 
     }
 
     public void InitializeEnemy() {
@@ -136,10 +140,21 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         animationAdapter.CreateSOInstance();
 
         sleepTurn = ScriptableObject.CreateInstance<IntVariable>();
-        confusionTurn = ScriptableObject.CreateInstance<IntVariable>();
-        confusionTurn.Value = 10;
+        confusionTurn = ScriptableObject.CreateInstance<IntVariable>();        
     }
     
+
+    //行動可能かどうかを返す
+    public bool CanAct() {
+        return TimeGage >= Threshold;
+    }
+
+    //ゲージを加算する
+    public void Tick() {
+        TimeGage += ActionRate;
+    }
+
+
 
     // ========================================================
     // ==================== IEffectReceiver ===================
@@ -159,6 +174,20 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         //TODO: 敵がアイテムを装備する?
     }
     
+    // ================================================
+    // ============== IStatusEffectTarget =============
+    // ================================================
+    public void AddStatusEffect(StatusEffect effect) {
+        
+    }
 
+    public void RemoveStatusEffect(StatusEffect effect) {
+        
+    }
+
+    public List<StatusEffect> GetStatusEffects() {
+        return new List<StatusEffect>();
+    }
+        
 
 }

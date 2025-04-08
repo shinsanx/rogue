@@ -15,3 +15,5 @@ MonoBehaviour:
   playerStateComplete: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}
   sleepTurnCount: {fileID: 11400000, guid: 693937a0bcbf041a299adea152acc689, type: 2}
   canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}
+  playerTimeGage: {fileID: 11400000, guid: 59b1387367938454883e43daae9425cc, type: 2}
+  playerActionRate: {fileID: 11400000, guid: 84c431937f2a3439d8e1072d12bacea6, type: 2}

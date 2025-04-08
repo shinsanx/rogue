@@ -9,15 +9,27 @@ public class PlayerState : State {
     [SerializeField] IntVariable sleepTurnCount;
     [SerializeField] BoolVariable canHandleInput;
 
+    //行動ゲージ関連
+    [SerializeField] IntVariable playerTimeGage;
+    [SerializeField] IntVariable playerActionRate;
+
     public override async void OnEnter() {
         canHandleInput.Value = false;
-        if (sleepTurnCount.Value > 0) {
-            sleepTurnCount.Value--;
-            await Task.Delay(1000);
+        playerTimeGage.Value += playerActionRate.Value;
+
+        if (playerTimeGage.Value >= 100) {
+            canHandleInput.Value = true;
+        } else {
             playerStateComplete.Raise();
-            Debug.Log("残りの睡眠ターン:" + sleepTurnCount.Value);
         }
-        canHandleInput.Value = true;
+        // if (sleepTurnCount.Value > 0) {
+        //     sleepTurnCount.Value--;
+        //     await Task.Delay(1000);
+        //     playerStateComplete.Raise();
+        //     Debug.Log("残りの睡眠ターン:" + sleepTurnCount.Value);
+        // }
+        // canHandleInput.Value = true;
+
     }
 
     public override void OnExit() {

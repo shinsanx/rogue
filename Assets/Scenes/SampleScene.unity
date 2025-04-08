@@ -5015,50 +5015,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116589719}
   m_CullTransparentMesh: 1
---- !u!1 &1225460616
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1225460618}
-  - component: {fileID: 1225460617}
-  m_Layer: 0
-  m_Name: MainThreadHelper
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1225460617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1225460616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da12dda6c073b48dda4c6ade6b13281d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1225460618
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1225460616}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1261833148
 GameObject:
   m_ObjectHideFlags: 0
@@ -5683,6 +5639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 839070a5dd71e47ae8ec5a4f5a3dd60d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTimeGage: {fileID: 11400000, guid: 59b1387367938454883e43daae9425cc, type: 2}
 --- !u!114 &1348055334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6390,6 +6347,8 @@ MonoBehaviour:
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
   zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
+  timeGage: {fileID: 0}
+  playerActionRate: {fileID: 0}
   OnPlayerLevelChanged: {fileID: 11400000, guid: 68d63f544ab764ad586a0e0db930cd56, type: 2}
   OnPlayerHPChanged: {fileID: 11400000, guid: 984ac2f2355174f2fa14150e5c723772, type: 2}
   OnPlayerStateComplete: {fileID: 11400000, guid: f0c61d7b9c682479db94266bc5cae679, type: 2}
@@ -8183,4 +8142,3 @@ SceneRoots:
   - {fileID: 19750210}
   - {fileID: 1874388000}
   - {fileID: 145286390}
-  - {fileID: 1225460618}
