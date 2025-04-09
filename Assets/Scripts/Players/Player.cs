@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.Events;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+using System.Linq;
 
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver, IStatusEffectTarget {
@@ -265,16 +263,33 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // ================================================
     // ============== IStatusEffectTarget =============
     // ================================================
+    private List<StatusEffectInstance> activeEffects = new();
+
+    public List<StatusEffectInstance> GetActiveStatusEffects() {
+        return activeEffects;
+    }
+
     public void AddStatusEffect(StatusEffect effect) {
-        
+        var instance = new StatusEffectInstance(effect, this);
+        activeEffects.Add(instance);        
     }
 
     public void RemoveStatusEffect(StatusEffect effect) {
-        
+        var instance = activeEffects.Find(e => e.Effect == effect);
+        if (instance != null) {
+            instance.EndEffect();
+            activeEffects.Remove(instance);
+        }
     }
 
-    public List<StatusEffect> GetStatusEffects() {
-        return new List<StatusEffect>();
+    public void TickStatusEffects() {
+        foreach (var instance in activeEffects.ToList()) {
+            instance.Tick();
+            if (instance.IsExpired) {
+                instance.EndEffect();
+                activeEffects.Remove(instance);
+            }
+        }
     }
         
 }

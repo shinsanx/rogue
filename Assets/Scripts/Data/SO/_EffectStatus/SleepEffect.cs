@@ -4,11 +4,17 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "StatusEffects/Sleep")]
 public class SleepEffect : StatusEffect {
-    public override bool BlocksAction() => true;
+    
+    public override void OnStart(IStatusEffectTarget target) {
+        Debug.Log($"{target} が眠り状態になった！");
+    }
 
-    public override void OnTick(IStatusEffectTarget target) {
-        remainingTurns--;
-        Debug.Log($"Sleepターン残り: {remainingTurns}");
+    public override void OnTick(IStatusEffectTarget target, StatusEffectInstance instance) {
+        Debug.Log($"{target}: Sleep残り{instance.RemainingTurns}ターン");
+    }
+
+    public override void OnEnd(IStatusEffectTarget target) {
+        Debug.Log($"{target} の眠りが解除された！");
     }
 }
 

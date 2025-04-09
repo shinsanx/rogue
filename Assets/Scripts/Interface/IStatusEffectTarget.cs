@@ -5,5 +5,5 @@ using UnityEngine;
 public interface IStatusEffectTarget {
     void AddStatusEffect(StatusEffect effect);
     void RemoveStatusEffect(StatusEffect effect);
-    List<StatusEffect> GetStatusEffects();
+    List<StatusEffectInstance> GetActiveStatusEffects();
 }

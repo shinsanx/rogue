@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System;
+using System.Linq;
+
 [RequireComponent(typeof(Animator))]
 
 public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver, IStatusEffectTarget {
@@ -177,16 +178,34 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     // ================================================
     // ============== IStatusEffectTarget =============
     // ================================================
+
+    private List<StatusEffectInstance> activeEffects = new();
+
+    public List<StatusEffectInstance> GetActiveStatusEffects() {
+        return activeEffects;
+    }
+
     public void AddStatusEffect(StatusEffect effect) {
-        
+        var instance = new StatusEffectInstance(effect, this);
+        activeEffects.Add(instance);        
     }
 
     public void RemoveStatusEffect(StatusEffect effect) {
-        
+        var instance = activeEffects.Find(e => e.Effect == effect);
+        if (instance != null) {
+            instance.EndEffect();
+            activeEffects.Remove(instance);
+        }
     }
 
-    public List<StatusEffect> GetStatusEffects() {
-        return new List<StatusEffect>();
+    public void TickStatusEffects() {
+        foreach (var instance in activeEffects.ToList()) {
+            instance.Tick();
+            if (instance.IsExpired) {
+                instance.EndEffect();
+                activeEffects.Remove(instance);
+            }
+        }
     }
         
 
