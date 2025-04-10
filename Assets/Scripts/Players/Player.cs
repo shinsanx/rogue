@@ -6,7 +6,7 @@ using DG.Tweening;
 using System.Linq;
 
 [RequireComponent(typeof(Animator))]
-public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver, IStatusEffectTarget {
+public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver {
     // === Serialized Fields ===            
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;    
 
@@ -213,11 +213,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // ============== IEffectReceiver =================
     // ================================================ 
     [field: SerializeField] public IntVariable sleepTurn { get; set; }
-    [field: SerializeField] public IntVariable confusionTurn { get; set; }
-
-    public void ApplyEffect(EffectSO effect) {
-        effect.ApplyEffect(this);
-    }
+    [field: SerializeField] public IntVariable confusionTurn { get; set; }    
 
     public void Heal(int amount) {
         OnPlayerEat.Raise();

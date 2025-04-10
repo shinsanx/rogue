@@ -6,7 +6,7 @@ using System.Linq;
 
 [RequireComponent(typeof(Animator))]
 
-public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver, IStatusEffectTarget {
+public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver {
     public Animator animator;
     public SpriteRenderer sr;
     public MonsterStatusSO monsterSO;    
@@ -163,16 +163,16 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     [field: SerializeField] public IntVariable sleepTurn { get; set; }
     [field: SerializeField] public IntVariable confusionTurn { get; set; }
 
-    public void ApplyEffect(EffectSO effect) {
-        effect.ApplyEffect(this);
-    }
-
     public void Heal(int amount) {
         HP += amount;
     }
 
     public void Equip(ItemSO item) {
         //TODO: 敵がアイテムを装備する?
+    }
+
+    public void MuscleHeal() {
+        //TODO: 敵がちからを回復する?
     }
     
     // ================================================

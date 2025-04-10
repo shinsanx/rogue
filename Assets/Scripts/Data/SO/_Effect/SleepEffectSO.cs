@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SleepEffect_SO", menuName = "Item/Effect/SleepEffectSO", order = 0)]
-public class SleepEffectSO : InstantEffectSO {    
+public class SleepEffectSO : StatusEffect {    
 
-    public override void ApplyInstantEffect(IEffectReceiver receiver) {
+    public override void OnStart(IStatusEffectTarget target) {
+        Debug.Log(target + "は眠った");
+    }
 
-        if (receiver is Player player) {
-            player.sleepTurn.Value = 5;
-        } else if (receiver is Enemy enemy) {
-            enemy.sleepTurn.Value = 5;
-        }
+    public override void OnTick(IStatusEffectTarget target, StatusEffectInstance instance) {
+        Debug.Log(target + "は眠っている");
+    }
+
+    public override void OnEnd(IStatusEffectTarget target) {
+        Debug.Log(target + "は目を覚ました");
     }
 }
 

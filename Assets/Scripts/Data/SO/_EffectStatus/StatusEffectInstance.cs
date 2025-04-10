@@ -5,10 +5,9 @@ using UnityEngine;
 public class StatusEffectInstance {
     public StatusEffect Effect { get; }
     public int RemainingTurns { get; private set; }
-
     private readonly IStatusEffectTarget target;
 
-    public StatusEffectInstance(StatusEffect effect, IStatusEffectTarget target) {
+    public StatusEffectInstance(StatusEffect effect, IEffectReceiver target) {
         Effect = effect;
         RemainingTurns = effect.duration;
         this.target = target;

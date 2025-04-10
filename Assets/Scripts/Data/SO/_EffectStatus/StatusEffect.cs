@@ -7,15 +7,15 @@ public abstract class StatusEffect : ScriptableObject {
     public int duration;
 
     // 毎ターン呼ばれる
-    public virtual void OnTick(IStatusEffectTarget target, StatusEffectInstance instance){
+    public virtual void OnTick(IEffectReceiver target, StatusEffectInstance instance){
         
     }
 
-    public virtual void OnStart(IStatusEffectTarget target) {
+    public virtual void OnStart(IEffectReceiver target) {
         // 行動前に呼ばれる
     }
 
-    public virtual void OnEnd(IStatusEffectTarget target) {
+    public virtual void OnEnd(IEffectReceiver target) {
         // 行動後に呼ばれる
     }    
     

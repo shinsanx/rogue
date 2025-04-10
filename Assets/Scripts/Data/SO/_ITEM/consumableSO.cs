@@ -5,6 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Consumable_SO", menuName ="Item/ConsumableSO", order =2)]
 public class ConsumableSO : ItemSO
 {
-    public EffectSO effect; //インスペクターで効果を設定する
+    public ItemEffectSO effect; //インスペクターで効果を設定する
 
 }

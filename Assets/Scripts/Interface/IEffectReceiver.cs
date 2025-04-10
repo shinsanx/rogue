@@ -4,9 +4,15 @@ using UnityEngine;
 
 public interface IEffectReceiver
 {
-    public IntVariable sleepTurn { get; set; }
-    void ApplyEffect(EffectSO effect);
+    // 即時系
+    void Heal(int amount);
+    void MuscleHeal();
     void Equip(ItemSO item);
+
+
+    // ステータス系
+    void AddStatusEffect(StatusEffect effect);
+    void RemoveStatusEffect(StatusEffect effect);
+    List<StatusEffectInstance> GetActiveStatusEffects();
 }
-    
 
