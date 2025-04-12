@@ -229,7 +229,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         onMessageSend.RaiseEvent(createMessageLogic.CreateHealMessage(healAmount, playerObjectData.Name.Value));
     }
 
-    public void Equip(ItemSO item) {
+    public void Equip(BaseItemSO item) {
         if (item is WeaponSO weapon) {
             EquipWeapon = weapon;
         } else if (item is ShieldSO shield) {
@@ -265,12 +265,12 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         return activeEffects;
     }
 
-    public void AddStatusEffect(StatusEffect effect) {
+    public void AddStatusEffect(BaseStatusEffect effect) {
         var instance = new StatusEffectInstance(effect, this);
         activeEffects.Add(instance);        
     }
 
-    public void RemoveStatusEffect(StatusEffect effect) {
+    public void RemoveStatusEffect(BaseStatusEffect effect) {
         var instance = activeEffects.Find(e => e.Effect == effect);
         if (instance != null) {
             instance.EndEffect();

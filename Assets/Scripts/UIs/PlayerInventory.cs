@@ -23,7 +23,7 @@ public class PlayerInventory : MonoBehaviour {
     }
 
     // アイテムを追加するメソッド
-    public void AddItem(ItemSO item) {
+    public void AddItem(BaseItemSO item) {
         if (inventorySO.items.Count >= MAX_ITEMS) {
             Debug.Log("インベントリが満杯です。");            
             successItemPicked.RaiseEvent(false);
@@ -39,7 +39,7 @@ public class PlayerInventory : MonoBehaviour {
     }
 
     // アイテムを削除するメソッド
-    public void RemoveItem(ItemSO item) {
+    public void RemoveItem(BaseItemSO item) {
         if (inventorySO.items.Contains(item)) {
             inventorySO.items.Remove(item);
             OnInventoryUpdated?.Invoke();

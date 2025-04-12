@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IStatusEffectTarget {
-    void AddStatusEffect(StatusEffect effect);
-    void RemoveStatusEffect(StatusEffect effect);
+    void AddStatusEffect(BaseStatusEffect effect);
+    void RemoveStatusEffect(BaseStatusEffect effect);
     List<StatusEffectInstance> GetActiveStatusEffects();
 }

@@ -22,7 +22,7 @@ public class ItemEffectManager : MonoBehaviour {
 
 
 
-    public void ApplyItemEffect(ItemSO item, GameObject target) {
+    public void ApplyItemEffect(BaseItemSO item, GameObject target) {
         Debug.Log("アイテムの効果を適用します。");
         if (item.id == itemDictionary["薬草"]) {
             ConsumableSO consumable = item as ConsumableSO;

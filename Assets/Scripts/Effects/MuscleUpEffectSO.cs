@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MuscleUpEffect_SO", menuName = "Item/Effect/MuscleUpEffectSO", order = 0)]
-public class MuscleUpEffectSO : EffectSO {
+public class MuscleUpEffectSO : BaseApplyEffectSO {
     public int muscleUpAmount;
 
     public override void ApplyEffect(IEffectReceiver receiver) {

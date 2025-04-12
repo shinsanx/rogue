@@ -6,7 +6,7 @@ using UnityEngine;
 public class CurrentSelectedObjectSO : ScriptableObject
 {
     public GameObject Object;   
-    public ItemSO Item;  
+    public BaseItemSO Item;  
     public SubmitMenuSet SubmitMenuSet;
 
     public void ResetCurrentSelectedObject() {

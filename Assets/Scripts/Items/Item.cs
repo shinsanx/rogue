@@ -7,8 +7,8 @@ public class Item : MonoBehaviour, IMenuActionAdapter {
     void Start() {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
-
-    public ItemSO itemSO;
+    
+    public BaseItemSO itemSO;
     public ObjectData objectData;
     private Vector2 moveOffset = new Vector2(.5f, .5f);
     [SerializeField] private MessageEventChannelSO onMessageSend;

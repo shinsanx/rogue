@@ -4,15 +4,15 @@ using UnityEngine;
 
 public interface IEffectReceiver
 {
-    // 即時系
+    // 即時系    
     void Heal(int amount);
     void MuscleHeal();
-    void Equip(ItemSO item);
+    void Equip(BaseItemSO item);
 
 
     // ステータス系
-    void AddStatusEffect(StatusEffect effect);
-    void RemoveStatusEffect(StatusEffect effect);
+    void AddStatusEffect(BaseStatusEffect effect);
+    void RemoveStatusEffect(BaseStatusEffect effect);
     List<StatusEffectInstance> GetActiveStatusEffects();
 }
 

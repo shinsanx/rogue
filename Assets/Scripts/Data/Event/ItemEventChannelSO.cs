@@ -6,8 +6,8 @@ using UnityEngine.Events;
 [CreateAssetMenu(menuName = "Event/ItemEventChannelSO")]
 public class ItemEventChannelSO : ScriptableObject
 {
-    public UnityEvent<ItemSO> OnEventRaised = new UnityEvent<ItemSO>();    
-    public void RaiseEvent(ItemSO item)
+    public UnityEvent<BaseItemSO> OnEventRaised = new UnityEvent<BaseItemSO>();    
+    public void RaiseEvent(BaseItemSO item)
     {        
         OnEventRaised.Invoke(item);        
     }

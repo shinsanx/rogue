@@ -30,14 +30,14 @@ public class ArrangeManager : MonoBehaviour {
         // アイテムを配置
         for (int i = 0; i < itemCount; i++) {
         //itemSOsの中からアイテムをランダムに選択
-        ItemSO selectedItem = itemTableSO.GetRandomItem();
+        BaseItemSO selectedItem = itemTableSO.GetRandomItem();
 
             PlaceItem(TileManager.i.GetRandomPosition(), selectedItem);
             await Task.Yield();
         }
     }
 
-    public void PlaceItem(Vector2Int position , ItemSO itemSO) {
+    public void PlaceItem(Vector2Int position , BaseItemSO itemSO) {
         // アイテムを配置
         GameObject itemObject = Instantiate(itemPrefab, position.ToVector2(), Quaternion.identity);
         Item item = itemObject.GetComponent<Item>();

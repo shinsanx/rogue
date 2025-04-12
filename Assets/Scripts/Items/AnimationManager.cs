@@ -21,7 +21,7 @@ public class AnimationManager : MonoBehaviour
     [SerializeField] private GameObject itemPrefab;
 
 
-    public async Task throwItemAnimation(ItemSO item, Vector2Int orgPosition, Vector2Int targetPosition){
+    public async Task throwItemAnimation(BaseItemSO item, Vector2Int orgPosition, Vector2Int targetPosition){
         float distance = Vector2Int.Distance(orgPosition, targetPosition);        
         GameObject itemInstance = Instantiate(itemPrefab, orgPosition.ToVector3() + itemOffset, Quaternion.identity);
         itemInstance.GetComponent<Item>().itemSO = item;

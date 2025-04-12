@@ -9,7 +9,7 @@ public class AllItemListSO : ScriptableObject
     public class ItemData
     {
         public int id;
-        public ItemSO itemSO;
+        public BaseItemSO itemSO;
     }
     public List<ItemData> itemDataList = new List<ItemData>();
 }

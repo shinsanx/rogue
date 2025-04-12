@@ -13,7 +13,7 @@ public class InventoryController : BaseMenuController {
     [SerializeField] private ObjectDataRuntimeSet objectSet;
     [SerializeField] private CurrentSelectedObjectSO currentSelectedObject;
 
-    private List<ItemSO> itemSlots = new List<ItemSO>();    
+    private List<BaseItemSO> itemSlots = new List<BaseItemSO>();    
 
     private const int ItemsPerPage = 12; // 1ページに表示するアイテム数
     private int currentPage = 0; // 現在のページ
@@ -40,12 +40,12 @@ public class InventoryController : BaseMenuController {
 
     // 現在のページに基づいてアイテムを表示するメソッド
     private void DisplayItemsOnCurrentPage() {
-        List<ItemSO> items = inventorySO.GetAllItems();
+        List<BaseItemSO> items = inventorySO.GetAllItems();
         int startIndex = currentPage * ItemsPerPage;
         int endIndex = Mathf.Min(startIndex + ItemsPerPage, items.Count);
 
         for (int i = startIndex; i < endIndex; i++) {
-            ItemSO item = items[i];
+            BaseItemSO item = items[i];
             GameObject slot = Instantiate(itemSlotPrefab, itemsParent);
             SetItemInformation(slot, item);
             menuItems.Add(slot);
@@ -54,7 +54,7 @@ public class InventoryController : BaseMenuController {
     }
 
     // アイテム情報を設定するメソッド
-    private void SetItemInformation(GameObject slot, ItemSO item) {
+    private void SetItemInformation(GameObject slot, BaseItemSO item) {
         Image icon = slot.transform.Find("Icon").GetComponent<Image>();
         if (item.icon != null) {
             icon.sprite = item.icon;

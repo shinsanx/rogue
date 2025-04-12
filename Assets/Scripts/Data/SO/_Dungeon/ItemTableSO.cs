@@ -10,11 +10,11 @@ public class ItemTableSO : ScriptableObject
     private List<WeightedItem> weightedItems = new List<WeightedItem>();
     
     // 元のItemsプロパティとの互換性を保つためのプロパティ
-    public List<ItemSO> Items 
+    public List<BaseItemSO> Items 
     {
         get 
         {
-            List<ItemSO> items = new List<ItemSO>();
+            List<BaseItemSO> items = new List<BaseItemSO>();
             foreach (var weightedItem in weightedItems)
             {
                 items.Add(weightedItem.item);
@@ -24,7 +24,7 @@ public class ItemTableSO : ScriptableObject
     }
     
     // ウェイトに基づいてランダムにアイテムを取得するメソッド
-    public ItemSO GetRandomItem()
+    public BaseItemSO GetRandomItem()
     {
         float totalWeight = 0;
         foreach (var weightedItem in weightedItems)
@@ -52,7 +52,7 @@ public class ItemTableSO : ScriptableObject
     [Serializable]
     public class WeightedItem
     {
-        public ItemSO item;
+        public BaseItemSO item;
         [Range(0, 100)]
         public float weight = 1;
     }

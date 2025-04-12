@@ -167,7 +167,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         HP += amount;
     }
 
-    public void Equip(ItemSO item) {
+    public void Equip(BaseItemSO item) {
         //TODO: 敵がアイテムを装備する?
     }
 
@@ -185,12 +185,12 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         return activeEffects;
     }
 
-    public void AddStatusEffect(StatusEffect effect) {
+    public void AddStatusEffect(BaseStatusEffect effect) {
         var instance = new StatusEffectInstance(effect, this);
         activeEffects.Add(instance);        
     }
 
-    public void RemoveStatusEffect(StatusEffect effect) {
+    public void RemoveStatusEffect(BaseStatusEffect effect) {
         var instance = activeEffects.Find(e => e.Effect == effect);
         if (instance != null) {
             instance.EndEffect();

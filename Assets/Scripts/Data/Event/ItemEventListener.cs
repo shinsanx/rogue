@@ -4,7 +4,7 @@ using UnityEngine.Events;
 public class ItemEventListener : MonoBehaviour
 {
     [SerializeField] private ItemEventChannelSO channel;
-    [SerializeField] private UnityEvent<ItemSO> response;
+    [SerializeField] private UnityEvent<BaseItemSO> response;
 
     private void OnEnable()
     {
@@ -28,12 +28,12 @@ public class ItemEventListener : MonoBehaviour
         }
     }
 
-    private void OnEventRaised(ItemSO item)
+    private void OnEventRaised(BaseItemSO item)
     {
         // デバッグ情報を追加
         if (item == null)
         {
-            Debug.LogError("Received null ItemSO in ItemEventListener!", this);
+            Debug.LogError("Received null BaseItemSO in ItemEventListener!", this);
             return;
         }
         

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ConfusionEffect_SO", menuName = "Item/Effect/ConfusionEffectSO", order = 0)]
-public class ConfusionEffectSO : StatusEffect {    
+public class ConfusionEffectSO : BaseStatusEffect {    
 
     
 }

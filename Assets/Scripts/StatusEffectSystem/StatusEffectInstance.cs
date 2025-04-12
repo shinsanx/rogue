@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StatusEffectInstance {
-    public StatusEffect Effect { get; }
+    public BaseStatusEffect Effect { get; }
     public int RemainingTurns { get; private set; }
-    private readonly IStatusEffectTarget target;
+    private readonly IEffectReceiver target;
 
-    public StatusEffectInstance(StatusEffect effect, IEffectReceiver target) {
+    public StatusEffectInstance(BaseStatusEffect effect, IEffectReceiver target) {
         Effect = effect;
         RemainingTurns = effect.duration;
         this.target = target;

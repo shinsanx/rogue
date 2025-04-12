@@ -138,7 +138,7 @@ public class MenuManager : MonoBehaviour {
 
     //メニューアクション
     // アイテムを使用するメソッド
-    public void UseItem(ItemSO item, IEffectReceiver receiver) {        
+    public void UseItem(BaseItemSO item, IEffectReceiver receiver) {        
         
         //足元にある場合だけ
         if(currentSelectedObjectSO.Object != null) {
@@ -157,7 +157,7 @@ public class MenuManager : MonoBehaviour {
     }
 
     //アイテムを置く
-    public void PlaceItem(ItemSO item, Vector2Int position) {                
+    public void PlaceItem(BaseItemSO item, Vector2Int position) {                
         ArrangeManager.i.PlaceItem(position, item);
         OnItemRemoved.RaiseEvent(item);        
         OnPlayerStateComplete.Raise();
@@ -166,7 +166,7 @@ public class MenuManager : MonoBehaviour {
     }
 
     //アイテムを投げる
-    public async Task ThrowItem(ItemSO item, Vector2Int position) {
+    public async Task ThrowItem(BaseItemSO item, Vector2Int position) {
         Vector2Int direction = playerFaceDirection.Value.RoundVector2().ToVector2Int();        
         Vector2Int throwPosition = TileManager.i.GetCharactersInFront(position, direction, 10);
         //throwPositionのタイプが壁だった場合は一つ前のポジションを取得する
@@ -203,7 +203,7 @@ public class MenuManager : MonoBehaviour {
     }
 
     //アイテムを装備する
-    public void Equip(ItemSO item, IEffectReceiver receiver) {
+    public void Equip(BaseItemSO item, IEffectReceiver receiver) {
         receiver.Equip(item);
         OnPlayerStateComplete.Raise();
         CloseAllMenus();
