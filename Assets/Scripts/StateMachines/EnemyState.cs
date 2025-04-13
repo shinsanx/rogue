@@ -7,9 +7,12 @@ using UnityEngine;
 public class EnemyState : State {    
     [SerializeField] GameEvent onEnemyActionStart;
     [SerializeField] GameEvent updateMiniMap;    
+    //[SerializeField] GameEvent enemyTickStatusEffects;
     
     public override void OnEnter() {
         EnemyStateStart();
+        
+        
     }
 
     public override void OnExit() {

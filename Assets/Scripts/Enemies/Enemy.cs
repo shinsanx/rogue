@@ -154,6 +154,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     //ゲージを加算する
     public void Tick() {
         TimeGage += ActionRate;
+        TickStatusEffects();
     }
 
 
@@ -200,8 +201,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     }
 
     public void TickStatusEffects() {
-        foreach (var instance in activeEffects.ToList()) {
-            instance.Tick();
+        foreach (var instance in activeEffects.ToList()) {            
+            instance.Tick();            
             if (instance.IsExpired) {
                 instance.EndEffect();
                 activeEffects.Remove(instance);

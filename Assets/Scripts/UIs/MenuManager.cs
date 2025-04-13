@@ -22,6 +22,8 @@ public class MenuManager : MonoBehaviour {
     public GameEvent OnEnableActionMap; //UserInputのOnEnableActionMapが登録
     public GameEvent OnDisableActionMap; //UserInputのOnDisableActionMapが登録
     public bool isMenuOpen = false;
+
+    [SerializeField] ObjectDataRuntimeSet objectDataSet;
     
 
 
@@ -174,10 +176,14 @@ public class MenuManager : MonoBehaviour {
             throwPosition = throwPosition - direction;
         }
         //throwPositionのタイプがEnemyだった場合はアイテムの効果を適用する
-        if (CharacterManager.i.GetObjectTypeByPosition(throwPosition) == "Enemy") {
-            ItemEffectManager.i.ApplyItemEffect(item, CharacterManager.i.GetObjectByPosition(throwPosition));
+        if (objectDataSet.GetObjectTypeByPosition(throwPosition) == "Enemy") {
+            Enemy enemy = objectDataSet.GetObjectByPosition(throwPosition).GetComponent<Enemy>();
+            //敵にアイテムの効果を適用する
+            ApplyItemEffect(item, enemy);
+
+            //ItemEffectManager.i.ApplyItemEffect(item, objectDataSet.GetObjectByPosition(throwPosition));
             await AnimationManager.i.throwItemAnimation(item, position, throwPosition);
-            OnItemRemoved.RaiseEvent(item);            
+            OnItemRemoved.RaiseEvent(item);
             OnPlayerStateComplete.Raise();
             CloseAllMenus();
 
@@ -216,6 +222,14 @@ public class MenuManager : MonoBehaviour {
             Debug.Log("すべてのメニューが閉じられました。");
             isMenuOpen = false;
             OnEnableActionMap.Raise();
+        }
+    }
+
+    private void ApplyItemEffect(BaseItemSO item, IEffectReceiver receiver) {
+        if (item is ConsumableSO consumable) {
+            consumable.effect.ApplyEffect(receiver);
+        } else {
+            Debug.Log("アイテムの効果を適用できません。");
         }
     }
 

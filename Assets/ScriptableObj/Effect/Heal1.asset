@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b26be40304a934d3e950d25454dfc790, type: 3}
   m_Name: Heal1
   m_EditorClassIdentifier: 
-  effectDescription: "\u85AC\u8349\u7684\u306A\u52B9\u679C"
+  effectName: "\u3084\u304F\u305D\u3046"
   healAmount: 30

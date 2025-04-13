@@ -1794,6 +1794,7 @@ MonoBehaviour:
   OnEnableActionMap: {fileID: 11400000, guid: c7e8756218e754cc29017716dd90a8ee, type: 2}
   OnDisableActionMap: {fileID: 11400000, guid: 4b2fb2e78ad0a4dc998aeb8bb9d1bd72, type: 2}
   isMenuOpen: 0
+  objectDataSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
 --- !u!114 &396302355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6370,6 +6371,7 @@ MonoBehaviour:
   <EquipWeapon>k__BackingField: {fileID: 0}
   <EquipShield>k__BackingField: {fileID: 0}
   <isConfusion>k__BackingField: {fileID: 11400000, guid: 0aa282de3af9e429595a7063e5cd321f, type: 2}
+  <isSleeping>k__BackingField: {fileID: 0}
 --- !u!114 &1419592883
 MonoBehaviour:
   m_ObjectHideFlags: 0
