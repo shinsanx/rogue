@@ -9,26 +9,26 @@ using System.Linq;
 public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAIState, IEffectReceiver {
     public Animator animator;
     public SpriteRenderer sr;
-    public MonsterStatusSO monsterSO;    
+    public MonsterStatusSO monsterSO;
     [SerializeField] private CreateMessageLogic createMessageLogic;
     [SerializeField] private MessageEventChannelSO onMessageSend;
     [SerializeField] private IntEventChannelSO addExp;
     public EnemyStatusLogic enemyStatusLogic;
     public EnemyAnimLogic enemyAnimLogic;
-    public EnemyAttackLogic enemyAttackLogic;    
+    public EnemyAttackLogic enemyAttackLogic;
     public EnemyMoveLogic enemyMoveLogic;
     public ObjectData objectData;
     public AnimationAdapter animationAdapter;
     Vector2 moveOffset = new Vector2(.5f, .5f);
     private int _hp;
-    public int MaxHealth { get; set; }   
+    public int MaxHealth { get; set; }
     [SerializeField] private FloatVariable moveSpeed;
-        
 
-    public void MovePosition() {        
+
+    public void MovePosition() {
         transform.DOMove(objectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
-            .SetEase(Ease.Linear);        
-    }  
+            .SetEase(Ease.Linear);
+    }
 
 
     // ========================================================
@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
                 //TODO: 回復アニメーションを再生する＆ダメージアニメーションを再生しない
             }
             _hp = value;
-            
+
             enemyAnimLogic.SetDamageAnimation();
             if (_hp <= 0) {
                 enemyAnimLogic.SetDamageAnimation();
@@ -65,7 +65,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         get { return animator.runtimeAnimatorController; }
         set { animator.runtimeAnimatorController = value; }
     }
-    
+
 
     // ========================================================
     // ==================== IEnemyAIState =================
@@ -82,7 +82,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public Vector2Int StartPosition { get; set; }
     public Vector2Int EndPosition { get; set; }
     public List<Vector2Int> MonsterView { get; set; }
-    public List<Vector2Int> RouteCache { get; set; }    
+    public List<Vector2Int> RouteCache { get; set; }
     public const int Threshold = 100; //行動の閾値
     public int ActionRate = 50;
     public int TimeGage = 0;
@@ -91,18 +91,19 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     // ========================================================
     // ===================== Methods =====================
     // ========================================================
-    public void ExecuteAction(EnemyAction action)
-    {        
-        if(action == null) {
+    public void ExecuteAction(EnemyAction action) {
+        if (action == null) {
             return;
         }
-        switch(action.Type)
-        {
+        switch (action.Type) {
             case ActionType.Move:
                 enemyMoveLogic.Move(action.TargetPosition, action.Direction);
                 break;
-            case ActionType.Attack:                
+            case ActionType.Attack:
                 enemyAttackLogic.Attack(action.Target, action.Direction);
+                break;
+            case ActionType.Sleep:
+                Debug.Log("ねむっています");
                 break;
         }
         TimeGage -= Threshold; //行動したらゲージ消費 
@@ -114,7 +115,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         enemyStatusLogic.OnDestroyed += OnEnemyDestroyed;
         enemyAnimLogic = new EnemyAnimLogic(animationAdapter, sr);
         enemyMoveLogic = new EnemyMoveLogic(this);
-        enemyAttackLogic = new EnemyAttackLogic(this);        
+        enemyAttackLogic = new EnemyAttackLogic(this);
 
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this, createMessageLogic);
         objectData.SetId(CharacterManager.GetUniqueID()); // Assign a unique ID                
@@ -123,7 +124,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     }
 
 
-    private void OnEnemyDestroyed() {  
+    private void OnEnemyDestroyed() {
         enemyAnimLogic.KillTween();
         Destroy(gameObject);
     }
@@ -140,10 +141,10 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         objectData.CreateSOInstance();
         animationAdapter.CreateSOInstance();
 
-        sleepTurn = ScriptableObject.CreateInstance<IntVariable>();
-        confusionTurn = ScriptableObject.CreateInstance<IntVariable>();        
+        isConfusion = ScriptableObject.CreateInstance<BoolVariable>();
+        isSleeping = ScriptableObject.CreateInstance<BoolVariable>();
     }
-    
+
 
     //行動可能かどうかを返す
     public bool CanAct() {
@@ -159,9 +160,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
 
     // ========================================================
     // ==================== IEffectReceiver ===================
-    // ========================================================
-    [field: SerializeField] public IntVariable sleepTurn { get; set; }
-    [field: SerializeField] public IntVariable confusionTurn { get; set; }
+    // ========================================================    
 
     public void Heal(int amount) {
         HP += amount;
@@ -174,10 +173,12 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public void MuscleHeal() {
         //TODO: 敵がちからを回復する?
     }
-    
+
     // ================================================
     // ============== IStatusEffectTarget =============
     // ================================================
+    public BoolVariable isConfusion { get; set; }
+    public BoolVariable isSleeping { get; set; }
 
     private List<StatusEffectInstance> activeEffects = new();
 
@@ -187,7 +188,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
 
     public void AddStatusEffect(BaseStatusEffect effect) {
         var instance = new StatusEffectInstance(effect, this);
-        activeEffects.Add(instance);        
+        activeEffects.Add(instance);
     }
 
     public void RemoveStatusEffect(BaseStatusEffect effect) {
@@ -207,6 +208,6 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
             }
         }
     }
-        
+
 
 }

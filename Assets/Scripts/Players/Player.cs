@@ -6,18 +6,18 @@ using DG.Tweening;
 using System.Linq;
 
 [RequireComponent(typeof(Animator))]
-public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffectReceiver {
+public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectReceiver {
     // === Serialized Fields ===            
-    [SerializeField] private ObjectDataRuntimeSet objectDataSet;    
+    [SerializeField] private ObjectDataRuntimeSet objectDataSet;
 
     // === Private Fields ===    
     private PlayerMoveLogic playerMoveLogic;
-    private PlayerAttackLogic playerAttackLogic;        
+    private PlayerAttackLogic playerAttackLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
-    [SerializeField]private CreateMessageLogic createMessageLogic;
+    [SerializeField] private CreateMessageLogic createMessageLogic;
     public ObjectData playerObjectData;
     [SerializeField] private CurrentSelectedObjectSO currentSelectedObjectSO;
-    [SerializeField] private MessageEventChannelSO onMessageSend;    
+    [SerializeField] private MessageEventChannelSO onMessageSend;
     [SerializeField] private BoolVariable fixDiagonalInput;
     private Vector2 moveOffset = new Vector2(0.5f, 0.5f);
     [SerializeField] bool resetStatus = true;
@@ -46,7 +46,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     [SerializeField] GameEvent OnPlayerHPChanged;
 
     // AttackLogic, MoveLogic, Inventoryで実装。
-    [SerializeField] GameEvent OnPlayerStateComplete;    
+    [SerializeField] GameEvent OnPlayerStateComplete;
 
     // AnimationAdapterで実装。
     [SerializeField] GameEvent OnPlayerTakeDamage;
@@ -58,16 +58,16 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     // ================================================
     // ============= IPlayerStatusAdapter =============
     // ================================================
-    
-    [field: SerializeField] public IntVariable playerLevel{get;private set;}
-    [field: SerializeField] public IntVariable playerMaxHealth{get;private set;}
-    [field: SerializeField] public IntVariable playerCurrentHealth{get;private set;}
-    [field: SerializeField] public IntVariable playerMaxMuscle{get;private set;}
-    [field: SerializeField] public IntVariable playerCurrentMuscle{get;private set;}
-    [field: SerializeField] public IntVariable playerBasicAttackPower{get;private set;}
-    [field: SerializeField] public IntVariable playerDefencePower{get;private set;}
-    [field: SerializeField] public IntVariable playerExperience{get;private set;}
-    [field:SerializeField] public Vector2Variable playerFaceDirection{get;private set;}
+
+    [field: SerializeField] public IntVariable playerLevel { get; private set; }
+    [field: SerializeField] public IntVariable playerMaxHealth { get; private set; }
+    [field: SerializeField] public IntVariable playerCurrentHealth { get; private set; }
+    [field: SerializeField] public IntVariable playerMaxMuscle { get; private set; }
+    [field: SerializeField] public IntVariable playerCurrentMuscle { get; private set; }
+    [field: SerializeField] public IntVariable playerBasicAttackPower { get; private set; }
+    [field: SerializeField] public IntVariable playerDefencePower { get; private set; }
+    [field: SerializeField] public IntVariable playerExperience { get; private set; }
+    [field: SerializeField] public Vector2Variable playerFaceDirection { get; private set; }
     [field: SerializeField] public WeaponSO EquipWeapon { get; private set; }
     [field: SerializeField] public ShieldSO EquipShield { get; private set; }
 
@@ -126,17 +126,16 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
     // UserInputからのイベントを受け取るメソッド
     public async void PlayerMove(Vector2 direction) {
-        if(isTurnButtonLongPressed.Value) {
-            playerMoveLogic.ManualTurn(direction);            
+        if (isTurnButtonLongPressed.Value) {
+            playerMoveLogic.ManualTurn(direction);
             return;
         }
-        if(confusionTurn.Value > 0) {
-            if(playerMoveLogic.RandomMove()) {
-                confusionTurn.Value--;                
-            }            
+        if (isConfusion.Value) {
+            if (playerMoveLogic.RandomMove()) {
+            }
             return;
         }
-        if(dashInput.Value) {
+        if (dashInput.Value) {
             moveSpeed.Value = 0.05f;
             playerMoveLogic.DashByInput(direction);
         } else if (zDashInput.Value) {
@@ -144,13 +143,12 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             await playerMoveLogic.ZDash(direction);
         } else {
             moveSpeed.Value = 0.3f;
-            playerMoveLogic.MoveByInput(direction);            
+            playerMoveLogic.MoveByInput(direction);
         }
     }
-    public void PlayerAttack() { 
-        if(confusionTurn.Value > 0) {
-            if(playerAttackLogic.ConfusionAttack()) {
-                confusionTurn.Value--;
+    public void PlayerAttack() {
+        if (isConfusion.Value) {
+            if (playerAttackLogic.ConfusionAttack()) {
             }
             return;
         }
@@ -158,7 +156,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
     }
 
     // オブジェクトの位置を変更するメソッド
-    public void MovePosition() {        
+    public void MovePosition() {
         transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
             .OnComplete(() => {
@@ -179,17 +177,17 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
         // Playerのターンを終了する
         OnPlayerStateComplete.Raise();
     }
-    
+
 
     // ================================================
     // ================ Methods ======================
     // ================================================
     public void InitializePlayer() {
         SetPlayerStatusDefault();
-        playerObjectData.SetId(CharacterManager.GetUniqueID());                        
+        playerObjectData.SetId(CharacterManager.GetUniqueID());
         playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack, OnPlayerDirectionChanged);
-        playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);                
+        playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);
     }
 
     private void SetPlayerStatusDefault() {
@@ -211,9 +209,9 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
     // ================================================
     // ============== IEffectReceiver =================
-    // ================================================ 
-    [field: SerializeField] public IntVariable sleepTurn { get; set; }
-    [field: SerializeField] public IntVariable confusionTurn { get; set; }    
+    // ================================================     
+    [field: SerializeField] public BoolVariable isConfusion { get; set; }
+    [field: SerializeField] public BoolVariable isSleeping { get; set; }
 
     public void Heal(int amount) {
         OnPlayerEat.Raise();
@@ -257,7 +255,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
 
     // ================================================
-    // ============== IStatusEffectTarget =============
+    // ============== IEffectReceiver =============
     // ================================================
     private List<StatusEffectInstance> activeEffects = new();
 
@@ -267,7 +265,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
     public void AddStatusEffect(BaseStatusEffect effect) {
         var instance = new StatusEffectInstance(effect, this);
-        activeEffects.Add(instance);        
+        activeEffects.Add(instance);
     }
 
     public void RemoveStatusEffect(BaseStatusEffect effect) {
@@ -280,6 +278,7 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
 
     public void TickStatusEffects() {
         foreach (var instance in activeEffects.ToList()) {
+            Debug.Log(instance + " tick");
             instance.Tick();
             if (instance.IsExpired) {
                 instance.EndEffect();
@@ -287,5 +286,5 @@ public class Player : MonoBehaviour,  IDamageable, IPlayerStatusAdapter, IEffect
             }
         }
     }
-        
+
 }

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: SleepStatusEffect
   m_EditorClassIdentifier: 
   effectName: "\u7761\u7720"
-  duration: 5
+  duration: 10
+  canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}

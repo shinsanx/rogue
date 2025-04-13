@@ -14,5 +14,9 @@ public interface IEffectReceiver
     void AddStatusEffect(BaseStatusEffect effect);
     void RemoveStatusEffect(BaseStatusEffect effect);
     List<StatusEffectInstance> GetActiveStatusEffects();
+
+    [SerializeField] BoolVariable isConfusion{ get; set; }
+    [SerializeField] BoolVariable isSleeping{get;set;}
+
 }
 

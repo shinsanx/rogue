@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99e5611dc37f04700a788a508e4007ed, type: 3}
-  m_Name: ConfusionTurnCount
+  m_Script: {fileID: 11500000, guid: 4389a11abc2064d1a89e4dc33a03c8c7, type: 3}
+  m_Name: ConfusionStatusEffect
   m_EditorClassIdentifier: 
-  Value: 0
+  effectName: "\u6DF7\u4E71"
+  duration: 10
+  isConfusion: {fileID: 11400000, guid: 0aa282de3af9e429595a7063e5cd321f, type: 2}

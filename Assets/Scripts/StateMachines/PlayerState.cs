@@ -13,8 +13,23 @@ public class PlayerState : State {
     [SerializeField] IntVariable playerTimeGage;
     [SerializeField] IntVariable playerActionRate;
 
+    //アイテム関連
+    [SerializeField] GameEvent playerTickStatusEffects;
+
     public override async void OnEnter() {
-        canHandleInput.Value = false;
+        canHandleInput.Value = true;
+
+        // StatusEffectのTick実行
+        playerTickStatusEffects.Raise();
+
+        if (!canHandleInput.Value) {
+            Debug.Log("行動できない状態");
+            await Task.Delay(500);
+            playerStateComplete.Raise();
+            return;
+        }
+
+        // 行動ゲージ処理
         playerTimeGage.Value += playerActionRate.Value;
 
         if (playerTimeGage.Value >= 100) {
@@ -22,14 +37,6 @@ public class PlayerState : State {
         } else {
             playerStateComplete.Raise();
         }
-        // if (sleepTurnCount.Value > 0) {
-        //     sleepTurnCount.Value--;
-        //     await Task.Delay(1000);
-        //     playerStateComplete.Raise();
-        //     Debug.Log("残りの睡眠ターン:" + sleepTurnCount.Value);
-        // }
-        // canHandleInput.Value = true;
-
     }
 
     public override void OnExit() {

@@ -61,9 +61,10 @@ public class EnemyManager : MonoBehaviour {
 
         // ステータス関連処理
         // 睡眠
-        if (enemy.sleepTurn.Value > 0) {
-            enemy.sleepTurn.Value--;
-            return null;
+        if (enemy.isSleeping.Value) {
+            enemyAction.Type = ActionType.Sleep;
+            enemyAction.TargetPosition = objectData.Position.Value;            
+            return enemyAction;
         }
 
 
@@ -74,13 +75,10 @@ public class EnemyManager : MonoBehaviour {
         UpdateEndState();
 
         // 混乱
-        if (enemy.confusionTurn.Value > 0) {
+        if (enemy.isConfusion.Value) {
             enemyAction.Direction = DirectionUtils.GetRandomDirection();
-
             enemyAction.TargetPosition = objectData.Position.Value + enemyAction.Direction;
-            enemyAction.Target = objectDataSet.GetObjectByPosition(enemyAction.TargetPosition);
-            enemy.confusionTurn.Value--;
-            Debug.Log(enemy.name + "の混乱ターンが減りました。残り" + enemy.confusionTurn.Value + "ターン");
+            enemyAction.Target = objectDataSet.GetObjectByPosition(enemyAction.TargetPosition);                        
         }
         return enemyAction;
     }

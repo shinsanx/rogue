@@ -6,6 +6,7 @@ public enum ActionType
 {
     Move,
     Attack,
+    Sleep,
     // 他のアクションタイプを追加
 }
 

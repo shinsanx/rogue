@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 941c758bfa8e64a37a329cbcd182011c, type: 3}
-  m_Name: SleepEffect
+  m_Script: {fileID: 11500000, guid: 9ead1a15005f74aecb1fa4b469bb23b6, type: 3}
+  m_Name: IsConfusiion
   m_EditorClassIdentifier: 
-  effectName: "\u7761\u7720"
-  statusEffectToApply: {fileID: 11400000, guid: 3cd99c7d4c6fb47bb991d6fe7bf69645, type: 2}
+  Value: 0
