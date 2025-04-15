@@ -63,7 +63,7 @@ public class EnemyManager : MonoBehaviour {
         // 睡眠
         if (enemy.isSleeping.Value) {
             enemyAction.Type = ActionType.Sleep;
-            enemyAction.TargetPosition = objectData.Position.Value;            
+            enemyAction.TargetPosition = objectData.Position.Value;
             return enemyAction;
         }
 
@@ -76,9 +76,25 @@ public class EnemyManager : MonoBehaviour {
 
         // 混乱
         if (enemy.isConfusion.Value) {
-            enemyAction.Direction = DirectionUtils.GetRandomDirection();
+            // ランダムな方向の中から移動可能な方向を確認する
+            int maxCount = 0;
+            Vector2Int direction = Vector2Int.zero;
+            // 方向が決まるまでループ
+            while (true) {
+                direction = DirectionUtils.GetRandomDirection();
+                if (TileManager.i.CheckMovableTile(objectData.Position.Value, objectData.Position.Value + direction)) {
+                    break;
+                }
+                maxCount += 1;
+                if (maxCount > 10) {
+                    Debug.Log("混乱状態で移動できる方向が見つかりませんでした");
+                    break;
+                }
+            }
+
+            enemyAction.Direction = direction;
             enemyAction.TargetPosition = objectData.Position.Value + enemyAction.Direction;
-            enemyAction.Target = objectDataSet.GetObjectByPosition(enemyAction.TargetPosition);                        
+            enemyAction.Target = objectDataSet.GetObjectByPosition(enemyAction.TargetPosition);
         }
         return enemyAction;
     }

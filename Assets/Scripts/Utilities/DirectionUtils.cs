@@ -43,7 +43,7 @@ public static class DirectionUtils {
         };
     }
 
-    public static Vector2Int GetRandomDirection() {
+    public static Vector2Int GetRandomDirection() {        
         int randomIndex = UnityEngine.Random.Range(0, directions.Count);
         return directions[randomIndex];
     }

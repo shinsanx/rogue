@@ -185,7 +185,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     public void InitializePlayer() {
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());
-        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput);
+        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput, TileManager.i);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack, OnPlayerDirectionChanged);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);
     }

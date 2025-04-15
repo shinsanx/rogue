@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using RandomDungeonWithBluePrint;
+using UnityEngine.Tilemaps;
 
 /// <summary>
 /// プレイヤーの移動に関するロジックを管理するクラス
@@ -18,6 +19,7 @@ public class PlayerMoveLogic {
     private IObjectData objectData;
     private StateMachine stateMachine;
     private Player player;
+    private TileManager tileManager;
     
     // 設定変数
     private Vector2Variable playerFaceDirection;
@@ -52,7 +54,9 @@ public class PlayerMoveLogic {
         Vector2Variable playerFaceDirection,
         ItemEventChannelSO OnItemPicked,
         CurrentSelectedObjectSO currentSelectedObjectSO,
-        BoolVariable fixDiagonalInput) {
+        BoolVariable fixDiagonalInput,
+        TileManager tileManager
+        ) {
 
         this.player = player;
         this.stateMachine = GameAssets.i.stateMachine;
@@ -63,6 +67,7 @@ public class PlayerMoveLogic {
         this.OnItemPicked = OnItemPicked;
         this.currentSelectedObjectSO = currentSelectedObjectSO;
         this.fixDiagonalInput = fixDiagonalInput;
+        this.tileManager = tileManager;
     }
 
     // ================================================
@@ -97,7 +102,7 @@ public class PlayerMoveLogic {
     /// 階段があるか確認し、あれば選択処理を実行する
     /// </summary>
     private void CheckAndInteractWithStairs(Vector2Int targetPos) {
-        GameObject stair = TileManager.i.CheckExistStair(targetPos);
+        GameObject stair = tileManager.CheckExistStair(targetPos);
         if (stair != null) {
             stair.GetComponent<IMenuActionAdapter>().OnSelected();
         }
@@ -161,7 +166,7 @@ public class PlayerMoveLogic {
         if (ShouldRestrictDiagonalMovement()) return;
 
         // 移動可能なタイルでなければ処理しない
-        if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) return;
+        if (!tileManager.CheckMovableTile(currentPos, targetPos)) return;
 
         // 移動先にアイテムがあれば拾う
         TryPickupItem(targetPos);
@@ -193,7 +198,7 @@ public class PlayerMoveLogic {
     /// 指定位置にあるアイテムを拾う処理を試みる
     /// </summary>
     private void TryPickupItem(Vector2Int targetPos) {
-        Item item = TileManager.i.CheckExistItem(targetPos);
+        Item item = tileManager.CheckExistItem(targetPos);
         if (item != null) {
             Debug.Log(targetPos + "にアイテムがあります");
             currentSelectedObjectSO.Object = item.gameObject;
@@ -258,7 +263,7 @@ public class PlayerMoveLogic {
     /// アイテムに乗る処理を試みる
     /// </summary>
     private bool TryGetOnItem(Vector2Int currentPos, Vector2Int direction) {
-        Item item = TileManager.i.CheckExistItem(currentPos + direction) as Item;
+        Item item = tileManager.CheckExistItem(currentPos + direction) as Item;
         if (item != null) {
             item.OnGetOnItem();
             Move(currentPos, currentPos + direction);
@@ -274,13 +279,13 @@ public class PlayerMoveLogic {
         while (true) {
             Vector2Int targetPos = currentPos + direction;
             
-            // 移動不可なら終了
-            if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) {
+            // 移動不可なら終了 
+            if (!tileManager.CheckMovableTile(currentPos, targetPos)) {
                 return;
             }
 
             // オブジェクトがあったら終了
-            if (TileManager.i.CheckExistObject(targetPos)) {
+            if (tileManager.CheckExistObject(targetPos)) {
                 return;
             }
 
@@ -294,7 +299,7 @@ public class PlayerMoveLogic {
             }
             
             // 移動後にジョイントポジションなら終了
-            if (TileManager.i.CheckExistJoint(currentPos)) {
+            if (tileManager.CheckExistJoint(currentPos)) {
                 return;
             }
             
@@ -306,11 +311,11 @@ public class PlayerMoveLogic {
     /// 周囲に攻撃可能な敵がいるかどうかを判定
     /// </summary>
     private bool ShouldStopForEnemies(Vector2Int currentPos) {
-        List<GameObject> surroundingEnemy = TileManager.i.GetSurroundingObjects(currentPos)
+        List<GameObject> surroundingEnemy = tileManager.GetSurroundingObjects(currentPos)
             .Where(o => o.GetComponent<Enemy>() != null).ToList();
             
         foreach (var enemy in surroundingEnemy) {
-            if (TileManager.i.CheckAttackableTile(currentPos, enemy.GetComponent<Enemy>().objectData.Position.Value)) {
+            if (tileManager.CheckAttackableTile(currentPos, enemy.GetComponent<Enemy>().objectData.Position.Value)) {
                 return true;
             }
         }
@@ -335,7 +340,7 @@ public class PlayerMoveLogic {
         Vector2Int currentPos = objectData.Position.Value;
 
         // ルーム内の場合は扇形の範囲内にあるアイテムを探索
-        if (TileManager.i.LookupRoomNum(currentPos + direction) != 0) {
+        if (tileManager.LookupRoomNum(currentPos + direction) != 0) {
             await ZDashInRoomAsync(currentPos, direction);
         } else {
             // 通路の場合、ルームに入るか移動不可になるまでダッシュ
@@ -379,14 +384,14 @@ public class PlayerMoveLogic {
                 DungeonConstants.ToDirection[playerFaceDirection.Value.ToVector2Int()]);
                 
             List<Vector2Int> movableTiles = facingTiles
-                .Where(tile => TileManager.i.CheckMovableTile(currentPos, tile)).ToList();
+                .Where(tile => tileManager.CheckMovableTile(currentPos, tile)).ToList();
                 
             if (movableTiles.Count == 0) {
                 return;
             }
 
             // 移動可能なタイルが2つ以上なら終了（部屋に到達した場合）
-            if (movableTiles.Count > 1 && TileManager.i.LookupRoomNum(currentPos + direction) != 0) {
+            if (movableTiles.Count > 1 && tileManager.LookupRoomNum(currentPos + direction) != 0) {
                 return;
             }
             
@@ -398,7 +403,7 @@ public class PlayerMoveLogic {
                 Move(currentPos, targetPos);
                 
                 // 移動不可なら終了
-                if (!TileManager.i.CheckMovableTile(currentPos, targetPos)) {
+                if (!tileManager.CheckMovableTile(currentPos, targetPos)) {
                     return;
                 }
                 
@@ -520,24 +525,24 @@ public class PlayerMoveLogic {
     /// </summary>
     private void CheckPositionForObject(Vector2Int pos, List<Vector2Int> objects) {
         // 壁の場合はスキップ
-        if (TileManager.i.GetMapChipType(pos) == (int)Constants.MapChipType.Wall) {
+        if (tileManager.GetMapChipType(pos) == (int)Constants.MapChipType.Wall) {
             return;
         }
 
         // アイテムがあるかチェック
-        Item item = TileManager.i.CheckExistItem(pos);
+        Item item = tileManager.CheckExistItem(pos);
         if (item != null) {
             objects.Add(item.objectData.Position.Value);
         }
 
         // 階段があるかチェック
-        GameObject stair = TileManager.i.CheckExistStair(pos);
+        GameObject stair = tileManager.CheckExistStair(pos);
         if (stair != null) {
             objects.Add(stair.GetComponent<ObjectData>().Position.Value);
         }
 
         // ジョイントがあるかチェック
-        if (TileManager.i.CheckExistJoint(pos)) {
+        if (tileManager.CheckExistJoint(pos)) {
             objects.Add(pos);
         }
     }
@@ -567,7 +572,7 @@ public class PlayerMoveLogic {
     private async Task DashToObjectAsync(Vector2Int currentPos, Vector2Int targetPos) {
         AStarPathfinding pathfinding = new AStarPathfinding();
         List<Vector2Int> path = pathfinding.FindPath(currentPos, targetPos, 
-            TileManager.i.ExtractAllRoomPositions(objectData.RoomNum.Value));
+            tileManager.ExtractAllRoomPositions(objectData.RoomNum.Value));
 
         Vector2Int movePos = currentPos;
 
@@ -587,7 +592,7 @@ public class PlayerMoveLogic {
     /// </summary>
     public void AutoTurn(Vector2Int currentPos) {
         // 周囲8マスを調べる
-        List<GameObject> surroundingObjects = TileManager.i.GetSurroundingObjects(currentPos);
+        List<GameObject> surroundingObjects = tileManager.GetSurroundingObjects(currentPos);
         foreach (var obj in surroundingObjects) {
             if (obj.GetComponent<Enemy>() != null) {
                 // 敵がいる場合は敵の方向を向く
@@ -616,8 +621,8 @@ public class PlayerMoveLogic {
     /// </summary>
     public bool RandomMove() {
         // 周囲8マスから移動可能なマスを探す
-        List<Vector2Int> movableTiles = TileManager.i.GetSurroundingPositions(objectData.Position.Value)
-            .Where(tile => TileManager.i.CheckMovableTile(objectData.Position.Value, tile)).ToList();
+        List<Vector2Int> movableTiles = tileManager.GetSurroundingPositions(objectData.Position.Value)
+            .Where(tile => tileManager.CheckMovableTile(objectData.Position.Value, tile)).ToList();
             
         if(movableTiles.Count == 0) {
             return false;

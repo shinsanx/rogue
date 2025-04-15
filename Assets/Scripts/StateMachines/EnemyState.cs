@@ -6,8 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyState", menuName = "StateMachine/EnemyState", order = 0)]
 public class EnemyState : State {    
     [SerializeField] GameEvent onEnemyActionStart;
-    [SerializeField] GameEvent updateMiniMap;    
-    //[SerializeField] GameEvent enemyTickStatusEffects;
+    [SerializeField] GameEvent updateMiniMap;        
     
     public override void OnEnter() {
         EnemyStateStart();
