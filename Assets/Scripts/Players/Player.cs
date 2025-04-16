@@ -25,8 +25,9 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     [SerializeField] private BoolVariable dashInput;
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
     [SerializeField] private BoolVariable zDashInput;
-    private bool isMoving = false;
-    public bool IsMoving() => isMoving;
+    [SerializeField] private BoolVariable CanMove;
+    //private bool isMoving = false;
+    //public bool IsMoving() => isMoving;
 
     //行動ゲージ関連
     private int threshold = 100; //行動の閾値
@@ -160,7 +161,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
         transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
             .OnComplete(() => {
-                isMoving = false;
+                CanMove.Value = true;
             });
     }
 
@@ -185,7 +186,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     public void InitializePlayer() {
         SetPlayerStatusDefault();
         playerObjectData.SetId(CharacterManager.GetUniqueID());
-        playerMoveLogic = new PlayerMoveLogic(this, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput, TileManager.i);
+        playerMoveLogic = new PlayerMoveLogic(CanMove,playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput, TileManager.i);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack, OnPlayerDirectionChanged);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);
     }

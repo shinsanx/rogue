@@ -17,8 +17,7 @@ public class PlayerMoveLogic {
     
     // 基本コンポーネント
     private IObjectData objectData;
-    private StateMachine stateMachine;
-    private Player player;
+    private StateMachine stateMachine;    
     private TileManager tileManager;
     
     // 設定変数
@@ -34,8 +33,12 @@ public class PlayerMoveLogic {
     private float roundX;
     private float roundY;
     private Vector2 moveOffset = new Vector2(.5f, .5f);
-    private bool isMoving = false;
+    //private bool isMoving = false;
+    private BoolVariable playerCanMove;
     private List<Vector2Int> inputs = new List<Vector2Int>();
+
+    // Handler
+    PlayerMoveHandler moveHandler;
     
     // ================================================
     // ============= イベントチャンネル =============
@@ -48,7 +51,8 @@ public class PlayerMoveLogic {
     // ================ コンストラクタ ================
     // ================================================
     public PlayerMoveLogic(
-        Player player,
+        BoolVariable playerCanMove,
+        ObjectData playerObjectData,        
         GameEvent OnPlayerStateComplete,
         GameEvent OnPlayerDirectionChanged,
         Vector2Variable playerFaceDirection,
@@ -57,17 +61,18 @@ public class PlayerMoveLogic {
         BoolVariable fixDiagonalInput,
         TileManager tileManager
         ) {
-
-        this.player = player;
+        
         this.stateMachine = GameAssets.i.stateMachine;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
-        this.objectData = player.playerObjectData;
+        this.objectData = playerObjectData;
         this.OnPlayerDirectionChanged = OnPlayerDirectionChanged;
         this.playerFaceDirection = playerFaceDirection;
         this.OnItemPicked = OnItemPicked;
         this.currentSelectedObjectSO = currentSelectedObjectSO;
         this.fixDiagonalInput = fixDiagonalInput;
         this.tileManager = tileManager;
+        moveHandler = new PlayerMoveHandler(playerCanMove,playerObjectData,OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
+
     }
 
     // ================================================
@@ -78,24 +83,26 @@ public class PlayerMoveLogic {
     /// 入力ベクトルに基づいてプレイヤーを移動させる
     /// </summary>
     public void MoveByInput(Vector2 inputVector) {
-        this.inputVector = inputVector;
+
+        moveHandler.MoveByInput(inputVector);
+        // this.inputVector = inputVector;
         
-        // 入力値を四捨五入して整数値に変換
-        roundX = Mathf.Round(inputVector.x);
-        roundY = Mathf.Round(inputVector.y);
+        // // 入力値を四捨五入して整数値に変換
+        // roundX = Mathf.Round(inputVector.x);
+        // roundY = Mathf.Round(inputVector.y);
 
-        Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY);
-        Vector2Int currentPos = objectData.Position.Value;
-        Vector2Int targetPos = inputVectorInt + currentPos;
+        // Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY);
+        // Vector2Int currentPos = objectData.Position.Value;
+        // Vector2Int targetPos = inputVectorInt + currentPos;
 
-        // 移動中なら処理しない
-        if (isMoving) return;
+        // // 移動中なら処理しない
+        // if (isMoving) return;
         
-        inputs.Add(inputVectorInt);
-        ProcessInputAsync(currentPos, targetPos);
+        // inputs.Add(inputVectorInt);
+        // ProcessInputAsync(currentPos, targetPos);
 
-        // 階段があれば選択処理を実行
-        CheckAndInteractWithStairs(targetPos);
+        // // 階段があれば選択処理を実行
+        // CheckAndInteractWithStairs(targetPos);
     }
 
     /// <summary>
@@ -105,41 +112,6 @@ public class PlayerMoveLogic {
         GameObject stair = tileManager.CheckExistStair(targetPos);
         if (stair != null) {
             stair.GetComponent<IMenuActionAdapter>().OnSelected();
-        }
-    }
-
-    /// <summary>
-    /// 入力を処理し、適切な方向に移動する
-    /// </summary>
-    private async void ProcessInputAsync(Vector2Int currentPos, Vector2Int targetPos) {
-        // 入力処理の遅延（連続入力対策）
-        await Task.Delay(30);
-
-        // 単一方向の入力
-        if (inputs.Count == 1) {
-            Move(currentPos, targetPos);
-        }
-
-        // 斜め方向の入力を処理
-        ProcessDiagonalInput(currentPos);
-        
-        // 入力リストをクリア
-        inputs.Clear();
-    }
-
-    /// <summary>
-    /// 斜め方向の入力を処理する
-    /// </summary>
-    private void ProcessDiagonalInput(Vector2Int currentPos) {
-        // 斜め方向の入力を優先順位に従って処理
-        if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpRight])) {
-            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpRight]);
-        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.UpLeft])) {
-            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.UpLeft]);
-        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownRight])) {
-            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownRight]);
-        } else if (inputs.Any(i => i == DungeonConstants.ToVector2Int[DungeonConstants.DownLeft])) {
-            Move(currentPos, currentPos + DungeonConstants.ToVector2Int[DungeonConstants.DownLeft]);
         }
     }
 
@@ -154,7 +126,7 @@ public class PlayerMoveLogic {
         }
 
         // プレイヤーが移動中なら処理しない
-        if (player.IsMoving()) {
+        if (!playerCanMove) {
             Debug.Log("playerが動いています");
             return;
         }
@@ -640,7 +612,7 @@ public class PlayerMoveLogic {
         Vector2Int currentPos = objectData.Position.Value;
         Vector2Int targetPos = inputVectorInt + currentPos;
 
-        if (isMoving) return false;
+        if (!playerCanMove) return false;
         
         // 移動実行
         Move(currentPos, targetPos);

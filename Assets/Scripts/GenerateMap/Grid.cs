@@ -25,6 +25,7 @@ namespace RandomDungeonWithBluePrint {
             foreach (var branch in branches.Distinct()) {
                 grid[branch.y][branch.x] = (int)Constants.MapChipType.Floor;
             }
+            CheckSurroundingGridType();
         }
 
         private void MakeGrid(int x, int y) {
@@ -44,74 +45,78 @@ namespace RandomDungeonWithBluePrint {
             int down = -1;
             List<string> directionNoWall = new List<string>();
 
-            for(int i = 0; i <Size.y; i++){
-                for(int j = 0; j<Size.x; j++){
+            for (int i = 0; i < Size.y; i++) {
+                for (int j = 0; j < Size.x; j++) {
                     directionNoWall.Clear();
 
-                    if(grid[i][j] == 1) {
-                        if(i + up < Size.y){
-                            directionNoWall.Add((grid[i +up][j]==0)? "Up":null);
+                    if (grid[i][j] == 1) {
+                        if (i + up < Size.y) {
+                            directionNoWall.Add((grid[i + up][j] == 0) ? "Up" : null);
                         }
-                        if(i >0){
-                            directionNoWall.Add((grid[i +down][j]==0)? "Down":null);
+                        if (i > 0) {
+                            directionNoWall.Add((grid[i + down][j] == 0) ? "Down" : null);
                         }
-                        if(j >0){
-                            directionNoWall.Add((grid[i][j+left]==0)? "Left":null);
+                        if (j > 0) {
+                            directionNoWall.Add((grid[i][j + left] == 0) ? "Left" : null);
                         }
-                        if(j + right < Size.x &&(grid[i][j + right]==0)){
+                        if (j + right < Size.x && (grid[i][j + right] == 0)) {
                             directionNoWall.Add("Right");
                         }
                         string str = string.Join("", directionNoWall.OrderBy(d => d));
-                        ConvertGridTypeByWallDirectionForNoWallGrid(i,j,str);
+                        ConvertGridTypeByWallDirectionForNoWallGrid(i, j, str);
                     }
                 }
             }
         }
 
-        private void ConvertGridTypeByWallDirectionForNoWallGrid(int y, int x, string direction){
-            switch(direction){
+        private void ConvertGridTypeByWallDirectionForNoWallGrid(int y, int x, string direction) {
+            switch (direction) {
                 case "Up":
-                grid[y][x] = (int)Constants.MapChipType.Up;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.Up;
+                    break;
                 case "Right":
-                grid[y][x] = (int)Constants.MapChipType.Right;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.Right;
+                    break;
                 case "Down":
-                grid[y][x] = (int)Constants.MapChipType.Down;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.Down;
+                    break;
                 case "Left":
-                grid[y][x] = (int)Constants.MapChipType.Left;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.Left;
+                    break;
                 case "DownUp":
-                grid[y][x] = (int)Constants.MapChipType.DownUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownUp;
+                    break;
                 case "LeftRight":
-                grid[y][x] = (int)Constants.MapChipType.LeftRight;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.LeftRight;
+                    break;
                 case "RightUp":
-                grid[y][x] = (int)Constants.MapChipType.RightUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.RightUp;
+                    break;
                 case "DownRight":
-                grid[y][x] = (int)Constants.MapChipType.DownRight;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownRight;
+                    break;
                 case "DownLeft":
-                grid[y][x] = (int)Constants.MapChipType.DownLeft;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownLeft;
+                    break;
                 case "LeftUp":
-                grid[y][x] = (int)Constants.MapChipType.LeftUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.LeftUp;
+                    break;
                 case "DownRightUp":
-                grid[y][x] = (int)Constants.MapChipType.DownRightUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownRightUp;
+                    break;
                 case "DownLeftRight":
-                grid[y][x] = (int)Constants.MapChipType.DownLeftRight;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownLeftRight;
+                    break;
                 case "DownLeftUp":
-                grid[y][x] = (int)Constants.MapChipType.DownLeftUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.DownLeftUp;
+                    break;
                 case "LeftRightUp":
-                grid[y][x] = (int)Constants.MapChipType.LeftRightUp;
-                break;
+                    grid[y][x] = (int)Constants.MapChipType.LeftRightUp;
+                    break;
+
+                default:
+                    Debug.LogWarning($"[Grid] 未対応の方向組み合わせ: {direction} at ({x}, {y})");
+                    break;
             }
         }
     }

@@ -2144,16 +2144,16 @@ MonoBehaviour:
   down: {fileID: 11400000, guid: 05a1e2d57bd4f4566b141063c7dca0db, type: 2}
   left: {fileID: 11400000, guid: 4144d40906edc4b8598c71e457cd7284, type: 2}
   right: {fileID: 11400000, guid: a2e1b6a1cfd4b47878b6d785a8f538f3, type: 2}
-  downUp: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
-  leftRight: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
+  downUp: {fileID: 11400000, guid: ca2cd1e582751415ba462fa49bd0547b, type: 2}
+  leftRight: {fileID: 11400000, guid: 71ed0d8108baf4604a64da77124cd8d8, type: 2}
   rightUp: {fileID: 11400000, guid: 946f34249f7b246508dbfac126f1f98e, type: 2}
   downRight: {fileID: 11400000, guid: ab38c0df481314fcbb3d9cb0fd0e5677, type: 2}
   downLeft: {fileID: 11400000, guid: d59b2ead93bf64576a6c5895f5ab5c78, type: 2}
   leftUp: {fileID: 11400000, guid: 33885dc7d3b8e44158b5775106e17c1f, type: 2}
-  downRightUp: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
-  downLeftRight: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
-  downLeftUp: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
-  leftRightUp: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
+  downRightUp: {fileID: 11400000, guid: b9395ccb3ebf840a8ae10e8f07780fec, type: 2}
+  downLeftRight: {fileID: 11400000, guid: cc4474ebbc9154a24b63bb81c3c0ed3b, type: 2}
+  downLeftUp: {fileID: 11400000, guid: a79744ae454bb42df90960db7386e0c6, type: 2}
+  leftRightUp: {fileID: 11400000, guid: 2d45f342228ad4a6a9421d394d285d33, type: 2}
 --- !u!1 &413068043
 GameObject:
   m_ObjectHideFlags: 0
