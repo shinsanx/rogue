@@ -3,8 +3,7 @@ using UnityEngine;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class PlayerMoveHandler {
-    //private Player player;
+public class PlayerMoveHandler {    
     private BoolVariable playerCanMove;
     private IObjectData objectData;
     private StateMachine stateMachine;
@@ -55,15 +54,15 @@ public class PlayerMoveHandler {
     
 
     public void Move(Vector2Int currentPos, Vector2Int targetPos) {
-        if (stateMachine.CurrentState != GameAssets.i.playerState) {
-            Debug.Log("playerのターンではありません");
-            return;
-        }
+        // if (stateMachine.CurrentState != GameAssets.i.playerState) {
+        //     Debug.Log("playerのターンではありません");
+        //     return;
+        // }
 
-        if (!playerCanMove.Value) {
-            Debug.Log("playerが動いています");
-            return;
-        }
+        // if (!playerCanMove.Value) {
+        //     Debug.Log("動けません");
+        //     return;
+        // }
 
         // 向き更新
         playerFaceDirection.SetValue(new Vector2(roundX, roundY));

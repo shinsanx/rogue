@@ -10,7 +10,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     // === Serialized Fields ===            
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;
 
-    // === Private Fields ===    
+    // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
     private PlayerAttackLogic playerAttackLogic;
     private PlayerStatusDataLogic playerStatusDataLogic;
@@ -127,14 +127,14 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
 
     // UserInputからのイベントを受け取るメソッド
     public async void PlayerMove(Vector2 direction) {
+        moveSpeed.Value = 0.3f;
         if (isTurnButtonLongPressed.Value) {
             playerMoveLogic.ManualTurn(direction);
             return;
         }
         if (isConfusion.Value) {
-            if (playerMoveLogic.RandomMove()) {
-            }
-            return;
+            // RandomMoveが成功したときのみ終了
+            if (playerMoveLogic.RandomMove()) return;                        
         }
         if (dashInput.Value) {
             moveSpeed.Value = 0.05f;
@@ -143,7 +143,6 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
             moveSpeed.Value = 0.05f;
             await playerMoveLogic.ZDash(direction);
         } else {
-            moveSpeed.Value = 0.3f;
             playerMoveLogic.MoveByInput(direction);
         }
     }
@@ -157,7 +156,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     }
 
     // オブジェクトの位置を変更するメソッド
-    public void MovePosition() {
+    public void MovePosition() {        
         transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
             .OnComplete(() => {

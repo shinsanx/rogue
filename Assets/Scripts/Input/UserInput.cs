@@ -12,14 +12,15 @@ public class UserInput : MonoBehaviour {
     [SerializeField] private BoolVariable isMoveButtonLongPrresed;
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
     [SerializeField] private BoolVariable canHandleInput;
-    
+    [SerializeField] private BoolVariable PlayerCanMove;
+
     // 斜め入力バッファリング用
     [SerializeField] private float diagonalInputBufferTime = 0.1f; // バッファ時間（秒）
     private Vector2 lastInputDirection = Vector2.zero;
     private float lastInputTime = 0f;
     private bool isBufferingInput = false;
     private Coroutine bufferCoroutine = null;
-    
+
     // 入力ロック機構
     [SerializeField] private float inputLockDuration = 0.2f; // 入力ロック時間（秒）
     private bool isInputLocked = false;
@@ -32,14 +33,14 @@ public class UserInput : MonoBehaviour {
     public GameEvent OnMenuCloseInput;
     public Vector2EventChannelSO OnNavigateInput;
     public GameEvent OnSubmitInput;
-    public GameEvent OnAutoTurnInput;    
+    public GameEvent OnAutoTurnInput;
     public GameEvent OnFootStepInput;
 
 
     [SerializeField] private BoolVariable fixDiagonalInput;
     [SerializeField] private BoolVariable dashInput;
     [SerializeField] private BoolVariable zDashInput;
-    [SerializeField] private FloatVariable moveSpeed;   
+    [SerializeField] private FloatVariable moveSpeed;
     private bool isFootStep = false;
 
     [SerializeField] private InputActionAsset inputActionAsset; //アクションマップ
@@ -59,10 +60,10 @@ public class UserInput : MonoBehaviour {
     public void OnToggleActionMap() {
         if (playerActionMap.enabled) {
             playerActionMap.Disable();
-            uiActionMap.Enable();            
+            uiActionMap.Enable();
         } else if (MenuManager.Instance.activeMenus.Count == 0) {
             playerActionMap.Enable();
-            uiActionMap.Disable();            
+            uiActionMap.Disable();
         }
     }
 
@@ -82,16 +83,16 @@ public class UserInput : MonoBehaviour {
     // ================================================
 
     //移動
-    public void OnMove(InputAction.CallbackContext context) {        
+    public void OnMove(InputAction.CallbackContext context) {
         if (context.started) {
-            isMoveButtonLongPrresed.Value = true;
+            //isMoveButtonLongPrresed.Value = true;
             return;
         }
         if (context.canceled) {
-            isMoveButtonLongPrresed.Value = false;
+            //isMoveButtonLongPrresed.Value = false;
             return;
         }
-        
+
         // 入力がロックされている場合は処理しない
         if (isInputLocked) {
             return;
@@ -100,34 +101,35 @@ public class UserInput : MonoBehaviour {
         if (!canHandleInput.Value) {
             return;
         }
-        
+
         // 現在の入力を取得
         Vector2 currentInput = context.ReadValue<Vector2>();
-        
+
+
         // 入力値を四捨五入して方向ベクトルに変換
         Vector2 roundedInput = new Vector2(
             Mathf.Round(currentInput.x),
             Mathf.Round(currentInput.y)
-        );        
-        
+        );
+
         // 入力がない場合は処理しない
         if (roundedInput == Vector2.zero) return;
-        
+
         // 現在時刻を取得
         float currentTime = Time.time;
-        
+
         // 前回の入力からの経過時間を計算
         float timeSinceLastInput = currentTime - lastInputTime;
-        
+
         // バッファ時間内に新しい入力があった場合
         if (timeSinceLastInput <= diagonalInputBufferTime && lastInputDirection != Vector2.zero) {
             // 前回の入力と現在の入力を組み合わせて斜め入力を作成
             Vector2 combinedInput = lastInputDirection + roundedInput;
-            
+
             // 斜め入力の正規化（-1〜1の範囲に収める）
             combinedInput.x = Mathf.Clamp(combinedInput.x, -1f, 1f);
             combinedInput.y = Mathf.Clamp(combinedInput.y, -1f, 1f);
-            
+
             // 斜め入力になっている場合のみ処理
             if (Mathf.Abs(combinedInput.x) > 0 && Mathf.Abs(combinedInput.y) > 0) {
                 // 実行中のコルーチンがあれば停止
@@ -135,33 +137,34 @@ public class UserInput : MonoBehaviour {
                     StopCoroutine(bufferCoroutine);
                     bufferCoroutine = null;
                 }
-                
+
                 inputVector = combinedInput;
                 OnMoveInput.RaiseEvent(inputVector);
-                
+
                 // バッファをリセット
                 lastInputDirection = Vector2.zero;
                 isBufferingInput = false;
-                
+
                 // 入力をロックして余分な入力を防止
                 LockInput();
-                
+
                 return;
             }
         }
-        
+        inputVector = roundedInput;
+
         // バッファリング中でない場合は通常の入力処理
         if (!isBufferingInput) {
             // バッファリングを開始
             isBufferingInput = true;
             lastInputDirection = roundedInput;
             lastInputTime = currentTime;
-            
+
             // 実行中のコルーチンがあれば停止
             if (bufferCoroutine != null) {
                 StopCoroutine(bufferCoroutine);
             }
-            
+
             // バッファ時間後に入力を処理するコルーチンを開始
             bufferCoroutine = StartCoroutine(ProcessBufferedInput());
         } else {
@@ -170,37 +173,37 @@ public class UserInput : MonoBehaviour {
             lastInputTime = currentTime;
         }
     }
-    
+
     // バッファ時間後に入力を処理するコルーチン
     private IEnumerator ProcessBufferedInput() {
         yield return new WaitForSeconds(diagonalInputBufferTime);
-        
+
         // バッファ時間後も斜め入力が検出されなかった場合は、最後の入力を処理
         if (isBufferingInput && lastInputDirection != Vector2.zero) {
             inputVector = lastInputDirection;
             OnMoveInput.RaiseEvent(inputVector);
-            
+
             // バッファをリセット
             lastInputDirection = Vector2.zero;
             isBufferingInput = false;
         }
-        
+
         bufferCoroutine = null;
     }
-    
+
     // 入力をロックする
     private void LockInput() {
         isInputLocked = true;
-        
+
         // 既存のロック解除コルーチンがあれば停止
         if (inputLockCoroutine != null) {
             StopCoroutine(inputLockCoroutine);
         }
-        
+
         // 指定時間後に入力ロックを解除するコルーチンを開始
         inputLockCoroutine = StartCoroutine(UnlockInputAfterDelay());
     }
-    
+
     // 指定時間後に入力ロックを解除するコルーチン
     private IEnumerator UnlockInputAfterDelay() {
         yield return new WaitForSeconds(inputLockDuration);
@@ -212,33 +215,67 @@ public class UserInput : MonoBehaviour {
 
 
     //長押し移動
-    public void OnLongPress(InputAction.CallbackContext context) {        
-
+    public void OnLongPress(InputAction.CallbackContext context) {
+        
         if (context.performed) {
+            isMoveButtonLongPrresed.Value = true;
             MoveContinuously();
+            return;
         }
+        if (context.canceled) {
+            isMoveButtonLongPrresed.Value = false;
+            return;
+        }
+
+
+
     }
 
     // 長押し移動
     private async void MoveContinuously() {
         if (!isMoveButtonLongPrresed.Value) return;
+
         while (isMoveButtonLongPrresed.Value) {
-            if (!canHandleInput.Value) {
-                return;
+            if (!canHandleInput.Value) return;
+
+            // 移動中フラグがfalseになるまで待つ
+            while (!PlayerCanMove.Value) {
+                await Task.Yield();
             }
-            OnMoveInput.RaiseEvent(inputVector);
-            await Task.Delay((int)(moveSpeed.Value * 1000));
+
+            // 最新の入力を取得する
+            Vector2 rawInput = GetCurrentInput();
+
+            Vector2 rounded = new Vector2(Mathf.Round(rawInput.x), Mathf.Round(rawInput.y));
+            if (rounded != Vector2.zero) {
+                inputVector = rounded.normalized;
+                OnMoveInput.RaiseEvent(inputVector);
+                PlayerCanMove.Value = false;
+            }
+
+            await Task.Yield();
         }
     }
 
+    //入力を取得する
+    private Vector2 GetCurrentInput() {
+        Vector2 result = Gamepad.current != null ?
+                Gamepad.current.leftStick.ReadValue() :
+                Keyboard.current != null ? new Vector2(
+                    (Keyboard.current.dKey.isPressed ? 1 : 0) - (Keyboard.current.aKey.isPressed ? 1 : 0),
+                    (Keyboard.current.wKey.isPressed ? 1 : 0) - (Keyboard.current.sKey.isPressed ? 1 : 0)) :
+                Vector2.zero;
+        return result;
+    }
+
     // 攻撃 keyboard:Space
-    public void OnAttack(InputAction.CallbackContext context) {        
+    public void OnAttack(InputAction.CallbackContext context) {
         if (context.started) return;
-        if (context.canceled) return;        
+        if (context.canceled) return;
         OnAttackInput.Raise();
     }
 
-    
+
     // 斜め移動を固定する keyboard:O
     public void OnFixDiagonalInput(InputAction.CallbackContext context) {
         if (context.started) fixDiagonalInput.Value = true;
@@ -258,7 +295,7 @@ public class UserInput : MonoBehaviour {
     }
 
     // 振り向く keyboard:U
-    public void OnTurn(InputAction.CallbackContext context) {        
+    public void OnTurn(InputAction.CallbackContext context) {
         // 押している時間が0.5秒未満ならOnAutoTurnInputを呼び出す
         // 押している時間が0.5秒以上ならisTurnButtonLongPressedをtrueにする
         if (context.started) {
@@ -271,9 +308,9 @@ public class UserInput : MonoBehaviour {
     }
 
     // 振り向くボタンの長押しをチェック
-    private IEnumerator CheckTurnButtonHoldTime() {        
+    private IEnumerator CheckTurnButtonHoldTime() {
         yield return new WaitForSeconds(0.2f);
-        
+
         // 0.5秒後もボタンが押されていれば長押し状態を維持
         // そうでなければ（既にキャンセルされていれば）自動回転を実行
         if (!isTurnButtonLongPressed.Value) {
@@ -283,19 +320,19 @@ public class UserInput : MonoBehaviour {
 
     // 足踏み keyboard K+Space
     public void OnFootStep(InputAction.CallbackContext context) {
-        if(context.started) {
+        if (context.started) {
             isFootStep = true;
             FootStepContinuously();
         }
-        if(context.canceled) {
+        if (context.canceled) {
             isFootStep = false;
         }
     }
 
     // 足踏み長押し処理
     private async void FootStepContinuously() {
-        if(!isFootStep) return;
-        while(isFootStep) {
+        if (!isFootStep) return;
+        while (isFootStep) {
             OnFootStepInput.Raise();
             await Task.Delay(50);
         }
@@ -332,13 +369,13 @@ public class UserInput : MonoBehaviour {
         if (context.started) return;
         if (context.canceled) return;
         Vector2 navigateVector = context.ReadValue<Vector2>();
-        if (navigateVector.magnitude == 0) return;        
+        if (navigateVector.magnitude == 0) return;
         OnNavigateInput.RaiseEvent(navigateVector);
     }
 
     public void OnSubmit(InputAction.CallbackContext context) {
         if (context.started) return;
-        if (context.canceled) return;        
+        if (context.canceled) return;
         OnSubmitInput.Raise();
     }
 

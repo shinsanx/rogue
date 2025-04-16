@@ -933,6 +933,7 @@ MonoBehaviour:
   isMoveButtonLongPrresed: {fileID: 11400000, guid: 1c3aaaa326d4246a29ae9c69830a0e28, type: 2}
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
   canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}
+  PlayerCanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   diagonalInputBufferTime: 0.1
   inputLockDuration: 0.2
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
@@ -6349,6 +6350,7 @@ MonoBehaviour:
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
   zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
+  CanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   timeGage: {fileID: 0}
   playerActionRate: {fileID: 0}
   OnPlayerLevelChanged: {fileID: 11400000, guid: 68d63f544ab764ad586a0e0db930cd56, type: 2}
