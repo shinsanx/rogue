@@ -40,6 +40,7 @@ public class PlayerMoveLogic {
     // Handler
     PlayerMoveHandler moveHandler;
     PlayerItemHandler itemHandler;
+    PlayerStairHandler stairHandler;
 
     // ================================================
     // ============= イベントチャンネル =============
@@ -74,6 +75,7 @@ public class PlayerMoveLogic {
         this.tileManager = tileManager;
         moveHandler = new PlayerMoveHandler(playerCanMove, playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
         itemHandler = new PlayerItemHandler(currentSelectedObjectSO, OnItemPicked, tileManager);
+        stairHandler = new PlayerStairHandler(tileManager);
 
 
     }
@@ -92,6 +94,9 @@ public class PlayerMoveLogic {
 
         // 先にアイテムを確認
         itemHandler.TryPickupItem(targetPos);
+
+        // 階段があるか確認し、あれば選択処理を実行する 
+        stairHandler.TryUseStair(targetPos);        
 
         // その後に実際の移動処理
         moveHandler.MoveByInput(inputVector);
