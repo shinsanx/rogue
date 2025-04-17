@@ -247,13 +247,16 @@ public class UserInput : MonoBehaviour {
             Vector2 rawInput = GetCurrentInput();
 
             Vector2 rounded = new Vector2(Mathf.Round(rawInput.x), Mathf.Round(rawInput.y));
-            if (rounded != Vector2.zero) {
-                inputVector = rounded.normalized;
-                OnMoveInput.RaiseEvent(inputVector);
-                PlayerCanMove.Value = false;
+            if (rounded == Vector2.zero) {
+                await Task.Yield();
+                continue;
             }
 
-            await Task.Yield();
+            inputVector = rounded.normalized;
+            OnMoveInput.RaiseEvent(inputVector);
+            PlayerCanMove.Value = false;
+
+            await Task.Delay((int)(moveSpeed.Value * 1000));
         }
     }
 

@@ -50,16 +50,16 @@ namespace RandomDungeonWithBluePrint {
                     directionNoWall.Clear();
 
                     if (grid[i][j] == 1) {
-                        if (i + up < Size.y) {
-                            directionNoWall.Add((grid[i + up][j] == 0) ? "Up" : null);
+                        if (i + up < Size.y && grid[i + up][j] == 0) {
+                            directionNoWall.Add("Up");
                         }
-                        if (i > 0) {
-                            directionNoWall.Add((grid[i + down][j] == 0) ? "Down" : null);
+                        if (i > 0 && grid[i + down][j] == 0) {
+                            directionNoWall.Add("Down");
                         }
-                        if (j > 0) {
-                            directionNoWall.Add((grid[i][j + left] == 0) ? "Left" : null);
+                        if (j > 0 && grid[i][j + left] == 0) {
+                            directionNoWall.Add("Left");
                         }
-                        if (j + right < Size.x && (grid[i][j + right] == 0)) {
+                        if (j + right < Size.x && grid[i][j + right] == 0) {
                             directionNoWall.Add("Right");
                         }
                         string str = string.Join("", directionNoWall.OrderBy(d => d));
@@ -112,6 +112,12 @@ namespace RandomDungeonWithBluePrint {
                     break;
                 case "LeftRightUp":
                     grid[y][x] = (int)Constants.MapChipType.LeftRightUp;
+                    break;
+                case "DownLeftRightUp":
+                    grid[y][x] = (int)Constants.MapChipType.DownLeftRightUp;
+                    break;
+                case "":
+                    // 方向がない場合（すべての方向に壁がない場合）は Floor のままにする
                     break;
 
                 default:

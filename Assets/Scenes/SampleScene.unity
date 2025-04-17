@@ -2155,6 +2155,7 @@ MonoBehaviour:
   downLeftRight: {fileID: 11400000, guid: cc4474ebbc9154a24b63bb81c3c0ed3b, type: 2}
   downLeftUp: {fileID: 11400000, guid: a79744ae454bb42df90960db7386e0c6, type: 2}
   leftRightUp: {fileID: 11400000, guid: 2d45f342228ad4a6a9421d394d285d33, type: 2}
+  downLeftRightUp: {fileID: 11400000, guid: 33a51202b4f7048e6a6730c471939305, type: 2}
 --- !u!1 &413068043
 GameObject:
   m_ObjectHideFlags: 0

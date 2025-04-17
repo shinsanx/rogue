@@ -53,26 +53,23 @@ public class PlayerMoveHandler {
 
     
 
-    public void Move(Vector2Int currentPos, Vector2Int targetPos) {
-        // if (stateMachine.CurrentState != GameAssets.i.playerState) {
-        //     Debug.Log("playerのターンではありません");
-        //     return;
-        // }
-
-        // if (!playerCanMove.Value) {
-        //     Debug.Log("動けません");
-        //     return;
-        // }
+    public void Move(Vector2Int currentPos, Vector2Int targetPos) {       
 
         // 向き更新
         playerFaceDirection.SetValue(new Vector2(roundX, roundY));
         onPlayerDirectionChanged.Raise();
 
         if (fixDiagonalInput.Value){
-             if (roundX == 0 || roundY == 0) return;
+             if (roundX == 0 || roundY == 0){
+                playerCanMove.Value = true;
+                 return;
+                 }
         }
 
-        if (!tileManager.CheckMovableTile(currentPos, targetPos)) return;
+        if (!tileManager.CheckMovableTile(currentPos, targetPos)){
+            playerCanMove.Value = true;
+            return;
+        } 
 
         Vector2 newPosition = targetPos + new Vector2(0.5f, 0.5f);
         objectData.SetPosition(newPosition.ToVector2Int());

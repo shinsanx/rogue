@@ -14,20 +14,20 @@ public class PlayerMoveLogic {
     // ================================================
     // ================ フィールド変数 ================
     // ================================================
-    
+
     // 基本コンポーネント
     private IObjectData objectData;
-    private StateMachine stateMachine;    
+    private StateMachine stateMachine;
     private TileManager tileManager;
-    
+
     // 設定変数
     private Vector2Variable playerFaceDirection;
     private BoolVariable fixDiagonalInput;
     private CurrentSelectedObjectSO currentSelectedObjectSO;
-    
+
     // アイテム関連
     private GameObject currentItemObject;
-    
+
     // 移動関連
     private Vector2 inputVector;
     private float roundX;
@@ -39,7 +39,8 @@ public class PlayerMoveLogic {
 
     // Handler
     PlayerMoveHandler moveHandler;
-    
+    PlayerItemHandler itemHandler;
+
     // ================================================
     // ============= イベントチャンネル =============
     // ================================================
@@ -52,7 +53,7 @@ public class PlayerMoveLogic {
     // ================================================
     public PlayerMoveLogic(
         BoolVariable playerCanMove,
-        ObjectData playerObjectData,        
+        ObjectData playerObjectData,
         GameEvent OnPlayerStateComplete,
         GameEvent OnPlayerDirectionChanged,
         Vector2Variable playerFaceDirection,
@@ -61,7 +62,7 @@ public class PlayerMoveLogic {
         BoolVariable fixDiagonalInput,
         TileManager tileManager
         ) {
-        
+
         this.stateMachine = GameAssets.i.stateMachine;
         this.OnPlayerStateComplete = OnPlayerStateComplete;
         this.objectData = playerObjectData;
@@ -71,38 +72,29 @@ public class PlayerMoveLogic {
         this.currentSelectedObjectSO = currentSelectedObjectSO;
         this.fixDiagonalInput = fixDiagonalInput;
         this.tileManager = tileManager;
-        moveHandler = new PlayerMoveHandler(playerCanMove,playerObjectData,OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
+        moveHandler = new PlayerMoveHandler(playerCanMove, playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
+        itemHandler = new PlayerItemHandler(currentSelectedObjectSO, OnItemPicked, tileManager);
+
 
     }
 
     // ================================================
     // ================ 通常移動処理 ================
     // ================================================
-    
+
     /// <summary>
     /// 入力ベクトルに基づいてプレイヤーを移動させる
     /// </summary>
     public void MoveByInput(Vector2 inputVector) {
+        Vector2Int inputVectorInt = new Vector2Int(Mathf.RoundToInt(inputVector.x), Mathf.RoundToInt(inputVector.y));
+        Vector2Int currentPos = objectData.Position.Value;
+        Vector2Int targetPos = inputVectorInt + currentPos;
 
+        // 先にアイテムを確認
+        itemHandler.TryPickupItem(targetPos);
+
+        // その後に実際の移動処理
         moveHandler.MoveByInput(inputVector);
-        // this.inputVector = inputVector;
-        
-        // // 入力値を四捨五入して整数値に変換
-        // roundX = Mathf.Round(inputVector.x);
-        // roundY = Mathf.Round(inputVector.y);
-
-        // Vector2Int inputVectorInt = new Vector2Int((int)roundX, (int)roundY);
-        // Vector2Int currentPos = objectData.Position.Value;
-        // Vector2Int targetPos = inputVectorInt + currentPos;
-
-        // // 移動中なら処理しない
-        // if (isMoving) return;
-        
-        // inputs.Add(inputVectorInt);
-        // ProcessInputAsync(currentPos, targetPos);
-
-        // // 階段があれば選択処理を実行
-        // CheckAndInteractWithStairs(targetPos);
     }
 
     /// <summary>
@@ -141,11 +133,11 @@ public class PlayerMoveLogic {
         if (!tileManager.CheckMovableTile(currentPos, targetPos)) return;
 
         // 移動先にアイテムがあれば拾う
-        TryPickupItem(targetPos);
+        itemHandler.TryPickupItem(targetPos);
 
         // 位置を更新
         UpdatePlayerPosition(targetPos);
-        
+
         // プレイヤーのターン終了を通知
         OnPlayerStateComplete.Raise();
     }
@@ -169,21 +161,21 @@ public class PlayerMoveLogic {
     /// <summary>
     /// 指定位置にあるアイテムを拾う処理を試みる
     /// </summary>
-    private void TryPickupItem(Vector2Int targetPos) {
-        Item item = tileManager.CheckExistItem(targetPos);
-        if (item != null) {
-            Debug.Log(targetPos + "にアイテムがあります");
-            currentSelectedObjectSO.Object = item.gameObject;
-            
-            // itemSOがnullでないことを確認
-            if (item.itemSO != null) {
-                currentItemObject = item.gameObject;
-                OnItemPicked.RaiseEvent(item.itemSO);
-            } else {
-                Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
-            }
-        }
-    }
+    // private void TryPickupItem(Vector2Int targetPos) {
+    //     Item item = tileManager.CheckExistItem(targetPos);
+    //     if (item != null) {
+    //         Debug.Log(targetPos + "にアイテムがあります");
+    //         currentSelectedObjectSO.Object = item.gameObject;
+
+    //         // itemSOがnullでないことを確認
+    //         if (item.itemSO != null) {
+    //             currentItemObject = item.gameObject;
+    //             OnItemPicked.RaiseEvent(item.itemSO);
+    //         } else {
+    //             Debug.LogError("Item " + item.name + " has no ItemSO assigned!");
+    //         }
+    //     }
+    // }
 
     /// <summary>
     /// プレイヤーの位置を更新する
@@ -197,26 +189,19 @@ public class PlayerMoveLogic {
     /// アイテムを拾った時の処理
     /// </summary>
     public void HandleItemPicked(bool success) {
-        if (success) {
-            Item item = currentItemObject.GetComponent<Item>();
-            if (item != null) {
-                item.OnPicked();
-            }
-        } else {
-            Debug.Log("アイテムを拾えませんでした。");
-        }
+        itemHandler.HandleItemPicked(success);
     }
 
     // ================================================
     // ================ ダッシュ処理 ================
     // ================================================
-    
+
     /// <summary>
     /// 入力方向にダッシュする
     /// </summary>
     public async void DashByInput(Vector2 inputVector) {
         this.inputVector = inputVector;
-        
+
         // 入力値を四捨五入して整数値に変換
         roundX = Mathf.Round(inputVector.x);
         roundY = Mathf.Round(inputVector.y);
@@ -250,7 +235,7 @@ public class PlayerMoveLogic {
     private async Task DashUntilObstacleAsync(Vector2Int currentPos, Vector2Int direction) {
         while (true) {
             Vector2Int targetPos = currentPos + direction;
-            
+
             // 移動不可なら終了 
             if (!tileManager.CheckMovableTile(currentPos, targetPos)) {
                 return;
@@ -269,12 +254,12 @@ public class PlayerMoveLogic {
             if (ShouldStopForEnemies(currentPos)) {
                 return;
             }
-            
+
             // 移動後にジョイントポジションなら終了
             if (tileManager.CheckExistJoint(currentPos)) {
                 return;
             }
-            
+
             await Task.Delay(50);
         }
     }
@@ -285,7 +270,7 @@ public class PlayerMoveLogic {
     private bool ShouldStopForEnemies(Vector2Int currentPos) {
         List<GameObject> surroundingEnemy = tileManager.GetSurroundingObjects(currentPos)
             .Where(o => o.GetComponent<Enemy>() != null).ToList();
-            
+
         foreach (var enemy in surroundingEnemy) {
             if (tileManager.CheckAttackableTile(currentPos, enemy.GetComponent<Enemy>().objectData.Position.Value)) {
                 return true;
@@ -352,12 +337,12 @@ public class PlayerMoveLogic {
 
         while (true) {
             // 前方5方向に移動可能なタイルを探索
-            List<Vector2Int> facingTiles = DirectionUtils.GetSurroundingFacingTiles(currentPos, 
+            List<Vector2Int> facingTiles = DirectionUtils.GetSurroundingFacingTiles(currentPos,
                 DungeonConstants.ToDirection[playerFaceDirection.Value.ToVector2Int()]);
-                
+
             List<Vector2Int> movableTiles = facingTiles
                 .Where(tile => tileManager.CheckMovableTile(currentPos, tile)).ToList();
-                
+
             if (movableTiles.Count == 0) {
                 return;
             }
@@ -366,23 +351,23 @@ public class PlayerMoveLogic {
             if (movableTiles.Count > 1 && tileManager.LookupRoomNum(currentPos + direction) != 0) {
                 return;
             }
-            
+
             // 移動可能なタイルが1つなら移動
             if (movableTiles.Count == 1) {
                 Vector2Int targetPos = movableTiles[0];
                 roundX = targetPos.x - currentPos.x;
                 roundY = targetPos.y - currentPos.y;
                 Move(currentPos, targetPos);
-                
+
                 // 移動不可なら終了
                 if (!tileManager.CheckMovableTile(currentPos, targetPos)) {
                     return;
                 }
-                
+
                 // currentPosを更新
                 currentPos = targetPos;
             }
-            
+
             await Task.Delay(50);
         }
     }
@@ -456,7 +441,7 @@ public class PlayerMoveLogic {
     /// <summary>
     /// 主方向の周囲の位置をチェックする
     /// </summary>
-    private void CheckSurroundingPositions(Vector2Int origin, Vector2Int mainPos, Vector2Int perpendicular, 
+    private void CheckSurroundingPositions(Vector2Int origin, Vector2Int mainPos, Vector2Int perpendicular,
                                           int width, int distance, List<Vector2Int> objectsInRange) {
         // 主方向を計算
         Vector2Int mainDirection;
@@ -543,7 +528,7 @@ public class PlayerMoveLogic {
     /// </summary>
     private async Task DashToObjectAsync(Vector2Int currentPos, Vector2Int targetPos) {
         AStarPathfinding pathfinding = new AStarPathfinding();
-        List<Vector2Int> path = pathfinding.FindPath(currentPos, targetPos, 
+        List<Vector2Int> path = pathfinding.FindPath(currentPos, targetPos,
             tileManager.ExtractAllRoomPositions(objectData.RoomNum.Value));
 
         Vector2Int movePos = currentPos;
@@ -558,7 +543,7 @@ public class PlayerMoveLogic {
     // ================================================
     // ================ 向き変更処理 ================
     // ================================================
-    
+
     /// <summary>
     /// 周囲の敵に基づいて自動的に向きを変更する
     /// </summary>
@@ -587,7 +572,7 @@ public class PlayerMoveLogic {
     // ================================================
     // ================ ランダム移動処理 ================
     // ================================================
-    
+
     /// <summary>
     /// ランダムな方向に移動する（混乱状態用）
     /// </summary>
@@ -595,8 +580,8 @@ public class PlayerMoveLogic {
         // 周囲8マスから移動可能なマスを探す
         List<Vector2Int> movableTiles = tileManager.GetSurroundingPositions(objectData.Position.Value)
             .Where(tile => tileManager.CheckMovableTile(objectData.Position.Value, tile)).ToList();
-            
-        if(movableTiles.Count == 0) {
+
+        if (movableTiles.Count == 0) {
             return false;
         }
 
@@ -613,7 +598,7 @@ public class PlayerMoveLogic {
         Vector2Int targetPos = inputVectorInt + currentPos;
 
         if (!playerCanMove) return false;
-        
+
         // 移動実行
         Move(currentPos, targetPos);
 

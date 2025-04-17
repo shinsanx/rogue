@@ -95,6 +95,7 @@ namespace RandomDungeonWithBluePrint {
             DownLeftRight,
             DownLeftUp,
             LeftRightUp,
+            DownLeftRightUp, // 上下左右すべての方向に壁がある場合
             Debug,
         }
 

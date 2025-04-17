@@ -28,8 +28,8 @@ public class Item : MonoBehaviour, IMenuActionAdapter {
     }
 
     public void OnPicked() {
-        Destroy(gameObject);
         onMessageSend.RaiseEvent(createMessageLogic.CreateGetItemMessage(itemSO.itemName));
+        Destroy(gameObject);
     }
 
     private void CreateSOInstance() {
@@ -40,7 +40,7 @@ public class Item : MonoBehaviour, IMenuActionAdapter {
         objectData.SetId(CharacterManager.GetUniqueID());
         objectData.Name.SetValue(itemSO.itemName);
         objectData.Type.SetValue("Item");        
-        objectData.Position.SetValue(objectData.Position.Value);
+        objectData.Position.SetValue(transform.position);
     }
 
     public void OnSelected() {

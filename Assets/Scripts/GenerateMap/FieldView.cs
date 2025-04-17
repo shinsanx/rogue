@@ -23,7 +23,7 @@ namespace RandomDungeonWithBluePrint {
         [SerializeField] private Tile downLeftRight = default;
         [SerializeField] private Tile downLeftUp = default;
         [SerializeField] private Tile leftRightUp = default;
-
+        [SerializeField] private Tile downLeftRightUp = default;
 
 
 
@@ -83,6 +83,9 @@ namespace RandomDungeonWithBluePrint {
                             break;
                             case (int)Constants.MapChipType.LeftRightUp:
                             tilemap.SetTile(new Vector3Int(x, y, 0), leftRightUp);
+                            break;
+                            case (int)Constants.MapChipType.DownLeftRightUp:
+                            tilemap.SetTile(new Vector3Int(x, y, 0), downLeftRightUp);
                             break;
                     }
                 }
