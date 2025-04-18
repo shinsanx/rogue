@@ -41,6 +41,7 @@ public class PlayerMoveLogic {
     PlayerMoveHandler moveHandler;
     PlayerItemHandler itemHandler;
     PlayerStairHandler stairHandler;
+    PlayerDashHandler dashHandler;
 
     // ================================================
     // ============= イベントチャンネル =============
@@ -76,6 +77,8 @@ public class PlayerMoveLogic {
         moveHandler = new PlayerMoveHandler(playerCanMove, playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
         itemHandler = new PlayerItemHandler(currentSelectedObjectSO, OnItemPicked, tileManager);
         stairHandler = new PlayerStairHandler(tileManager);
+        dashHandler = new PlayerDashHandler(playerObjectData, tileManager, moveHandler, playerFaceDirection, OnPlayerDirectionChanged);
+        
 
 
     }
@@ -204,21 +207,22 @@ public class PlayerMoveLogic {
     /// <summary>
     /// 入力方向にダッシュする
     /// </summary>
-    public async void DashByInput(Vector2 inputVector) {
-        this.inputVector = inputVector;
+    public async Task DashByInput(Vector2 inputVector) {
+        await dashHandler.DashByInput(inputVector);
+        // this.inputVector = inputVector;
 
-        // 入力値を四捨五入して整数値に変換
-        roundX = Mathf.Round(inputVector.x);
-        roundY = Mathf.Round(inputVector.y);
+        // // 入力値を四捨五入して整数値に変換
+        // roundX = Mathf.Round(inputVector.x);
+        // roundY = Mathf.Round(inputVector.y);
 
-        Vector2Int direction = new Vector2Int((int)roundX, (int)roundY);
-        Vector2Int currentPos = objectData.Position.Value;
+        // Vector2Int direction = new Vector2Int((int)roundX, (int)roundY);
+        // Vector2Int currentPos = objectData.Position.Value;
 
-        // アイテムに乗る処理
-        if (TryGetOnItem(currentPos, direction)) return;
+        // // アイテムに乗る処理
+        // if (TryGetOnItem(currentPos, direction)) return;
 
-        // オブジェクトがあるまで移動する
-        await DashUntilObstacleAsync(currentPos, direction);
+        // // オブジェクトがあるまで移動する
+        // await DashUntilObstacleAsync(currentPos, direction);
     }
 
     /// <summary>
@@ -292,22 +296,24 @@ public class PlayerMoveLogic {
     /// Z入力によるダッシュ処理
     /// </summary>
     public async Task ZDash(Vector2 inputVector) {
-        this.inputVector = inputVector;
+        Debug.Log("Zダッシュ");
+        await dashHandler.ZDash(inputVector);
+        // this.inputVector = inputVector;
 
-        // 入力値を四捨五入して整数値に変換
-        roundX = Mathf.Round(inputVector.x);
-        roundY = Mathf.Round(inputVector.y);
+        // // 入力値を四捨五入して整数値に変換
+        // roundX = Mathf.Round(inputVector.x);
+        // roundY = Mathf.Round(inputVector.y);
 
-        Vector2Int direction = new Vector2Int((int)roundX, (int)roundY);
-        Vector2Int currentPos = objectData.Position.Value;
+        // Vector2Int direction = new Vector2Int((int)roundX, (int)roundY);
+        // Vector2Int currentPos = objectData.Position.Value;
 
-        // ルーム内の場合は扇形の範囲内にあるアイテムを探索
-        if (tileManager.LookupRoomNum(currentPos + direction) != 0) {
-            await ZDashInRoomAsync(currentPos, direction);
-        } else {
-            // 通路の場合、ルームに入るか移動不可になるまでダッシュ
-            await ZDashInCorridorAsync(currentPos, direction);
-        }
+        // // ルーム内の場合は扇形の範囲内にあるアイテムを探索
+        // if (tileManager.LookupRoomNum(currentPos + direction) != 0) {
+        //     await ZDashInRoomAsync(currentPos, direction);
+        // } else {
+        //     // 通路の場合、ルームに入るか移動不可になるまでダッシュ
+        //     await ZDashInCorridorAsync(currentPos, direction);
+        // }
     }
 
     /// <summary>
