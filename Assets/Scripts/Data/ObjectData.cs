@@ -12,19 +12,38 @@ public class ObjectData : MonoBehaviour, IObjectData
     [SerializeField] private ObjectDataRuntimeSet _objectDataRuntimeSet;
     [SerializeField] private GameEvent onPositionChanged;
 
+    private TileManager _tileManager;
+
     public event System.Action<IObjectData> OnObjectUpdated;
 
     void OnEnable() {
         _objectDataRuntimeSet.Add(this);
+        // 初期化時にTileManagerを取得
+        if (_tileManager == null) {
+            SetTileManager(TileManager.i);
+        }
     }
 
     void OnDisable() {
         _objectDataRuntimeSet.Remove(this);
     }
 
+    public void SetTileManager(TileManager tileManager) {
+        _tileManager = tileManager;
+    }
+
     public void SetPosition(Vector2Int position) {
         Position.SetValue(position);
-        SetRoomNum(TileManager.i.LookupRoomNum(position));
+        
+        // TileManagerが設定されている場合はそれを使用
+        if (_tileManager != null) {
+            SetRoomNum(_tileManager.LookupRoomNum(position));
+        } else {
+            // フォールバックとして直接シングルトンを使用
+            Debug.LogWarning("TileManager has not been set on ObjectData");
+            SetRoomNum(TileManager.i.LookupRoomNum(position));
+        }
+        
         onPositionChanged.Raise();
         OnObjectUpdated?.Invoke(this);
     }

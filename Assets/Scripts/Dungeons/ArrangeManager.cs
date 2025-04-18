@@ -44,7 +44,11 @@ public class ArrangeManager : MonoBehaviour {
         item.itemSO = itemSO;
         item.Initialize();
         itemObject.transform.SetParent(itemParent.transform);
-        item.objectData.SetPosition(position);
+        
+        // TileManagerの参照を注入
+        ObjectData objectData = item.objectData;
+        objectData.SetTileManager(TileManager.i);
+        objectData.SetPosition(position);
     }
 
     //敵をランダムなポジションに配置
@@ -65,8 +69,12 @@ public class ArrangeManager : MonoBehaviour {
         Enemy enemy = enemyObject.GetComponent<Enemy>();
         enemy.monsterSO = monsterSO;
         enemy.InitializeEnemy();
-        enemyObject.transform.SetParent(enemyParent.transform);        
-        enemyObject.GetComponent<ObjectData>().SetPosition(position);
+        enemyObject.transform.SetParent(enemyParent.transform);
+        
+        // TileManagerの参照を注入
+        ObjectData objectData = enemyObject.GetComponent<ObjectData>();
+        objectData.SetTileManager(TileManager.i);
+        objectData.SetPosition(position);
     }
 
     public async Task ArrangeStairToRandomPosition() {
@@ -78,7 +86,11 @@ public class ArrangeManager : MonoBehaviour {
         GameObject stairObject = Instantiate(stairPrefab, position.ToVector2(), Quaternion.identity);
         stairObject.transform.SetParent(itemParent.transform);
         stairObject.GetComponent<Stair>().Initialize();
-        stairObject.GetComponent<ObjectData>().SetPosition(position);
+        
+        // TileManagerの参照を注入
+        ObjectData objectData = stairObject.GetComponent<ObjectData>();
+        objectData.SetTileManager(TileManager.i);
+        objectData.SetPosition(position);
     }
 
     public void DestroyAllObjects() {
