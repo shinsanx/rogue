@@ -40,7 +40,8 @@ public class ObjectData : MonoBehaviour, IObjectData
             SetRoomNum(_tileManager.LookupRoomNum(position));
         } else {
             // フォールバックとして直接シングルトンを使用
-            Debug.LogWarning("TileManager has not been set on ObjectData");
+            Debug.LogWarning("TileManager has not been set on ObjectData");            
+
             SetRoomNum(TileManager.i.LookupRoomNum(position));
         }
         

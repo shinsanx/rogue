@@ -16,7 +16,7 @@ public class PlayerMoveLogic {
     // ================================================
 
     // 基本コンポーネント
-    private IObjectData objectData;
+    private ObjectData objectData;
     private StateMachine stateMachine;
     private TileManager tileManager;
 
@@ -74,6 +74,8 @@ public class PlayerMoveLogic {
         this.currentSelectedObjectSO = currentSelectedObjectSO;
         this.fixDiagonalInput = fixDiagonalInput;
         this.tileManager = tileManager;
+        // Ensure ObjectData knows the TileManager (avoids warning each move)
+        this.objectData.SetTileManager(tileManager);
         moveHandler = new PlayerMoveHandler(playerCanMove, playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, fixDiagonalInput, tileManager);
         itemHandler = new PlayerItemHandler(currentSelectedObjectSO, OnItemPicked, tileManager);
         stairHandler = new PlayerStairHandler(tileManager);
