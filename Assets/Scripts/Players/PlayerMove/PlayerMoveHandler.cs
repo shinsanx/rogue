@@ -56,7 +56,9 @@ public class PlayerMoveHandler {
     public void Move(Vector2Int currentPos, Vector2Int targetPos) {       
 
         // 向き更新
-        playerFaceDirection.SetValue(new Vector2(roundX, roundY));
+        Vector2 faceDir = targetPos - currentPos;
+        //playerFaceDirection.SetValue(new Vector2(roundX, roundY));
+        playerFaceDirection.SetValue(faceDir);
         onPlayerDirectionChanged.Raise();
 
         if (fixDiagonalInput.Value){
