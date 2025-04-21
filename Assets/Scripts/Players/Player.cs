@@ -236,8 +236,8 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     }
 
     public void HandleItemPicked(bool success) {
-        playerMoveLogic.HandleItemPicked(success);
-    }
+        playerMoveLogic.HandleItemPicked(success);        
+    }   
 
     // ちからの最大値を上げる
     public void MuscleUp(int amount) {

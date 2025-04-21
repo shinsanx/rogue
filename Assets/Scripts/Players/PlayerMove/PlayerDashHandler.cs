@@ -59,8 +59,8 @@ public class PlayerDashHandler {
             if (!tileManager.CheckMovableTile(currPos, next)) break; // 壁
             if (tileManager.CheckExistObject(next))           break; // 障害物
 
-            currPos = next;
             moveHandler.Move(currPos, next);
+            currPos = next;
 
             if (ShouldStopForEnemies(currPos))  break;
             if (tileManager.CheckExistJoint(currPos)) break;
@@ -187,9 +187,13 @@ public class PlayerDashHandler {
         objs.OrderBy(p => Vector2Int.Distance(origin, p)).First();
 
     private async Task DashToObjectAsync(Vector2Int start, Vector2Int target) {
+        List<Vector2Int> views = tileManager.ExtractAllRoomPositions(objectData.RoomNum.Value);
+        if(views == null || views.Count == 0) {
+            moveHandler.Move(start, target);
+            return;
+        }
         var path = new AStarPathfinding()
-                   .FindPath(start, target,
-                             tileManager.ExtractAllRoomPositions(objectData.RoomNum.Value));
+                   .FindPath(start, target,views);                             
 
         Vector2Int curr = start;
         foreach (var p in path) {
