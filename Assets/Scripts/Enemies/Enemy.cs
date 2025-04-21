@@ -118,7 +118,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         enemyAttackLogic = new EnemyAttackLogic(this);
 
         enemyStatusLogic.InitializeEnemyStatus(this, monsterSO, this, createMessageLogic);
-        objectData.SetId(CharacterManager.GetUniqueID()); // Assign a unique ID                
+        //objectData.SetId(CharacterManager.GetUniqueID()); // Assign a unique ID                
 
         //MoveAnimationDirection = new Vector2(0,-1); //初期の方向　仮で一旦下を向くように
     }

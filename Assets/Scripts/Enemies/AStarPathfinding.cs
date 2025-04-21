@@ -23,7 +23,8 @@ public class AStarPathfinding {
             return null;
         }
 
-        bool isTargetPlayer = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Player";
+        //bool isTargetPlayer = CharacterManager.i.GetObjectTypeByPosition(targetPos) == "Player";
+        bool isTargetPlayer = TileManager.i.GetPlayerPosition() == targetPos;;
         Node startNode = new Node(startPos);
         Node targetNode = new Node(targetPos);
 

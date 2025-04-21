@@ -24,7 +24,7 @@ public class Stair : MonoBehaviour, IMenuActionAdapter
     }
 
     private void InitializeStairStatus() {
-        objectData.SetId(CharacterManager.GetUniqueID());
+        //objectData.SetId(CharacterManager.GetUniqueID());
         objectData.Name.SetValue("階段");
         objectData.Type.SetValue("Stair");
         objectData.Position.SetValue(objectData.Position.Value);

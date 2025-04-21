@@ -263,6 +263,11 @@ public class TileManager : MonoBehaviour {
         return objectDataSet.GetObjectByPositionExceptPlayerAndEnemy(objectDataSet.GetPlayerPosition());
     }
 
+    //Playerのポジションを取得する
+    public Vector2Int GetPlayerPosition() {
+        return objectDataSet.GetPlayerPosition();
+    }
+
     public void Initialize() {
         if (_i == null) {
             _i = this;

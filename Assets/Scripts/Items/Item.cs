@@ -36,8 +36,7 @@ public class Item : MonoBehaviour, IMenuActionAdapter {
         objectData.CreateSOInstance();
     }
 
-    private void InitializeItemStatus() {
-        objectData.SetId(CharacterManager.GetUniqueID());
+    private void InitializeItemStatus() {        
         objectData.Name.SetValue(itemSO.itemName);
         objectData.Type.SetValue("Item");        
         objectData.Position.SetValue(transform.position);

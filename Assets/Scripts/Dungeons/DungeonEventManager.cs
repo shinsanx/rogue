@@ -18,7 +18,7 @@ public class DungeonEventManager : MonoBehaviour {
     [SerializeField] DungeonStateManager dungeonStateManager;
     [SerializeField] EnemyManager enemyManager;
     [SerializeField] DungeonDataSO dungeonData;
-    [SerializeField] CharacterManager characterManager;
+    //[SerializeField] CharacterManager characterManager;
     [SerializeField] TileManager tileManager;
     [SerializeField] CurrentDungeonData currentDungeonData;
     private EnemyTableSO currentEnemyTable;
@@ -31,7 +31,7 @@ public class DungeonEventManager : MonoBehaviour {
 
 
         // 2. キャラクターマネージャーの初期化
-        await InitializeCharacterManager();
+        //await InitializeCharacterManager();
         // 1. StateMachineの初期化を最初に行う
         await InitializeStateMachine();
 
@@ -82,7 +82,7 @@ public class DungeonEventManager : MonoBehaviour {
         ArrangeManager.i.DestroyAllObjects();
         
                 // 2. キャラクターマネージャーの初期化
-        await InitializeCharacterManager();
+        //await InitializeCharacterManager();
         // 1. StateMachineの初期化を最初に行う
         await InitializeStateMachine();
 
@@ -144,10 +144,10 @@ public class DungeonEventManager : MonoBehaviour {
         return Task.CompletedTask;
     }
 
-    private Task InitializeCharacterManager() {
-        characterManager.Initialize();
-        return Task.CompletedTask;
-    }
+    // private Task InitializeCharacterManager() {
+    //     characterManager.Initialize();
+    //     return Task.CompletedTask;
+    // }
 
     private Task InitializeDungeonStateManager() {
         dungeonStateManager.Initialize();
