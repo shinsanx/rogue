@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using RandomDungeonWithBluePrint;
-using JetBrains.Annotations;
+
 
 public class AutoMapping : MonoBehaviour {
     public GameObject roads;
@@ -54,8 +53,7 @@ public class AutoMapping : MonoBehaviour {
             for (int y = 0; y < mapSize.y; y++) {
                 int tileType = currentField.Grid[x, y];
 
-                if (tileType == (int)Constants.MapChipType.Floor ||
-                    tileType >= (int)Constants.MapChipType.Up) {
+                if (tileType == (int)Constants.MapChipType.Floor) {
                     CreateUIElement(roadImagePrefab, roads.transform, new Vector2Int(x, y), scale, startPosition);
                 }
             }

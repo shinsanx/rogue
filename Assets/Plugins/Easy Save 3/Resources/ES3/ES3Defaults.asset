@@ -36,6 +36,10 @@ MonoBehaviour:
     - ProCamera2D.Runtime
     - SingularityGroup.HotReload.Runtime
     - SingularityGroup.HotReload.Runtime.Public
+    - TNRD.NSubstitute
+    - Zenject
+    - Zenject-IntegrationTests
+    - Zenject-IntegrationTests-Editor
     showAdvancedSettings: 0
   addMgrToSceneAutomatically: 0
   autoUpdateReferences: 1

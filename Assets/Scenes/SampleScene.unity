@@ -3171,7 +3171,6 @@ MonoBehaviour:
   dungeonStateManager: {fileID: 1348055333}
   enemyManager: {fileID: 1665713301}
   dungeonData: {fileID: 11400000, guid: a786f3ae3741b4ee499259246c3b443c, type: 2}
-  characterManager: {fileID: 1741563297}
   tileManager: {fileID: 693550566}
   currentDungeonData: {fileID: 11400000, guid: d72a4e83bf8054663881dba28c4b7532, type: 2}
 --- !u!114 &672341474
@@ -7697,9 +7696,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef9e3f0cf9bf406f9ec54fd7e2b2127, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemySet: {fileID: 11400000, guid: f01bf25a874894f839a33075a1e3a583, type: 2}
-  itemSet: {fileID: 11400000, guid: 273d0e774c4ea47abac5c006d913d693, type: 2}
-  objectDataSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
 --- !u!1 &1741935258
 GameObject:
   m_ObjectHideFlags: 0
