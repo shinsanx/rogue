@@ -253,6 +253,11 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
         onMessageSend.RaiseEvent(createMessageLogic.CreateMuscleHealMessage());
     }
 
+    public void TakePoison() {
+        ChangePlayerCurrentMuscle(playerCurrentMuscle.Value - 1);
+        TakeDamage(5, "");
+    }
+
 
     // ================================================
     // ============== IEffectReceiver =============
