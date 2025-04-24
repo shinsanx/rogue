@@ -7,7 +7,11 @@ public class MuscleHealEffectSO : BaseApplyEffectSO {
 
     public override void ApplyEffect(IEffectReceiver receiver) {
 
-       
+       if (receiver is Player player) {
+            player.MuscleHeal();
+        } else if (receiver is Enemy enemy) {
+            enemy.TakeDamage(1, "");
+        }
     }
 }
 
