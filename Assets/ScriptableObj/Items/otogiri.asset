@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5e5ec5acb347460e85ecb85f7b1f226, type: 3}
-  m_Name: dokuso
+  m_Name: otogiri
   m_EditorClassIdentifier: 
-  id: 41
-  itemName: 
-  description: "\u3061\u304B\u3089\u304C\u4E0B\u304C\u308B\u3002\uFF15\u30DD\u30A4\u30F3\u30C8\u30C0\u30E1\u30FC\u30B8\u53D7\u3051\u308B"
-  purchasePrice: 50
-  sellingPrice: 10
+  id: 46
+  itemName: "\u5F1F\u5207\u8349"
+  description: "HP\u3092100\u56DE\u5FA9\u3059\u308B\u3002HP\u304C\u6700\u5927\u306A\u30892\u30DD\u30A4\u30F3\u30C8\u5897\u3048\u308B"
+  purchasePrice: 100
+  sellingPrice: 50
   icon: {fileID: 21300000, guid: 17cbbfbbba13141cda87edc48ff86914, type: 3}
   submitMenuSet: {fileID: 11400000, guid: 4725414b1aa0645f68c602b10620f1c3, type: 2}
-  effect: {fileID: 11400000, guid: daa112c7c8c3f462eaac11e1d0bc96ce, type: 2}
+  effect: {fileID: 11400000, guid: 7c46ec7870cd84bb9991621d03b838f1, type: 2}

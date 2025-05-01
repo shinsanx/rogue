@@ -33,6 +33,10 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     private int threshold = 100; //行動の閾値
     [SerializeField] private IntVariable timeGage;
     [SerializeField] private IntVariable playerActionRate;
+    public int actionRate {
+        get => playerActionRate.Value;
+        set => playerActionRate.Value = value;
+    }
 
 
     // ================================================
@@ -213,13 +217,13 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     [field: SerializeField] public BoolVariable isConfusion { get; set; }
     [field: SerializeField] public BoolVariable isSleeping { get; set; }
 
-    public void Heal(int amount) {
+    public void Heal(int amount, int maxUpAmount) {
         OnPlayerEat.Raise();
 
         //体力MAXの場合
         if (playerMaxHealth.Value == playerCurrentHealth.Value) {
-            ChangePlayerMaxHealth(playerMaxHealth.Value + 1);
-            onMessageSend.RaiseEvent(createMessageLogic.CreateMaxHpUpMessage(1));
+            ChangePlayerMaxHealth(playerMaxHealth.Value + maxUpAmount);
+            onMessageSend.RaiseEvent(createMessageLogic.CreateMaxHpUpMessage(maxUpAmount));
             return;
         }
         int healAmount = Mathf.Clamp(amount, 0, playerMaxHealth.Value - playerCurrentHealth.Value);

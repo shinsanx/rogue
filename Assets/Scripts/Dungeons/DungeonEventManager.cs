@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Com.LuisPedroFonseca.ProCamera2D;
 using RandomDungeonWithBluePrint;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
@@ -24,6 +25,8 @@ public class DungeonEventManager : MonoBehaviour {
     private EnemyTableSO currentEnemyTable;
     private ItemTableSO currentItemTable;
 
+    [SerializeField] private ProCamera2DNumericBoundaries numericBoundaries;
+
 
     private async void Start() {
         // 1. TileManagerの初期化
@@ -41,6 +44,7 @@ public class DungeonEventManager : MonoBehaviour {
 
         // 3. マップ生成
         await InitializeRandomMapGenerator();
+
 
 
 
@@ -91,6 +95,8 @@ public class DungeonEventManager : MonoBehaviour {
 
         // 3. マップ生成
         await InitializeRandomMapGenerator();
+
+        InitializeMapBoundaries(randomMapGenerator.currentField.Size);
 
         // 6. ダンジョンステートマネージャーの初期化
         await InitializeDungeonStateManager();
@@ -196,4 +202,14 @@ public class DungeonEventManager : MonoBehaviour {
         currentDungeonData.currentFloor++;
         await NextFloor();
     }
+
+    private void InitializeMapBoundaries(Vector2 mapSize) {
+        // 左右と上下の範囲を設定する
+        numericBoundaries.LeftBoundary = 0;
+        numericBoundaries.RightBoundary = mapSize.x;
+        numericBoundaries.BottomBoundary = 0;
+        numericBoundaries.TopBoundary = mapSize.y;
+
+    }
+    
 }

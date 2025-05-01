@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99e5611dc37f04700a788a508e4007ed, type: 3}
   m_Name: PlayerCurrentHP
   m_EditorClassIdentifier: 
-  Value: 0
+  Value: 15

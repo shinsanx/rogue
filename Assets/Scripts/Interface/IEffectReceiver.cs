@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IEffectReceiver
 {
     // 即時系    
-    void Heal(int amount);
+    void Heal(int amount, int maxUpAmount);
     void MuscleHeal();
     void Equip(BaseItemSO item);
 
@@ -16,7 +16,8 @@ public interface IEffectReceiver
     List<StatusEffectInstance> GetActiveStatusEffects();
 
     [SerializeField] BoolVariable isConfusion{ get; set; }
-    [SerializeField] BoolVariable isSleeping{get;set;}
+    [SerializeField] BoolVariable isSleeping{get;set;}   
+    int actionRate{get;set;} 
 
 }
 

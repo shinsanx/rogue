@@ -84,7 +84,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public List<Vector2Int> MonsterView { get; set; }
     public List<Vector2Int> RouteCache { get; set; }
     public const int Threshold = 100; //行動の閾値
-    public int ActionRate = 50;
+    public int actionRate {get;set;}=50;
     public int TimeGage = 0;
 
 
@@ -153,7 +153,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
 
     //ゲージを加算する
     public void Tick() {
-        TimeGage += ActionRate;
+        TimeGage += actionRate;
         TickStatusEffects();
     }
 
@@ -163,7 +163,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     // ==================== IEffectReceiver ===================
     // ========================================================    
 
-    public void Heal(int amount) {
+    public void Heal(int amount, int maxUpAmount) {
         HP += amount;
     }
 

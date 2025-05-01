@@ -102,6 +102,7 @@ namespace RandomDungeonWithBluePrint {
         public enum TileType{
             Nothing,
             Aisle,
+            Room,
         }
     }
 }

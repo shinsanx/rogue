@@ -19,6 +19,7 @@ public class EnemyState : State {
     }
 
     public void EnemyStateStart() {
+        //EnemyManagerへ
         onEnemyActionStart.Raise();        
         
     }

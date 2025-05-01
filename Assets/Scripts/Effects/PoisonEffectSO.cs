@@ -8,7 +8,7 @@ public class PoisonEffectSO : BaseApplyEffectSO {
     public override void ApplyEffect(IEffectReceiver receiver) {
 
        if (receiver is Player player) {
-            player.MuscleHeal();
+            player.TakePoison();
         } else if (receiver is Enemy enemy) {
             enemy.TakeDamage(5, "");
         }

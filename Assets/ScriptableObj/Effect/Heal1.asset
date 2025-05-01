@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectName: "\u3084\u304F\u305D\u3046"
   healAmount: 30
+  maxUpAmount: 1

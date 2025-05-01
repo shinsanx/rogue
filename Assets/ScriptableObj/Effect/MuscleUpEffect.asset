@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e890d5b700e1348a0b9c150fc0e12ff1, type: 3}
   m_Name: MuscleUpEffect
   m_EditorClassIdentifier: 
-  effectDescription: "\u6700\u5927\u5024\u3092\uFF11\u30DD\u30A4\u30F3\u30C8\u3042\u3052\u308B"
+  effectName: "\u3061\u304B\u3089\u306E\u6700\u5927\u5024\u30A2\u30C3\u30D7"
   muscleUpAmount: 1

@@ -15,9 +15,9 @@ public class GameAssets: MonoBehaviour {
 
     public StateMachine stateMachine;
     public State playerState;
-    public State enemyState;            
+    public State enemyState;
 
-    public AllItemListSO allItemListSO;
+    //public AllItemListSO allItemListSO;
     public RandomDungeonWithBluePrint.TileSet tileSet;
 
 }

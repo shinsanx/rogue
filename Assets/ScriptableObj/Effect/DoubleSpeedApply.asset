@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e12d5ebb0fc74ab28ddbc33db9b94a7, type: 3}
-  m_Name: MuscleHealEffect
+  m_Script: {fileID: 11500000, guid: 941c758bfa8e64a37a329cbcd182011c, type: 3}
+  m_Name: DoubleSpeedApply
   m_EditorClassIdentifier: 
-  effectName: "\u3061\u304B\u3089\u306E\u56DE\u5FA9"
+  effectName: "\u500D\u901F"
+  statusEffectToApply: {fileID: 11400000, guid: 194c514a1c5864175b036645901f1c0f, type: 2}

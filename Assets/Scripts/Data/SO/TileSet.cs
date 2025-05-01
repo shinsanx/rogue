@@ -52,6 +52,8 @@ namespace RandomDungeonWithBluePrint {
             foreach (Room room in rooms) {
                 foreach (Vector2Int pos in room.Rect.allPositionsWithin) {//矩形領域内のすべての座標を表示
                     tileInfos[pos.y][pos.x].mapChipType = (int)Constants.MapChipType.Floor;//Roomの座標をFloorにする
+                    tileInfos[pos.y][pos.x].tileType = (int)Constants.TileType.Room;//Roomの座標をRoomにする                    
+                    tileTypeByPosition[pos] = tileInfos[pos.y][pos.x].tileType; //辞書に格納
 
                     //キーが重複した場合は上書き
                     if (mapChipTypeByPosition.ContainsKey(pos)) {

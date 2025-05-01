@@ -8,11 +8,13 @@ public class AutoMapping : MonoBehaviour {
     public GameObject enemies;
     public GameObject items;
     public GameObject roadImagePrefab;
+    public GameObject roomImagePrefab;
     public GameObject enemyImagePrefab;
     public GameObject playerImagePrefab;
     public GameObject itemImagePrefab;
     private Field currentField;
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;
+    [SerializeField] private TileManager tileManager;
 
     float scale;
     Vector2 startPosition;
@@ -51,10 +53,15 @@ public class AutoMapping : MonoBehaviour {
         // 道を描画
         for (int x = 0; x < mapSize.x; x++) {
             for (int y = 0; y < mapSize.y; y++) {
-                int tileType = currentField.Grid[x, y];
-
-                if (tileType == (int)Constants.MapChipType.Floor) {
+                //int tileType = currentField.Grid[x, y];
+                
+                int tileType = tileManager.GetTileType(new Vector2Int(x, y));
+                if(tileType == (int)Constants.TileType.Aisle) {
                     CreateUIElement(roadImagePrefab, roads.transform, new Vector2Int(x, y), scale, startPosition);
+                }
+
+                if (tileType == (int)Constants.TileType.Room) {
+                    CreateUIElement(roomImagePrefab, roads.transform, new Vector2Int(x, y), scale, startPosition);
                 }
             }
         }

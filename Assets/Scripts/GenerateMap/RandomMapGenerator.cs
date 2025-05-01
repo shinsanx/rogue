@@ -48,7 +48,7 @@ namespace RandomDungeonWithBluePrint {
 
         public void CreateMiniMap(){
             MessageBus.Instance.Publish("UpdateMiniMap", currentField);
-        }        
+        }
 
         public void Initialize(BluePrintWithWeight[] bluePrints) {
             this.bluePrints = bluePrints;

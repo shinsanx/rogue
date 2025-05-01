@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7380610545985406881
+--- !u!1 &2949959084488398866
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 881170346613897239}
-  - component: {fileID: 8607735009869515618}
-  - component: {fileID: 7443222878428801275}
+  - component: {fileID: 5487906035841228973}
+  - component: {fileID: -4266214105588760176}
+  - component: {fileID: 2427440262130884347}
   m_Layer: 5
-  m_Name: MapPlayerImage
+  m_Name: MapRoomImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &881170346613897239
+--- !u!224 &5487906035841228973
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7380610545985406881}
+  m_GameObject: {fileID: 2949959084488398866}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -35,37 +35,37 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8607735009869515618
+--- !u!222 &-4266214105588760176
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7380610545985406881}
+  m_GameObject: {fileID: 2949959084488398866}
   m_CullTransparentMesh: 1
---- !u!114 &7443222878428801275
+--- !u!114 &2427440262130884347
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7380610545985406881}
+  m_GameObject: {fileID: 2949959084488398866}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.9813789, b: 0.5424528, a: 0.7529412}
-  m_RaycastTarget: 1
+  m_Color: {r: 0.18752365, g: 0.17377181, b: 0.5188679, a: 0.8980392}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 26220c7c36b164c7594d3e289d8790f2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 455283daa979e401387aea2295ed685e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
