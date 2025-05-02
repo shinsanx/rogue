@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MessagePresenter : MonoBehaviour {
@@ -8,10 +7,10 @@ public class MessagePresenter : MonoBehaviour {
 
     void Awake() {
         model = new MessageModel(this);
-        model.OnChanged += () => view.Render(model.Entries);
+        model.OnChanged += () => view.Render(model.Shown);
+        model.OnTimeout += view.FadeOutAll;
     }
 
-    /* -------- 変更：List<string> 受け取り -------- */
-    public void Send(List<string> msgs) => model.PushMany(msgs);
-    /* -------------------------------------------- */
+    /* まとめ送信口 */
+    public void Send(System.Collections.Generic.List<string> msgs) => model.PushMany(msgs);
 }

@@ -1,62 +1,66 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class MessageModel {
     public event Action OnChanged;
+    public event Action OnTimeout;              // 3 秒無入力タイムアウト
 
-    const int MaxLines = 3;
-    const float Life = 3f;   // 行が消えるまで
-    const float Interval = 1f; // 次の行を出すまで
+    const int MaxShown = 3;
+    const float Interval = 1f;               // 1 秒ごとに表示
+    const float TimeoutSec = 3f;               // 3 秒無音なら全消し
 
-    readonly Queue<string> _shown = new(); // 画面に出てる 0〜3 行
-    readonly Queue<string> _pending = new(); // まだ出してへん行
+    readonly Queue<string> _pending = new();
+    readonly Queue<string> _shown = new();
     readonly MonoBehaviour _host;
 
-    bool _consuming; // pending を流すコルーチンが動いてるか
+    float _lastAddTime;                        // 最後に show した時刻
+    bool _consuming;
 
-    public IEnumerable<string> Entries => _shown;
+    public IEnumerable<string> Shown => _shown;
 
     public MessageModel(MonoBehaviour host) => _host = host;
 
-    /* ==== まとめて受け取り ==== */
+    /* ---- まとめて受信 ---- */
     public void PushMany(List<string> msgs) {
         foreach (var m in msgs) _pending.Enqueue(m);
-        if (!_consuming) _host.StartCoroutine(ConsumePending());
+        if (!_consuming) _host.StartCoroutine(Consume());
     }
 
-    /* ==== pending → shown へ１行ずつ移すコルーチン ==== */
-    IEnumerator ConsumePending() {
+    /* ---- 1 秒おきに pending → shown ---- */
+    IEnumerator Consume() {
         _consuming = true;
-
         while (_pending.Count > 0) {
-            Show(_pending.Dequeue());       // １行表示
+            Show(_pending.Dequeue());
             yield return new WaitForSeconds(Interval);
         }
-
         _consuming = false;
     }
 
-    /* ==== 実際に表示キューへ入れる（１行単位） ==== */
+    /* ---- 実際に表示キューへ ---- */
     void Show(string msg) {
         _shown.Enqueue(msg);
-        while (_shown.Count > MaxLines) _shown.Dequeue();
+        if (_shown.Count > MaxShown)           // 4 件目が来た！
+        {
+            _shown.Dequeue();                  // 最古を drop → View がフェード
+        }
 
+        _lastAddTime = Time.time;
         OnChanged?.Invoke();
-        _host.StartCoroutine(ExpireAfter(Life, msg));
+
+        // タイムアウト監視コルーチンをリセット
+        _host.StopCoroutine(nameof(CheckTimeout));
+        _host.StartCoroutine(CheckTimeout());
     }
 
-    IEnumerator ExpireAfter(float sec, string msg) {
-        yield return new WaitForSeconds(sec);
-
-        if (_shown.Contains(msg)) {
-            var list = new List<string>(_shown);
-            list.Remove(msg);
+    /* ---- 3 秒無入力 → 全消し ---- */
+    IEnumerator CheckTimeout() {
+        yield return new WaitForSeconds(TimeoutSec);
+        if (Time.time - _lastAddTime >= TimeoutSec && _pending.Count == 0) {
             _shown.Clear();
-            foreach (var s in list) _shown.Enqueue(s);
-
-            OnChanged?.Invoke();
+            OnTimeout?.Invoke();               // View に「全部フェードして！」通知
+            OnChanged?.Invoke();               // データも空になったと知らせる
         }
     }
 }

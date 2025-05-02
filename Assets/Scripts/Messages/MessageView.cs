@@ -1,65 +1,102 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using DG.Tweening;
 using UnityEngine.UI;
+using DG.Tweening;
 
-public class MessageView : MonoBehaviour {
-    [SerializeField] TextMeshProUGUI[] lines; // size = 3
-    [SerializeField] RectTransform root;      // ViewRoot
-    [SerializeField] float slideTime = 0.25f; // スライド時間
+public class MessageView : MonoBehaviour
+{
+    [Header("UI Refs")]
+    [SerializeField] TextMeshProUGUI[] lines;  // Line0 = 最上段, Line2 = 最下段
+    [SerializeField] RectTransform      root;
 
-    readonly Queue<string> _current = new();
+    [Header("Animation")]
+    [SerializeField] float slideTime = .25f;  // スライド所要
+    [SerializeField] float fadeTime  = .25f;  // フェード所要
+    [SerializeField] float spacing   = 4f;    // LayoutGroup.Spacing と合わせる
 
-    void Awake() {
-        // LayoutGroup がある場合、手動で anchoredPosition を触るので
-        // childForceExpand を切っとくと挙動が安定
-        if (root.TryGetComponent(out VerticalLayoutGroup vlg))
-            vlg.childForceExpandHeight = false;
+    Vector2 basePos;                           // root 初期座標
+
+    /* ★ これを入れ忘れてた！ */
+    readonly Queue<string> _current = new();   // 直近の表示内容 (最古→最新)
+
+    /* ------------------------------- */
+
+    void Awake() => basePos = root.anchoredPosition;
+
+    /* ====== Presenter から呼ばれる ====== */
+    public void Render(IEnumerable<string> shown)
+    {
+        var list = new List<string>(shown);     // list[0] 最古, list[^1] 最新
+        bool hasAdd = list.Count > _current.Count;
+
+        if (hasAdd)                            // 新規行が増えた！
+            PlaySlideAnimation(list);
+        else
+            ApplyListToLines(list);            // 行数変化なし/減少
     }
 
-    public void Render(IEnumerable<string> entries) {
-        // 1) entries → List にコピー（最新が list[0]）
-        var list = new List<string>(entries);
-        //list.Reverse();
+    /* ---- スライド演出 ---- */
+    void PlaySlideAnimation(List<string> finalList)
+    {
+        float lineH = lines[0].rectTransform.sizeDelta.y + spacing;
 
-        // 2) 追加行数を判定
-        int added = list.Count - _current.Count;
-        if (added > 0) {
-            // 既存 root を上方向に slide
-            float lineHeight = lines[0].rectTransform.sizeDelta.y + 4f; // 4 = spacing
-            root.DOComplete(); // 旧アニメ終端
-            root.DOAnchorPosY(root.anchoredPosition.y + lineHeight * added, slideTime)
-                .SetEase(Ease.OutCubic)
-                .OnComplete(() => {
-                    // アニメ完了後に位置リセットして見た目を保つ
-                    root.anchoredPosition = Vector2.zero;
-                    RefreshTexts(list);
-                });
+        /* ① 今はまだ旧表示のまま */
+        ApplyListToLines(new List<string>(_current));
 
-            // アニメ中も文字を更新しておく（新規行は一旦非表示）
-            RefreshTexts(list, added);
-        } else {
-            // 行が減った or 変化なし → そのまま更新
-            RefreshTexts(list);
+        /* ② root を上へアニメーション */
+        root.DOComplete();
+        root.DOAnchorPos(basePos + new Vector2(0, lineH), slideTime)
+            .SetEase(Ease.OutCubic)
+            .OnComplete(() =>
+            {
+                root.anchoredPosition = basePos;
+
+                /* ③ アニメ完了後に最終並びへ更新 */
+                ApplyListToLines(finalList);
+            });
+
+        SyncCurrent(finalList);
+    }
+
+    /* ---- 行⇆UI 反映共通 ---- */
+    void ApplyListToLines(List<string> list)
+    {
+        int offset = lines.Length - list.Count;    // 空き行 (上側)
+        for (int i = 0; i < lines.Length; i++)
+        {
+            int src = i - offset;
+            if (src >= 0)
+            {
+                lines[i].text = list[src];
+                lines[i].gameObject.SetActive(true);
+                lines[i].alpha = 1f;
+            }
+            else
+            {
+                lines[i].gameObject.SetActive(false);
+            }
         }
+    }
 
-        // _current を同期
+    /* ---- _current を最新化 ---- */
+    void SyncCurrent(List<string> list)
+    {
         _current.Clear();
         foreach (var s in list) _current.Enqueue(s);
     }
 
-    /// <summary>
-    /// texts を list で更新。filter == added の時は最新行をまだ表示しない
-    /// </summary>
-    void RefreshTexts(List<string> list, int hideTopN = 0) {
-        for (int i = 0; i < lines.Length; i++) {
-            if (i < list.Count) {
-                lines[i].text = list[i];
-                lines[i].gameObject.SetActive(i >= hideTopN); // スライド前は非表示
-            } else {
-                lines[i].gameObject.SetActive(false);
-            }
-        }
+    /* ==== 1 行 or 全行フェード用の API (オプション) ==== */
+    public void FadeOutTop()
+    {
+        if (lines[0].gameObject.activeSelf)
+            lines[0].DOFade(0, fadeTime).OnComplete(() => lines[0].gameObject.SetActive(false));
+    }
+
+    public void FadeOutAll()
+    {
+        foreach (var t in lines)
+            if (t.gameObject.activeSelf)
+                t.DOFade(0, fadeTime).OnComplete(() => t.gameObject.SetActive(false));
     }
 }
