@@ -15,18 +15,16 @@ public class CreateMessageLogic : ScriptableObject {
 
     //Enemyがダメージを受けたときのメッセージ
     public List<string> CreateAttackMessage(List<string> strings, int damage, string dealerName, string takerName) {
-        string firstText = dealerName + "は、" + takerName + "に";
-        string secondText = upperDamageText.ConvertNumToUpperString(damage) + "ポイントのダメージを与えた。";
-
-        strings.Add(firstText);
-        strings.Add(secondText);
+        string firstText = dealerName + "は、" + takerName + "に " +upperDamageText.ConvertNumToUpperString(damage) + " のダメージを与えた。";
+        
+        strings.Add(firstText);        
         return strings;
     }
 
     //プレイヤーによって倒されたときのメッセージ（Expつき）
     public List<string> CreateDefeatedMessage(List<string> strings, string takerName, int exp) {
         string firstText = takerName + "をやっつけた。";
-        string secondText = upperDamageText.ConvertNumToUpperString(exp) + "ポイントの経験値を得た。";
+        string secondText = upperDamageText.ConvertNumToUpperString(exp) + " の経験値を得た。";
 
         strings.Add(firstText);
         strings.Add(secondText);
@@ -35,7 +33,7 @@ public class CreateMessageLogic : ScriptableObject {
 
     //レベルが上がったとき
     public List<string> LvUppedMessage(string playerName, int lv) {
-        string firstText = playerName + "はレベル" + upperDamageText.ConvertNumToUpperString(lv) + "に上がった。";
+        string firstText = playerName + "はレベル " + upperDamageText.ConvertNumToUpperString(lv) + " に上がった。";
 
         List<string> strings = new List<string>{
             firstText,
@@ -45,11 +43,9 @@ public class CreateMessageLogic : ScriptableObject {
 
     //プレイヤーがダメージを受けたとき
     public List<string> CreateTakeDamageMessage(List<string> strings, int damage, string dealerName) {
-        string firstText = dealerName + "から";
-        string secondText = upperDamageText.ConvertNumToUpperString(damage) + "ポイントのダメージを受けた。";
+        string firstText = dealerName + "から " + upperDamageText.ConvertNumToUpperString(damage) + " のダメージを受けた。";        
 
-        strings.Add(firstText);
-        strings.Add(secondText);
+        strings.Add(firstText);        
         return strings;
     }
 

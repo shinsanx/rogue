@@ -16,7 +16,7 @@ namespace RandomDungeonWithBluePrint {
 
         [SerializeField] private BluePrintWithWeight[] bluePrints = default;
         
-        [SerializeField] private Button generateButton = default;
+        //[SerializeField] private Button generateButton = default;
         [SerializeField] private FieldView fieldView = default;
         public Field currentField; //現在生成されているField
 

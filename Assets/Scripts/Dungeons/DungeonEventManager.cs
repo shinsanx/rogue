@@ -5,6 +5,7 @@ using Com.LuisPedroFonseca.ProCamera2D;
 using RandomDungeonWithBluePrint;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DungeonEventManager : MonoBehaviour {
     //Todo: マップ生成
@@ -22,8 +23,10 @@ public class DungeonEventManager : MonoBehaviour {
     //[SerializeField] CharacterManager characterManager;
     [SerializeField] TileManager tileManager;
     [SerializeField] CurrentDungeonData currentDungeonData;
+    [SerializeField] Button generateButton;
     private EnemyTableSO currentEnemyTable;
     private ItemTableSO currentItemTable;
+
 
     [SerializeField] private ProCamera2DNumericBoundaries numericBoundaries;
 
@@ -33,8 +36,6 @@ public class DungeonEventManager : MonoBehaviour {
         await InitializeTileManager();
 
 
-        // 2. キャラクターマネージャーの初期化
-        //await InitializeCharacterManager();
         // 1. StateMachineの初期化を最初に行う
         await InitializeStateMachine();
 
@@ -53,6 +54,7 @@ public class DungeonEventManager : MonoBehaviour {
 
         // 7. プレイヤーをランダムな位置へ召喚
         await InitializePlayer();
+        await PlacePlayer();
 
         // 8. ダンジョンデータの読み込み
         LoadDungeonData();
@@ -75,11 +77,12 @@ public class DungeonEventManager : MonoBehaviour {
         // 14. ダンジョンデータの保存
         SaveDungeonData();
 
+        generateButton.onClick.AddListener(async ()=> {            
+            await NextFloor();
+        });
+
         Debug.Log("Initialize completed");
-        // }
-        // catch (System.Exception ex) {
-        //     Debug.LogError($"DungeonEventManager Initialization Failed: {ex.Message}");
-        // }
+        
     }
 
     private async Task NextFloor() {      
@@ -101,8 +104,8 @@ public class DungeonEventManager : MonoBehaviour {
         // 6. ダンジョンステートマネージャーの初期化
         await InitializeDungeonStateManager();
 
-        // 7. プレイヤーをランダムな位置へ召喚
-        await InitializePlayer();
+        // 7. プレイヤーをランダムな位置へ召喚        
+        await PlacePlayer();
 
         // 8. ダンジョンデータの読み込み
         LoadDungeonData();
@@ -161,7 +164,11 @@ public class DungeonEventManager : MonoBehaviour {
     }
 
     private Task InitializePlayer() {
-        player.InitializePlayer();
+        player.InitializePlayer();        
+        return Task.CompletedTask;
+    }
+
+    private Task PlacePlayer() {
         player.playerObjectData.SetPosition(TileManager.i.GetRandomPosition());
         return Task.CompletedTask;
     }
