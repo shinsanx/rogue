@@ -53,8 +53,9 @@ namespace RandomDungeonWithBluePrint {
         public void Initialize(BluePrintWithWeight[] bluePrints) {
             this.bluePrints = bluePrints;
             Random.InitState(DateTime.Now.Millisecond);
-            generateButton.onClick.AddListener(() => Create(Raffle()));
-            generateButton.onClick.Invoke();
+            Create(Raffle());
+            //generateButton.onClick.AddListener(() => Create(Raffle()));
+            //generateButton.onClick.Invoke();
         }
     }
 }

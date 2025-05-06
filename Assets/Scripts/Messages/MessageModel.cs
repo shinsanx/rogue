@@ -6,6 +6,7 @@ using System;
 public class MessageModel {
     public event Action OnChanged;
     public event Action OnTimeout;              // 3 秒無入力タイムアウト
+    public event Action OnOverFlow;             // 4 件目が来た！
 
     const int MaxShown = 3;
     const float Interval = 1f;               // 1 秒ごとに表示
@@ -44,6 +45,7 @@ public class MessageModel {
         if (_shown.Count > MaxShown)           // 4 件目が来た！
         {
             _shown.Dequeue();                  // 最古を drop → View がフェード
+            OnOverFlow?.Invoke();            // View に「1 件消して！」通知
         }
 
         _lastAddTime = Time.time;

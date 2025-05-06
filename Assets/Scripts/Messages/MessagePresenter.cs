@@ -9,6 +9,7 @@ public class MessagePresenter : MonoBehaviour {
         model = new MessageModel(this);
         model.OnChanged += () => view.Render(model.Shown);
         model.OnTimeout += view.FadeOutAll;
+        model.OnOverFlow += view.FadeOutTop;
     }
 
     /* まとめ送信口 */
