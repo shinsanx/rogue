@@ -9,6 +9,7 @@ using System.Linq;
 public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectReceiver {
     // === Serialized Fields ===            
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;
+    [SerializeField] private UserInput userInput;
 
     // === Private Fields ===
     private PlayerMoveLogic playerMoveLogic;
@@ -138,7 +139,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
         }
         if (isConfusion.Value) {
             // RandomMoveが成功したときのみ終了
-            if (playerMoveLogic.RandomMove()) return;                        
+            if (playerMoveLogic.RandomMove()) return;
         }
         if (dashInput.Value) {
             moveSpeed.Value = 0.05f;
@@ -160,11 +161,19 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     }
 
     // オブジェクトの位置を変更するメソッド
-    public void MovePosition() {        
-        transform.DOMove(playerObjectData.Position.Value.ToVector2() + moveOffset, moveSpeed.Value)
+    public void MovePosition() {
+        // ① これから動く “目標グリッド座標” を一旦キャッシュ
+        Vector2 targetGridPos = playerObjectData.Position.Value.ToVector2();
+
+        transform.DOMove(targetGridPos + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
             .OnComplete(() => {
-                CanMove.Value = true;
+                // ② 実際に動き終わったワールド座標を逆変換して
+                //    ObjectData に書き戻すだけで OK
+                Vector2Int snapped = Vector2Int.RoundToInt(transform.position - (Vector3)moveOffset);
+                playerObjectData.Position.SetValue(snapped);
+
+                CanMove.Value = true;   // 元の処理
             });
     }
 
@@ -187,9 +196,10 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     // ================ Methods ======================
     // ================================================
     public void InitializePlayer() {
+        userInput.OnMoveInputAction += PlayerMove;
         SetPlayerStatusDefault();
         //playerObjectData.SetId(CharacterManager.GetUniqueID());
-        playerMoveLogic = new PlayerMoveLogic(CanMove,playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput, TileManager.i);
+        playerMoveLogic = new PlayerMoveLogic(CanMove, playerObjectData, OnPlayerStateComplete, OnPlayerDirectionChanged, playerFaceDirection, OnItemPicked, currentSelectedObjectSO, fixDiagonalInput, TileManager.i);
         playerAttackLogic = new PlayerAttackLogic(this, OnPlayerStateComplete, objectDataSet, playerFaceDirection, OnPlayerAttack, OnPlayerDirectionChanged);
         playerStatusDataLogic = new PlayerStatusDataLogic(this, createMessageLogic, onMessageSend);
     }
@@ -240,8 +250,8 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     }
 
     public void HandleItemPicked(bool success) {
-        playerMoveLogic.HandleItemPicked(success);        
-    }   
+        playerMoveLogic.HandleItemPicked(success);
+    }
 
     // ちからの最大値を上げる
     public void MuscleUp(int amount) {

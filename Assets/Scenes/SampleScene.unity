@@ -998,8 +998,7 @@ MonoBehaviour:
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
   canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}
   PlayerCanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
-  diagonalInputBufferTime: 0.1
-  inputLockDuration: 0.2
+  CanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
   OnMoveInput: {fileID: 11400000, guid: 03cacfb776acc43c88e852af9247d30b, type: 2}
   OnMenuOpenInput: {fileID: 11400000, guid: b87e98a9bf8da441ba2298f0b0e3dde3, type: 2}
@@ -6278,6 +6277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectDataSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
+  userInput: {fileID: 190771914}
   createMessageLogic: {fileID: 11400000, guid: 484b2ecb0f15046118a416552d4625f1, type: 2}
   playerObjectData: {fileID: 1419592883}
   currentSelectedObjectSO: {fileID: 11400000, guid: f4e44cb9f07594a79be9ebbeaa8c7202, type: 2}

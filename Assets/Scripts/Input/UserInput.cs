@@ -1,8 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Events;
 using System.Threading.Tasks;
 using System;
 
@@ -13,22 +11,21 @@ public class UserInput : MonoBehaviour {
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
     [SerializeField] private BoolVariable canHandleInput;
     [SerializeField] private BoolVariable PlayerCanMove;
+    // === unified move‑handling ===
+    [SerializeField] private BoolVariable CanMove;   // Player が移動可能になると true
+    private int horizontal = 0;                      // ‑1(左) / 0 / 1(右)
+    private int vertical = 0;                      // ‑1(下) / 0 / 1(上)
+    private enum Axis { None, Horizontal, Vertical }
+    private Axis lastAxisChanged = Axis.None;        // 直近に変化した軸
+    private Coroutine moveRepeatCoroutine = null;    // 移動ループ用
+    private bool awaitingFirstStep = false;      // 単発入力 → 初回 1 歩をまだ送っていない
+    private Coroutine firstStepCoroutine = null;
 
-    // 斜め入力バッファリング用
-    [SerializeField] private float diagonalInputBufferTime = 0.1f; // バッファ時間（秒）
-    private Vector2 lastInputDirection = Vector2.zero;
-    private float lastInputTime = 0f;
-    private bool isBufferingInput = false;
-    private Coroutine bufferCoroutine = null;
-
-    // 入力ロック機構
-    [SerializeField] private float inputLockDuration = 0.2f; // 入力ロック時間（秒）
-    private bool isInputLocked = false;
-    private Coroutine inputLockCoroutine = null;
 
     // イベント
     public GameEvent OnAttackInput;
     public Vector2EventChannelSO OnMoveInput;
+    public Action<Vector2> OnMoveInputAction; //移動
     public GameEvent OnMenuOpenInput;
     public GameEvent OnMenuCloseInput;
     public Vector2EventChannelSO OnNavigateInput;
@@ -42,6 +39,18 @@ public class UserInput : MonoBehaviour {
     [SerializeField] private BoolVariable zDashInput;
     [SerializeField] private FloatVariable moveSpeed;
     private bool isFootStep = false;
+
+    // 「押しっぱなしで連続移動」を始めるまで／次の1歩までのポーズ (秒)
+    [SerializeField, Tooltip("キーを押し続けたとき2歩目以降が出るまでの待ち時間")]
+    private float repeatDelay = 0.15f;
+
+    // 2 軸が「ほぼ同時」に押されたと判定する許容時間 (秒)
+    [SerializeField, Tooltip("この時間以内に上下左右が同時に押されると斜め移動を許可")]
+    private float simultaneousThreshold = 0.1f;
+
+    // 押下されたフレームの時刻
+    private float horizontalPressedAt = 0f;
+    private float verticalPressedAt = 0f;
 
     [SerializeField] private InputActionAsset inputActionAsset; //アクションマップ
     private InputActionMap playerActionMap;
@@ -82,182 +91,114 @@ public class UserInput : MonoBehaviour {
     // ==================== Playerの入力 ====================
     // ================================================
 
-    //移動
+    // 移動の入力は NewInputSystem コールバック一本化
     public void OnMove(InputAction.CallbackContext context) {
-        if (context.started) {
-            //isMoveButtonLongPrresed.Value = true;
-            return;
+        // performed / canceled だけで十分
+        if (!(context.performed || context.canceled)) return;
+
+        // ── 1) 現在の生入力 ─────────────────────────
+        Vector2 raw = context.ReadValue<Vector2>();
+        int newH = Mathf.RoundToInt(raw.x);
+        int newV = Mathf.RoundToInt(raw.y);
+
+        bool changed = false;
+        if (newH != horizontal) {
+            horizontal = newH;
+            if (newH != 0) horizontalPressedAt = Time.time;
+            if (newH != 0) lastAxisChanged = Axis.Horizontal;
+            changed = true;
         }
-        if (context.canceled) {
-            //isMoveButtonLongPrresed.Value = false;
-            return;
+        if (newV != vertical) {
+            vertical = newV;
+            if (newV != 0) verticalPressedAt = Time.time;
+            if (newV != 0) lastAxisChanged = Axis.Vertical;
+            changed = true;
         }
 
-        // 入力がロックされている場合は処理しない
-        if (isInputLocked) {
-            return;
-        }
-
-        if (!canHandleInput.Value) {
-            return;
-        }
-
-        // 現在の入力を取得
-        Vector2 currentInput = context.ReadValue<Vector2>();
+        if (!changed) return; // 方向に全く変化なし
 
 
-        // 入力値を四捨五入して方向ベクトルに変換
-        Vector2 roundedInput = new Vector2(
-            Mathf.Round(currentInput.x),
-            Mathf.Round(currentInput.y)
-        );
-
-        // 入力がない場合は処理しない
-        if (roundedInput == Vector2.zero) return;
-
-        // 現在時刻を取得
-        float currentTime = Time.time;
-
-        // 前回の入力からの経過時間を計算
-        float timeSinceLastInput = currentTime - lastInputTime;
-
-        // バッファ時間内に新しい入力があった場合
-        if (timeSinceLastInput <= diagonalInputBufferTime && lastInputDirection != Vector2.zero) {
-            // 前回の入力と現在の入力を組み合わせて斜め入力を作成
-            Vector2 combinedInput = lastInputDirection + roundedInput;
-
-            // 斜め入力の正規化（-1〜1の範囲に収める）
-            combinedInput.x = Mathf.Clamp(combinedInput.x, -1f, 1f);
-            combinedInput.y = Mathf.Clamp(combinedInput.y, -1f, 1f);
-
-            // 斜め入力になっている場合のみ処理
-            if (Mathf.Abs(combinedInput.x) > 0 && Mathf.Abs(combinedInput.y) > 0) {
-                // 実行中のコルーチンがあれば停止
-                if (bufferCoroutine != null) {
-                    StopCoroutine(bufferCoroutine);
-                    bufferCoroutine = null;
-                }
-
-                inputVector = combinedInput;
-                OnMoveInput.RaiseEvent(inputVector);
-
-                // バッファをリセット
-                lastInputDirection = Vector2.zero;
-                isBufferingInput = false;
-
-                // 入力をロックして余分な入力を防止
-                LockInput();
-
-                return;
+        // ── 2) すべてキーが離された場合 ─────────────────
+        if (horizontal == 0 && vertical == 0) {
+            // 全停止
+            if (moveRepeatCoroutine != null) {
+                StopCoroutine(moveRepeatCoroutine);
+                moveRepeatCoroutine = null;
             }
-        }
-        inputVector = roundedInput;
-
-        // バッファリング中でない場合は通常の入力処理
-        if (!isBufferingInput) {
-            // バッファリングを開始
-            isBufferingInput = true;
-            lastInputDirection = roundedInput;
-            lastInputTime = currentTime;
-
-            // 実行中のコルーチンがあれば停止
-            if (bufferCoroutine != null) {
-                StopCoroutine(bufferCoroutine);
+            if (awaitingFirstStep && firstStepCoroutine != null) {
+                StopCoroutine(firstStepCoroutine);
+                awaitingFirstStep = false;
             }
-
-            // バッファ時間後に入力を処理するコルーチンを開始
-            bufferCoroutine = StartCoroutine(ProcessBufferedInput());
-        } else {
-            // バッファリング中に新しい入力があった場合は更新
-            lastInputDirection = roundedInput;
-            lastInputTime = currentTime;
-        }
-    }
-
-    // バッファ時間後に入力を処理するコルーチン
-    private IEnumerator ProcessBufferedInput() {
-        yield return new WaitForSeconds(diagonalInputBufferTime);
-
-        // バッファ時間後も斜め入力が検出されなかった場合は、最後の入力を処理
-        if (isBufferingInput && lastInputDirection != Vector2.zero) {
-            inputVector = lastInputDirection;
-            OnMoveInput.RaiseEvent(inputVector);
-
-            // バッファをリセット
-            lastInputDirection = Vector2.zero;
-            isBufferingInput = false;
-        }
-
-        bufferCoroutine = null;
-    }
-
-    // 入力をロックする
-    private void LockInput() {
-        isInputLocked = true;
-
-        // 既存のロック解除コルーチンがあれば停止
-        if (inputLockCoroutine != null) {
-            StopCoroutine(inputLockCoroutine);
-        }
-
-        // 指定時間後に入力ロックを解除するコルーチンを開始
-        inputLockCoroutine = StartCoroutine(UnlockInputAfterDelay());
-    }
-
-    // 指定時間後に入力ロックを解除するコルーチン
-    private IEnumerator UnlockInputAfterDelay() {
-        yield return new WaitForSeconds(inputLockDuration);
-        isInputLocked = false;
-        inputLockCoroutine = null;
-    }
-
-
-
-
-    //長押し移動
-    public void OnLongPress(InputAction.CallbackContext context) {
-        
-        if (context.performed) {
-            isMoveButtonLongPrresed.Value = true;
-            MoveContinuously();
-            return;
-        }
-        if (context.canceled) {
-            isMoveButtonLongPrresed.Value = false;
             return;
         }
 
-
-
+        // ── 3) まだ移動ループが始まっていないなら、まず「初回 1 歩」用のキューを準備 ──
+        if (!awaitingFirstStep && moveRepeatCoroutine == null) {
+            awaitingFirstStep = true;
+            firstStepCoroutine = StartCoroutine(FirstStepCoroutine());
+        }
     }
 
-    // 長押し移動
-    private async void MoveContinuously() {
-        if (!isMoveButtonLongPrresed.Value) return;
 
-        while (isMoveButtonLongPrresed.Value) {
-            if (!canHandleInput.Value) return;
+    // 押下直後の "初回 1 歩だけ" を送るための小さな待機
+    private IEnumerator FirstStepCoroutine() {
+        // 次フレームまで待機して、ほぼ同時押しを拾う
+        yield return null;
 
-            // 移動中フラグがfalseになるまで待つ
-            while (!PlayerCanMove.Value) {
-                await Task.Yield();
+        // Player 側がまだ移動中なら完了を待つ
+        while (!CanMove.Value) yield return null;
+
+        Vector2Int dir = ComputeStepDirection();
+        if (dir != Vector2Int.zero) {
+            OnMoveInputAction?.Invoke(dir);
+        }
+
+        awaitingFirstStep = false;
+        firstStepCoroutine = null;
+
+        // キーが押下されたままなら連続移動ループを開始
+        if (horizontal != 0 || vertical != 0) {
+            moveRepeatCoroutine = StartCoroutine(MoveRepeat(true)); // true = 最初の待機を挟む
+        }
+    }
+
+    // 連続移動コルーチン
+    // initialPause == true の場合、最初に repeatDelay を空けてからループ
+    private IEnumerator MoveRepeat(bool initialPause = false) {
+        if (initialPause) yield return new WaitForSeconds(repeatDelay);
+
+        while (horizontal != 0 || vertical != 0) {
+            // Player 側の移動完了を待つ
+            while (!CanMove.Value) yield return null;
+
+            Vector2Int dir = ComputeStepDirection();
+            if (dir != Vector2Int.zero) {
+                OnMoveInputAction?.Invoke(dir);
             }
 
-            // 最新の入力を取得する
-            Vector2 rawInput = GetCurrentInput();
+            // 次のステップまでポーズ
+            yield return new WaitForSeconds(repeatDelay);
+        }
+        moveRepeatCoroutine = null;
+    }
 
-            Vector2 rounded = new Vector2(Mathf.Round(rawInput.x), Mathf.Round(rawInput.y));
-            if (rounded == Vector2.zero) {
-                await Task.Yield();
-                continue;
+    // 現在保持している水平・垂直入力から “今回 1 マスだけ” の方向を決定
+    private Vector2Int ComputeStepDirection() {
+        // 斜め判定
+        if (horizontal != 0 && vertical != 0) {
+            // ほぼ同時押しなら斜め移動を許可
+            if (Mathf.Abs(horizontalPressedAt - verticalPressedAt) <= simultaneousThreshold) {
+                return new Vector2Int(horizontal, vertical);
             }
 
-            inputVector = rounded.normalized;
-            OnMoveInput.RaiseEvent(inputVector);
-            PlayerCanMove.Value = false;
-
-            await Task.Delay((int)(moveSpeed.Value * 1000));
+            // 片方後押しなら最後に変化した軸を優先
+            return lastAxisChanged == Axis.Horizontal
+                ? new Vector2Int(horizontal, 0)
+                : new Vector2Int(0, vertical);
         }
+
+        // 単一軸押し
+        return new Vector2Int(horizontal, vertical);
     }
 
     //入力を取得する
