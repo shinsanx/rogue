@@ -164,6 +164,8 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     public void MovePosition() {
         // ① これから動く “目標グリッド座標” を一旦キャッシュ
         Vector2 targetGridPos = playerObjectData.Position.Value.ToVector2();
+        OnPlayerStateComplete.Raise();        // ★行動完了をここで 1 回だけ通知
+
 
         transform.DOMove(targetGridPos + moveOffset, moveSpeed.Value)
             .SetEase(Ease.Linear)
@@ -173,7 +175,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
                 Vector2Int snapped = Vector2Int.RoundToInt(transform.position - (Vector3)moveOffset);
                 playerObjectData.Position.SetValue(snapped);
 
-                CanMove.Value = true;   // 元の処理
+                CanMove.Value = true;                 // 移動解除
             });
     }
 

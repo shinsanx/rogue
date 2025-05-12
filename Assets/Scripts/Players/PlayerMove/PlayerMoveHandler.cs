@@ -76,7 +76,7 @@ public class PlayerMoveHandler {
         Vector2 newPosition = targetPos + new Vector2(0.5f, 0.5f);
         objectData.SetPosition(newPosition.ToVector2Int());
 
-        onPlayerStateComplete.Raise();
+        //onPlayerStateComplete.Raise();
     }
 
     public bool RandomMove() {

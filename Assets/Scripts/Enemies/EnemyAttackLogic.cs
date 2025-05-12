@@ -11,10 +11,8 @@ public class EnemyAttackLogic
 
     private DamageCalculate damageCalculate;
     private Enemy enemy;
+        
     
-
-    private StateMachine stateMachine;
-    private State enemyState;
     private int targetDefencePw;
 
     public EnemyAttackLogic(
@@ -23,8 +21,6 @@ public class EnemyAttackLogic
         this.enemy = enemy;
         this.enemyAnimLogic = enemy.enemyAnimLogic;
         this.objectData = enemy.objectData;
-        stateMachine = GameAssets.i.stateMachine;
-        enemyState = GameAssets.i.enemyState;            
     }
 
     public void Attack(GameObject go, Vector2Int direction){

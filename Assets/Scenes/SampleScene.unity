@@ -999,6 +999,8 @@ MonoBehaviour:
   canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}
   PlayerCanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   CanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
+  repeatDelay: 0.3
+  inputActionAsset: {fileID: -944628639613478452, guid: b3ec8069520734aebb96eda0effdc605, type: 3}
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
   OnMoveInput: {fileID: 11400000, guid: 03cacfb776acc43c88e852af9247d30b, type: 2}
   OnMenuOpenInput: {fileID: 11400000, guid: b87e98a9bf8da441ba2298f0b0e3dde3, type: 2}
@@ -1011,7 +1013,6 @@ MonoBehaviour:
   dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
   zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
   moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
-  inputActionAsset: {fileID: -944628639613478452, guid: b3ec8069520734aebb96eda0effdc605, type: 3}
 --- !u!114 &190771916
 MonoBehaviour:
   m_ObjectHideFlags: 0
