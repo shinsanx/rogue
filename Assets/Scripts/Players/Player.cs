@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectReceiver {
@@ -151,13 +152,14 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
             playerMoveLogic.MoveByInput(direction);
         }
     }
-    public void PlayerAttack() {
+    public async void PlayerAttack() {
         if (isConfusion.Value) {
-            if (playerAttackLogic.ConfusionAttack()) {
+            bool result = await playerAttackLogic.ConfusionAttackAsync();
+            if (result) {
             }
             return;
         }
-        playerAttackLogic.Attack();
+        await playerAttackLogic.AttackAsync();
     }
 
     // オブジェクトの位置を変更するメソッド
@@ -175,7 +177,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
                 Vector2Int snapped = Vector2Int.RoundToInt(transform.position - (Vector3)moveOffset);
                 playerObjectData.Position.SetValue(snapped);
 
-                CanMove.Value = true;                 // 移動解除
+                //CanMove.Value = true;                 // 移動解除
             });
     }
 

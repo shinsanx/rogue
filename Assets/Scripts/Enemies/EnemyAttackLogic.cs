@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Threading.Tasks;
 
 public class EnemyAttackLogic
 {
@@ -11,6 +12,7 @@ public class EnemyAttackLogic
 
     private DamageCalculate damageCalculate;
     private Enemy enemy;
+    private bool isAttacking = false;
         
     
     private int targetDefencePw;
@@ -25,6 +27,22 @@ public class EnemyAttackLogic
 
     public void Attack(GameObject go, Vector2Int direction){
         DealDamage(go, direction);        
+    }
+
+    public async Task AttackAsync(GameObject go, Vector2Int direction){
+        if(isAttacking) return;
+        isAttacking = true;
+
+        var tcs = new TaskCompletionSource<bool>();
+
+        enemyAnimLogic.SetAttackAnimation(direction, OnComplete: () => tcs.TrySetResult(true));
+
+        DealDamage(go, direction);
+        await tcs.Task;
+
+        await Task.Delay(500);
+        isAttacking = false;
+        Debug.Log("AttackAsync end");
     }
 
     

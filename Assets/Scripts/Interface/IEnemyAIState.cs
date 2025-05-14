@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
 public interface IEnemyAIState
 {
@@ -16,5 +17,7 @@ public interface IEnemyAIState
     Vector2Int StartPosition { get; set; }
     Vector2Int EndPosition { get; set; }
     List<Vector2Int> MonsterView { get; set; }
-    List<Vector2Int> RouteCache { get; set; }   
+    List<Vector2Int> RouteCache { get; set; }
+    /// <summary> 敵の行動を実行し、終了したら完了する Task を返す </summary>
+    Task ExecuteActionAsync(EnemyAction action);
 }

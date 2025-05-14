@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 143c68fcbacc944ea86894e5738ba50d, type: 3}
   m_Name: TestDungeonFloor1
   m_EditorClassIdentifier: 
-  InitialEnemyCount: 2
+  InitialEnemyCount: 5
   InitialItemCount: 8
   EnemyTable: {fileID: 11400000, guid: 7f5c19a4949c54f049174d0ead324492, type: 2}
   ItemTable: {fileID: 11400000, guid: e38b9b30e78134762a43087eff912f55, type: 2}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(Animator))]
 
@@ -84,30 +85,30 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     public List<Vector2Int> MonsterView { get; set; }
     public List<Vector2Int> RouteCache { get; set; }
     public const int Threshold = 100; //行動の閾値
-    public int actionRate {get;set;}=50;
+    public int actionRate { get; set; } = 50;
     public int TimeGage = 0;
 
 
     // ========================================================
     // ===================== Methods =====================
     // ========================================================
-    public void ExecuteAction(EnemyAction action) {
-        if (action == null) {
-            return;
-        }
-        switch (action.Type) {
-            case ActionType.Move:
-                enemyMoveLogic.Move(action.TargetPosition, action.Direction);
-                break;
-            case ActionType.Attack:
-                enemyAttackLogic.Attack(action.Target, action.Direction);
-                break;
-            case ActionType.Sleep:
-                Debug.Log("ねむっています");
-                break;
-        }
-        TimeGage -= Threshold; //行動したらゲージ消費 
-    }
+    // public void ExecuteAction(EnemyAction action) {
+    //     if (action == null) {
+    //         return;
+    //     }
+    //     switch (action.Type) {
+    //         case ActionType.Move:
+    //             enemyMoveLogic.Move(action.TargetPosition, action.Direction);
+    //             break;
+    //         case ActionType.Attack:
+    //             enemyAttackLogic.Attack(action.Target, action.Direction);
+    //             break;
+    //         case ActionType.Sleep:
+    //             Debug.Log("ねむっています");
+    //             break;
+    //     }
+    //     TimeGage -= Threshold; //行動したらゲージ消費 
+    // }
 
     public void InitializeEnemy() {
         CreateSOInstance();
@@ -157,6 +158,27 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         TickStatusEffects();
     }
 
+    public async Task ExecuteActionAsync(EnemyAction action) {
+        switch (action.Type) {
+            case ActionType.Attack:
+                Debug.Log("start");
+                await enemyAttackLogic.AttackAsync(action.Target, action.Direction);
+                Debug.Log("end");
+                break;
+
+            case ActionType.Move:
+                enemyMoveLogic.Move(action.TargetPosition, action.Direction);
+                break;
+
+            case ActionType.Sleep:
+                await Task.Delay(200);          // ただ待つだけでも OK
+                break;
+        }
+        TimeGage = 0; //行動したらゲージ消費 
+
+        // ここに来た時点で完了
+    }
+
 
 
     // ========================================================
@@ -201,8 +223,8 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
     }
 
     public void TickStatusEffects() {
-        foreach (var instance in activeEffects.ToList()) {            
-            instance.Tick();            
+        foreach (var instance in activeEffects.ToList()) {
+            instance.Tick();
             if (instance.IsExpired) {
                 instance.EndEffect();
                 activeEffects.Remove(instance);

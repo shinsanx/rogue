@@ -14,7 +14,7 @@ public class StateMachine : ScriptableObject
 
     public void init(){
         _currentState = null; //生成した時に前の情報を引き継がない
-        SetState(defaultState);
+        //SetState(defaultState);
     }
 
     public void SetState(State newState){

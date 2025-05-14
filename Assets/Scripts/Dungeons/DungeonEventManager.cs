@@ -31,12 +31,13 @@ public class DungeonEventManager : MonoBehaviour {
 
 
     private async void Start() {
+
+
         // 1. TileManagerの初期化
         await InitializeTileManager();
 
 
-        // 1. StateMachineの初期化を最初に行う
-        await InitializeStateMachine();
+        
 
 
         // 2. ミニマップの初期化
@@ -50,6 +51,10 @@ public class DungeonEventManager : MonoBehaviour {
 
         // 6. ダンジョンステートマネージャーの初期化
         await InitializeDungeonStateManager();
+
+        // 1. StateMachineの初期化を最初に行う
+        await InitializeStateMachine();
+
 
         // 7. プレイヤーをランダムな位置へ召喚
         await InitializePlayer();
@@ -89,8 +94,13 @@ public class DungeonEventManager : MonoBehaviour {
         
                 // 2. キャラクターマネージャーの初期化
         //await InitializeCharacterManager();
+
+        await InitializeDungeonStateManager();
+
         // 1. StateMachineの初期化を最初に行う
         await InitializeStateMachine();
+
+        // 6. ダンジョンステートマネージャーの初期化
 
         // 2. ミニマップの初期化
         await InitializeAutoMapping();
@@ -100,8 +110,7 @@ public class DungeonEventManager : MonoBehaviour {
 
         InitializeMapBoundaries(randomMapGenerator.currentField.Size);
 
-        // 6. ダンジョンステートマネージャーの初期化
-        await InitializeDungeonStateManager();
+        
 
         // 7. プレイヤーをランダムな位置へ召喚        
         await PlacePlayer();

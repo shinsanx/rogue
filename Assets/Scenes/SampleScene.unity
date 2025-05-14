@@ -994,25 +994,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d43b19d3af1a4a78a31e360f2c3ac77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMoveButtonLongPrresed: {fileID: 11400000, guid: 1c3aaaa326d4246a29ae9c69830a0e28, type: 2}
-  isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
-  canHandleInput: {fileID: 11400000, guid: 5c3b3476d598e480eafc9c5cd3855459, type: 2}
-  PlayerCanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   CanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
   repeatDelay: 0.3
   inputActionAsset: {fileID: -944628639613478452, guid: b3ec8069520734aebb96eda0effdc605, type: 3}
+  isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
+  fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
+  dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
+  zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
   OnAttackInput: {fileID: 11400000, guid: 31794e34aa2a44ed197c0bac065b2a48, type: 2}
-  OnMoveInput: {fileID: 11400000, guid: 03cacfb776acc43c88e852af9247d30b, type: 2}
   OnMenuOpenInput: {fileID: 11400000, guid: b87e98a9bf8da441ba2298f0b0e3dde3, type: 2}
   OnMenuCloseInput: {fileID: 11400000, guid: 2625e7f99d1eb4d98be2c5f6ca47ac8e, type: 2}
   OnNavigateInput: {fileID: 11400000, guid: 33ed4e14321dc4ef5a12cc99b7e44a8b, type: 2}
   OnSubmitInput: {fileID: 11400000, guid: 0ef092ca94e18488b97c484a460e071f, type: 2}
   OnAutoTurnInput: {fileID: 11400000, guid: 0b697caa8fc9b41899c0b55d6f805e7c, type: 2}
   OnFootStepInput: {fileID: 11400000, guid: b2580d970ef5d457799be75b4f11de84, type: 2}
-  fixDiagonalInput: {fileID: 11400000, guid: 70cfa75bdef554f849e16c56dd493683, type: 2}
-  dashInput: {fileID: 11400000, guid: 7bd8561672095444bbbd0b1ba3d135d8, type: 2}
-  zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
-  moveSpeed: {fileID: 11400000, guid: 4127c5717f42f4adab3708e963d7d9a9, type: 2}
 --- !u!114 &190771916
 MonoBehaviour:
   m_ObjectHideFlags: 0

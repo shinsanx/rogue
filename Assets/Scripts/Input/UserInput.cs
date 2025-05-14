@@ -116,7 +116,7 @@ public class UserInput : MonoBehaviour {
 
             // まだバッファ空 or 片軸しか入ってなければ上書き
             if (queuedDir == Vector2Int.zero || queuedDir.x == 0 || queuedDir.y == 0)
-                queuedDir = newDir;            
+                queuedDir = newDir;
             return;
         }
 
