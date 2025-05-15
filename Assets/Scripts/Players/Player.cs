@@ -153,13 +153,16 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
         }
     }
     public async void PlayerAttack() {
+        CanMove.Value = false;
         if (isConfusion.Value) {
             bool result = await playerAttackLogic.ConfusionAttackAsync();
             if (result) {
             }
+            CanMove.Value = true;
             return;
         }
         await playerAttackLogic.AttackAsync();
+        CanMove.Value = true;
     }
 
     // オブジェクトの位置を変更するメソッド

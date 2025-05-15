@@ -131,16 +131,21 @@ public class UserInput : MonoBehaviour {
     //  押下直後の 1 歩目だけ送るコルーチン
     // ─────────────────────────────
     private IEnumerator FirstStepCoroutine() {
-        yield return null;                     // 同時押し拾う
-        while (!CanMove.Value) yield return null;
+    yield return null;
+    while (!CanMove.Value) yield return null;
 
-        awaitingFirstStep = false;
-        firstStepCoroutine = null;
+    awaitingFirstStep = false;
+    firstStepCoroutine = null;
 
-        // 押しっぱなら MoveRepeat 開始（delay 無し）
-        if (horizontal != 0 || vertical != 0)
-            moveRepeatCoroutine = StartCoroutine(MoveRepeat(false));
+    Vector2Int dir = queuedDir != Vector2Int.zero ? queuedDir : ComputeStepDirection();
+    queuedDir = Vector2Int.zero;
+
+    if (dir != Vector2Int.zero) {
+        OnMoveInputAction?.Invoke(dir);
+        // 長押しならそのまま連続移動
+        moveRepeatCoroutine = StartCoroutine(MoveRepeat(false));
     }
+}
 
     // ─────────────────────────────
     //  連続移動コルーチン
