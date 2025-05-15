@@ -40,9 +40,8 @@ public class EnemyAttackLogic
         DealDamage(go, direction);
         await tcs.Task;
 
-        await Task.Delay(500);
+        //await Task.Delay(50); //Attackを遅らせるなら追加
         isAttacking = false;
-        Debug.Log("AttackAsync end");
     }
 
     

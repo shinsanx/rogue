@@ -33,48 +33,35 @@ public class EnemyManager : MonoBehaviour {
     // StateLogicで呼び出される
     // 敵の行動をスタートする
     public async void ProcessEnemies() {
-        // ① 毎ターン最初にキャッシュを更新
         playerPos = _playerPos.Value;
         enemies = objectDataSet.GetAllEnemies().Distinct().ToList();
 
-        /* ---------- Pass1 : Move 組 ---------- */
+        // Move組：並列
         var moveTasks = new List<Task>();
-
         foreach (var enemy in enemies) {
             enemy.Tick();
             if (!enemy.CanAct()) continue;
-
-            // 移動だけ許可
             EnemyAction action = AIStart(enemy, allowMove: true, allowAttack: false);
             if (action.Type == ActionType.Move) {
                 moveTasks.Add(enemy.ExecuteActionAsync(action));
             }
         }
-
-        await Task.WhenAll(moveTasks);   // 全員の移動が完了するまで待機
-
-        // 位置が確定するよう 1 フレーム挟む
+        await Task.WhenAll(moveTasks);
         await Task.Yield();
 
-        /* ---------- Pass2 : Attack 組 ---------- */
-        var attackTasks = new List<Task>();
-
+        // Attack組：1体ずつ順番に
         foreach (var enemy in enemies) {
             if (!enemy.CanAct()) continue;
-
-            // 今の位置でもう一度 AI 判定（攻撃のみ許可）
             EnemyAction action = AIStart(enemy, allowMove: false, allowAttack: true);
             if (action.Type == ActionType.Attack) {
-                attackTasks.Add(enemy.ExecuteActionAsync(action));
+                await enemy.ExecuteActionAsync(action);
             }
         }
 
-        await Task.WhenAll(attackTasks); // 攻撃アニメ＋余韻が全部終わるまで待機
-
-        /* ---------- ターン終了 ---------- */
         Debug.Log("敵の行動が完了しました");
         onCompleteEnemyTurn.Raise();
     }
+
 
 
     public EnemyAction AIStart(Enemy enemy, bool allowMove = true, bool allowAttack = true) {
@@ -119,11 +106,11 @@ public class EnemyManager : MonoBehaviour {
         }
 
         // --- ★ 絞り込みフィルタ ------------------------------------------
-    if (!allowMove   && enemyAction.Type == ActionType.Move)
-        enemyAction.Type = ActionType.None;
+        if (!allowMove && enemyAction.Type == ActionType.Move)
+            enemyAction.Type = ActionType.None;
 
-    if (!allowAttack && enemyAction.Type == ActionType.Attack)
-        enemyAction.Type = ActionType.None;
+        if (!allowAttack && enemyAction.Type == ActionType.Attack)
+            enemyAction.Type = ActionType.None;
 
         return enemyAction;
     }
