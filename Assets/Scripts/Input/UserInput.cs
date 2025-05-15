@@ -117,6 +117,11 @@ public class UserInput : MonoBehaviour {
             // まだバッファ空 or 片軸しか入ってなければ上書き
             if (queuedDir == Vector2Int.zero || queuedDir.x == 0 || queuedDir.y == 0)
                 queuedDir = newDir;
+
+            // CanMove が false でコルーチンが動いてなければ起動
+            if (!CanMove.Value && moveRepeatCoroutine == null)
+                moveRepeatCoroutine = StartCoroutine(MoveRepeat(false));
+
             return;
         }
 
@@ -131,21 +136,16 @@ public class UserInput : MonoBehaviour {
     //  押下直後の 1 歩目だけ送るコルーチン
     // ─────────────────────────────
     private IEnumerator FirstStepCoroutine() {
-    yield return null;
-    while (!CanMove.Value) yield return null;
+        yield return null;                     // 同時押し拾う
+        while (!CanMove.Value) yield return null;
 
-    awaitingFirstStep = false;
-    firstStepCoroutine = null;
+        awaitingFirstStep = false;
+        firstStepCoroutine = null;
 
-    Vector2Int dir = queuedDir != Vector2Int.zero ? queuedDir : ComputeStepDirection();
-    queuedDir = Vector2Int.zero;
-
-    if (dir != Vector2Int.zero) {
-        OnMoveInputAction?.Invoke(dir);
-        // 長押しならそのまま連続移動
-        moveRepeatCoroutine = StartCoroutine(MoveRepeat(false));
+        // 押しっぱなら MoveRepeat 開始（delay 無し）
+        if (horizontal != 0 || vertical != 0)
+            moveRepeatCoroutine = StartCoroutine(MoveRepeat(false));
     }
-}
 
     // ─────────────────────────────
     //  連続移動コルーチン
@@ -153,6 +153,10 @@ public class UserInput : MonoBehaviour {
     private IEnumerator MoveRepeat(bool initialPause) {
         if (initialPause)
             yield return new WaitForSeconds(repeatDelay);
+
+        // ★ CanMove が true になるまで待機
+        while (!CanMove.Value)
+            yield return null;
 
         while (horizontal != 0 || vertical != 0) {
             // 現移動完了待ち
