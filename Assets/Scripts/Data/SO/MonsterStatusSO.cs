@@ -15,4 +15,15 @@ public class MonsterStatusSO : ScriptableObject {
     public float ItemDropRate;
     public Sprite Sprite;
     public RuntimeAnimatorController AnimatorController;
+    public ApproachType ApproachType = ApproachType.None;
+    public float CustomApproachDistance = 0f;
+}
+
+
+public enum ApproachType
+{
+    None,     // 近づかない
+    Short,    // 少し近づく
+    Long,     // 大きく近づく
+    Custom    // ScriptableObjectで個別に距離指定
 }

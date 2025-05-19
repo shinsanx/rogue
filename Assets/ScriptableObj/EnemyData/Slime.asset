@@ -22,3 +22,5 @@ MonoBehaviour:
   ItemDropRate: 0.5
   Sprite: {fileID: -793291109, guid: 9b0695fa9c46042beb567075f38d1996, type: 3}
   AnimatorController: {fileID: 9100000, guid: df7f9eeea40db4a828a67adfb5499868, type: 2}
+  ApproachType: 2
+  CustomApproachDistance: 0

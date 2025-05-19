@@ -162,7 +162,7 @@ public class Enemy : MonoBehaviour, IDamageable, IMonsterStatusAdapter, IEnemyAI
         switch (action.Type) {
             case ActionType.Attack:
                 Debug.Log("start");
-                await enemyAttackLogic.AttackAsync(action.Target, action.Direction);
+                await enemyAttackLogic.AttackAsync(action.Target, action.Direction, monsterSO);
                 Debug.Log("end");
                 break;
 
