@@ -28,6 +28,7 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
     [SerializeField] private BoolVariable isTurnButtonLongPressed;
     [SerializeField] private BoolVariable zDashInput;
     [SerializeField] private BoolVariable CanMove;
+    [SerializeField] BoolVariable isPlayerMoveComplete; //EnemyMoveLogic.csで使用
     //private bool isMoving = false;
     //public bool IsMoving() => isMoving;
 
@@ -144,11 +145,12 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
         }
         if (dashInput.Value) {
             moveSpeed.Value = 0.05f;
-            playerMoveLogic.DashByInput(direction);
+            await playerMoveLogic.DashByInput(direction);
         } else if (zDashInput.Value) {
             moveSpeed.Value = 0.05f;
             await playerMoveLogic.ZDash(direction);
         } else {
+            isPlayerMoveComplete.Value = false;
             playerMoveLogic.MoveByInput(direction);
         }
     }
@@ -158,15 +160,15 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
             bool result = await playerAttackLogic.ConfusionAttackAsync();
             if (result) {
             }
-            CanMove.Value = true;
             return;
         }
         await playerAttackLogic.AttackAsync();
-        CanMove.Value = true;
+
     }
 
     // オブジェクトの位置を変更するメソッド
     public void MovePosition() {
+        if (CanMove.Value == false) return;
         // ① これから動く “目標グリッド座標” を一旦キャッシュ
         Vector2 targetGridPos = playerObjectData.Position.Value.ToVector2();
         OnPlayerStateComplete.Raise();        // ★行動完了をここで 1 回だけ通知
@@ -179,8 +181,8 @@ public class Player : MonoBehaviour, IDamageable, IPlayerStatusAdapter, IEffectR
                 //    ObjectData に書き戻すだけで OK
                 Vector2Int snapped = Vector2Int.RoundToInt(transform.position - (Vector3)moveOffset);
                 playerObjectData.Position.SetValue(snapped);
-
-                //CanMove.Value = true;                 // 移動解除
+                
+                isPlayerMoveComplete.Value = true;   // 移動完了
             });
     }
 

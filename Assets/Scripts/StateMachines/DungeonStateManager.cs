@@ -19,10 +19,7 @@ public class DungeonStateManager : MonoBehaviour {
 
     // Playerのターンを終わらせる
     public void PlayerActionComplete() {
-        Debug.Log("PlayerActionComplete");
-        if(playerTimeGage.Value >= 100) {
-            playerTimeGage.Value = 0;
-        }
+        Debug.Log("PlayerActionComplete");                
         if(stateMachine == null) {
             Debug.LogError("StateMachine is null");
             return;

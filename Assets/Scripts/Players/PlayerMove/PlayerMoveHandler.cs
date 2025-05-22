@@ -63,13 +63,13 @@ public class PlayerMoveHandler {
 
         if (fixDiagonalInput.Value){
              if (roundX == 0 || roundY == 0){
-                playerCanMove.Value = true;
+                //playerCanMove.Value = true;
                  return;
                  }
         }
 
         if (!tileManager.CheckMovableTile(currentPos, targetPos)){
-            playerCanMove.Value = true;
+            //playerCanMove.Value = true;
             return;
         } 
 

@@ -37,11 +37,10 @@ public class EnemyAnimLogic {
         //seq.AppendInterval(0.2f);
 
         // ② 攻撃アニメ（OnMoveAnimation, OnAttackAnimationはそのまま）
-        seq.InsertCallback(0f,() => {
+        seq.InsertCallback(0f, () => {
             animationAdapter.MoveAnimationDirection.SetValue(direction);
             animationAdapter.OnMoveAnimation();
             animationAdapter.OnAttackAnimation();
-            Debug.Log("anim");
         });
 
         if (approachDistance > 0f) {
@@ -49,7 +48,7 @@ public class EnemyAnimLogic {
             seq.Append(spriteRenderer.transform.DOLocalMove(targetPos, 0.07f));
         }
 
-        
+
 
         // ③ 元に戻る
         if (approachDistance > 0f) {

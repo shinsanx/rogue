@@ -7,8 +7,7 @@ using System;
 
 public class EnemyManager : MonoBehaviour {
     private List<Enemy> enemies = new List<Enemy>();
-    private StateMachine stateMachine;
-    private State enemyState;
+
     private IEnemyAIState enemyAIState;
     private GameObject player;
     [SerializeField] private Vector2IntVariable _playerPos;
@@ -20,10 +19,9 @@ public class EnemyManager : MonoBehaviour {
     private AStarPathfinding pathfinding;
     [SerializeField] private ObjectDataRuntimeSet objectDataSet;
     [SerializeField] GameEvent onCompleteEnemyTurn;
+    [SerializeField] BoolVariable isPlayerMoveComplete; //Playerが移動完了したかどうか
 
     public void Initialize() {
-        stateMachine = GameAssets.i.stateMachine;
-        enemyState = GameAssets.i.enemyState;
         player = objectDataSet.GetPlayer();
         // MainThreadHelperのインスタンスを確実に生成
         var helper = MainThreadHelper.Instance;
@@ -50,17 +48,24 @@ public class EnemyManager : MonoBehaviour {
         await Task.Yield();
 
         // Attack組：1体ずつ順番に
+
         foreach (var enemy in enemies) {
             if (!enemy.CanAct()) continue;
             EnemyAction action = AIStart(enemy, allowMove: false, allowAttack: true);
             if (action.Type == ActionType.Attack) {
+                if (!isPlayerMoveComplete.Value) {
+                    Debug.Log("Playerが移動完了していないため、待ちます");
+                    await Task.Delay(500);
+                    isPlayerMoveComplete.Value = true;
+                }
                 await enemy.ExecuteActionAsync(action);
             }
         }
 
-        Debug.Log("敵の行動が完了しました");
         onCompleteEnemyTurn.Raise();
     }
+
+
 
 
 

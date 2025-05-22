@@ -6285,6 +6285,7 @@ MonoBehaviour:
   isTurnButtonLongPressed: {fileID: 11400000, guid: 7e3e0cbc43f504fe09cdef7f3fd41bb5, type: 2}
   zDashInput: {fileID: 11400000, guid: 94e1e0201443a4531b22bbbc88b82d44, type: 2}
   CanMove: {fileID: 11400000, guid: 92fd4205d6cd74095aebaef03611107e, type: 2}
+  isPlayerMoveComplete: {fileID: 11400000, guid: 3ad8f6cb429d5443095f039993fe88ea, type: 2}
   timeGage: {fileID: 11400000, guid: 59b1387367938454883e43daae9425cc, type: 2}
   playerActionRate: {fileID: 11400000, guid: 84c431937f2a3439d8e1072d12bacea6, type: 2}
   OnPlayerLevelChanged: {fileID: 11400000, guid: 68d63f544ab764ad586a0e0db930cd56, type: 2}
@@ -7604,6 +7605,7 @@ MonoBehaviour:
   _playerPos: {fileID: 11400000, guid: 2a0401bef74d141588319b077f8888e1, type: 2}
   objectDataSet: {fileID: 11400000, guid: e04ab0521662c413d97c3f1595554919, type: 2}
   onCompleteEnemyTurn: {fileID: 11400000, guid: 90d1d9bfa98a04112a8d5a034a827931, type: 2}
+  isPlayerMoveComplete: {fileID: 11400000, guid: 3ad8f6cb429d5443095f039993fe88ea, type: 2}
 --- !u!114 &1665713302
 MonoBehaviour:
   m_ObjectHideFlags: 0

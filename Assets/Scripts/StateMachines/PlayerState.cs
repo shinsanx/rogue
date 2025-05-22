@@ -19,13 +19,14 @@ public class PlayerState : State {
     [SerializeField] GameEvent playerTickStatusEffects;
 
     public override async void OnEnter() {
+        Debug.Log("PlayerStateが開始されました");
         canHandleInput.Value = true;
         canPlayerMove.Value = true;
 
         // StatusEffectのTick実行
         playerTickStatusEffects.Raise();
 
-        if (!canHandleInput.Value) {
+        if (!canPlayerMove.Value) {
             Debug.Log("行動できない状態");
             await Task.Delay(500);
             playerStateComplete.Raise();
@@ -36,13 +37,16 @@ public class PlayerState : State {
         playerTimeGage.Value += playerActionRate.Value;
 
         if (playerTimeGage.Value >= 100) {
-            canHandleInput.Value = true;
+            canPlayerMove.Value = true;
         } else {
             playerStateComplete.Raise();
         }
     }
 
-    public override void OnExit() {
+    public override void OnExit() {        
+        if(playerTimeGage.Value >= 100) {
+            playerTimeGage.Value = 0;            
+        }
         canHandleInput.Value = false;
         canPlayerMove.Value = false;
         // PlayerStateが終了したときの処理を書く
