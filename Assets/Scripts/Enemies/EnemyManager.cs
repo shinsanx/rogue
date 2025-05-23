@@ -34,24 +34,29 @@ public class EnemyManager : MonoBehaviour {
         playerPos = _playerPos.Value;
         enemies = objectDataSet.GetAllEnemies().Distinct().ToList();
 
-        // Move組：並列
+        /* ──────────────── Move 組（並列）──────────── */
         var moveTasks = new List<Task>();
         foreach (var enemy in enemies) {
             enemy.Tick();
             if (!enemy.CanAct()) continue;
-            EnemyAction action = AIStart(enemy, allowMove: true, allowAttack: false);
-            if (action.Type == ActionType.Move) {
+
+            // ★ Handler を生成して行動決定
+            var brain = new EnemyAIHandler(enemy, objectDataSet, playerPos);
+            var action = brain.DecideAction(allowMove: true, allowAttack: false);
+
+            if (action.Type == ActionType.Move)
                 moveTasks.Add(enemy.ExecuteActionAsync(action));
-            }
         }
         await Task.WhenAll(moveTasks);
         await Task.Yield();
 
-        // Attack組：1体ずつ順番に
-
+        /* ──────────────── Attack 組（順番）──────────── */
         foreach (var enemy in enemies) {
             if (!enemy.CanAct()) continue;
-            EnemyAction action = AIStart(enemy, allowMove: false, allowAttack: true);
+
+            var brain = new EnemyAIHandler(enemy, objectDataSet, playerPos);
+            var action = brain.DecideAction(allowMove: false, allowAttack: true);
+
             if (action.Type == ActionType.Attack) {
                 if (!isPlayerMoveComplete.Value) {
                     Debug.Log("Playerが移動完了していないため、待ちます");
@@ -68,6 +73,7 @@ public class EnemyManager : MonoBehaviour {
 
 
 
+    /*
 
     public EnemyAction AIStart(Enemy enemy, bool allowMove = true, bool allowAttack = true) {
         ResetEnemyAction();
@@ -461,7 +467,7 @@ public class EnemyManager : MonoBehaviour {
 
 
 
-
+*/
 
 
 
